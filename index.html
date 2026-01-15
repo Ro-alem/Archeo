@@ -6,10 +6,8 @@
     <title>ArchaeoPoint - От раскопа до карты в один клик</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css" />
-    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css" />
-    <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#8B4513">
     <style>
         /* Основные стили */
         * {
@@ -31,6 +29,7 @@
             --info-color: #3498db;
             --shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
             --border-radius: 8px;
+            --transition: all 0.3s ease;
         }
 
         body {
@@ -38,6 +37,12 @@
             color: #333;
             min-height: 100vh;
             overflow-x: hidden;
+            transition: var(--transition);
+        }
+
+        body.dark-mode {
+            background-color: #121212;
+            color: #e0e0e0;
         }
 
         .container {
@@ -45,6 +50,42 @@
             min-height: 100vh;
             display: flex;
             flex-direction: column;
+        }
+
+        /* Уведомление о работе в офлайн-режиме */
+        #offline-notification {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background-color: #f39c12;
+            color: white;
+            padding: 10px;
+            text-align: center;
+            z-index: 2000;
+            display: none;
+        }
+
+        #offline-notification.show {
+            display: block;
+            animation: slideDown 0.3s ease;
+        }
+
+        @keyframes slideDown {
+            from { transform: translateY(-100%); }
+            to { transform: translateY(0); }
+        }
+
+        /* Прогресс бар загрузки */
+        .progress-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 3px;
+            background-color: var(--primary-color);
+            width: 0%;
+            z-index: 2001;
+            transition: width 0.3s ease;
         }
 
         /* Шапка */
@@ -57,6 +98,10 @@
             align-items: center;
             box-shadow: var(--shadow);
             z-index: 1000;
+        }
+
+        .dark-mode header {
+            background: linear-gradient(135deg, #1a1a1a, #2d2d2d);
         }
 
         .logo {
@@ -84,7 +129,7 @@
         nav ul {
             display: flex;
             list-style: none;
-            gap: 2rem;
+            gap: 1rem;
         }
 
         nav a {
@@ -93,11 +138,54 @@
             font-weight: 500;
             padding: 0.5rem 1rem;
             border-radius: var(--border-radius);
-            transition: all 0.3s ease;
+            transition: var(--transition);
         }
 
         nav a:hover {
             background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .header-controls {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .theme-toggle {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.2rem;
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: var(--border-radius);
+            transition: var(--transition);
+        }
+
+        .theme-toggle:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .sync-status {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.8rem;
+            padding: 0.3rem 0.8rem;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+        }
+
+        .sync-status.syncing {
+            color: #f39c12;
+        }
+
+        .sync-status.synced {
+            color: #27ae60;
+        }
+
+        .sync-status.offline {
+            color: #e74c3c;
         }
 
         .user-info {
@@ -121,6 +209,10 @@
         main {
             flex: 1;
             padding: 2rem;
+        }
+
+        .dark-mode main {
+            background-color: #121212;
         }
 
         /* Стили для страниц */
@@ -149,6 +241,11 @@
             text-align: center;
         }
 
+        .dark-mode .gatekeeper {
+            background-color: #1e1e1e;
+            color: #e0e0e0;
+        }
+
         .gatekeeper h2 {
             margin-bottom: 1rem;
             color: var(--primary-color);
@@ -158,6 +255,10 @@
             margin-bottom: 2rem;
             color: #666;
             line-height: 1.6;
+        }
+
+        .dark-mode .gatekeeper p {
+            color: #aaa;
         }
 
         .form-group {
@@ -172,18 +273,72 @@
             color: var(--dark-color);
         }
 
+        .dark-mode .form-group label {
+            color: #e0e0e0;
+        }
+
         .form-control {
             width: 100%;
             padding: 0.75rem 1rem;
             border: 1px solid #ddd;
             border-radius: var(--border-radius);
             font-size: 1rem;
-            transition: border-color 0.3s ease;
+            transition: var(--transition);
+            background-color: white;
+            color: #333;
+        }
+
+        .dark-mode .form-control {
+            background-color: #2d2d2d;
+            border-color: #444;
+            color: #e0e0e0;
         }
 
         .form-control:focus {
             outline: none;
             border-color: var(--primary-color);
+        }
+
+        .input-with-icon {
+            position: relative;
+        }
+
+        .input-with-icon .form-control {
+            padding-left: 3rem;
+        }
+
+        .input-icon {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #666;
+        }
+
+        /* 2FA стили */
+        .two-factor-form {
+            display: none;
+        }
+
+        .two-factor-code {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .two-factor-code input {
+            width: 100%;
+            height: 50px;
+            text-align: center;
+            font-size: 1.5rem;
+            border: 2px solid #ddd;
+            border-radius: var(--border-radius);
+        }
+
+        .two-factor-code input:focus {
+            border-color: var(--primary-color);
+            outline: none;
         }
 
         .btn {
@@ -196,7 +351,7 @@
             font-size: 1rem;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: var(--transition);
             text-decoration: none;
         }
 
@@ -225,8 +380,17 @@
             background-color: var(--warning-color);
         }
 
+        .btn-info {
+            background-color: var(--info-color);
+        }
+
         .btn-block {
             width: 100%;
+        }
+
+        .btn-sm {
+            padding: 0.4rem 1rem;
+            font-size: 0.9rem;
         }
 
         .link-btn {
@@ -236,6 +400,10 @@
             cursor: pointer;
             text-decoration: underline;
             font-size: 0.9rem;
+        }
+
+        .dark-mode .link-btn {
+            color: var(--accent-color);
         }
 
         .alert {
@@ -262,6 +430,22 @@
             border: 1px solid #bee5eb;
         }
 
+        .alert-warning {
+            background-color: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+
+        .dark-mode .alert-success {
+            background-color: #155724;
+            color: #d4edda;
+        }
+
+        .dark-mode .alert-info {
+            background-color: #0c5460;
+            color: #d1ecf1;
+        }
+
         /* Добро пожаловать */
         .welcome-hero {
             text-align: center;
@@ -270,6 +454,10 @@
             border-radius: var(--border-radius);
             margin-bottom: 3rem;
             box-shadow: var(--shadow);
+        }
+
+        .dark-mode .welcome-hero {
+            background: linear-gradient(135deg, #2d2d2d, #1e1e1e);
         }
 
         .welcome-hero h1 {
@@ -286,6 +474,10 @@
             line-height: 1.6;
         }
 
+        .dark-mode .welcome-hero p {
+            color: #aaa;
+        }
+
         .features {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
@@ -298,7 +490,11 @@
             padding: 2rem;
             border-radius: var(--border-radius);
             box-shadow: var(--shadow);
-            transition: transform 0.3s ease;
+            transition: var(--transition);
+        }
+
+        .dark-mode .feature-card {
+            background-color: #1e1e1e;
         }
 
         .feature-card:hover {
@@ -314,6 +510,10 @@
         .feature-card h3 {
             margin-bottom: 1rem;
             color: var(--dark-color);
+        }
+
+        .dark-mode .feature-card h3 {
+            color: #e0e0e0;
         }
 
         /* Интерактивная карта */
@@ -341,9 +541,14 @@
             padding: 1rem;
             border-radius: var(--border-radius);
             box-shadow: var(--shadow);
-            width: 280px;
+            width: 300px;
             max-height: 90vh;
             overflow-y: auto;
+        }
+
+        .dark-mode .map-controls {
+            background-color: #1e1e1e;
+            color: #e0e0e0;
         }
 
         .map-controls h3 {
@@ -355,10 +560,28 @@
             gap: 0.5rem;
         }
 
-        .layer-control, .artifact-control {
+        .map-controls-section {
             margin-bottom: 1rem;
             padding-bottom: 1rem;
             border-bottom: 1px solid #eee;
+        }
+
+        .dark-mode .map-controls-section {
+            border-bottom-color: #444;
+        }
+
+        .map-controls-section h4 {
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        .dark-mode .map-controls-section h4 {
+            color: #aaa;
+        }
+
+        .layer-control, .artifact-control {
+            margin-bottom: 0.5rem;
         }
 
         .layer-control label, .artifact-control label {
@@ -367,11 +590,12 @@
             gap: 0.5rem;
             margin-bottom: 0.5rem;
             cursor: pointer;
+            font-size: 0.9rem;
         }
 
         .color-indicator {
-            width: 20px;
-            height: 20px;
+            width: 16px;
+            height: 16px;
             border-radius: 50%;
             display: inline-block;
             border: 1px solid #ddd;
@@ -402,15 +626,31 @@
             display: flex;
             align-items: center;
             gap: 0.5rem;
+            transition: var(--transition);
         }
 
         .map-tool-btn:hover {
             background-color: var(--secondary-color);
         }
 
-        .leaflet-control-zoom {
-            margin-top: 10px !important;
-            margin-right: 10px !important;
+        .map-tool-btn.active {
+            background-color: var(--secondary-color);
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .map-measurement-result {
+            position: absolute;
+            background-color: white;
+            padding: 0.5rem;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            z-index: 1000;
+            display: none;
+        }
+
+        .dark-mode .map-measurement-result {
+            background-color: #1e1e1e;
+            color: #e0e0e0;
         }
 
         /* Панель управления */
@@ -427,11 +667,19 @@
             box-shadow: var(--shadow);
         }
 
+        .dark-mode .dashboard-card {
+            background-color: #1e1e1e;
+        }
+
         .dashboard-card h3 {
             margin-bottom: 1.5rem;
             color: var(--primary-color);
             padding-bottom: 0.5rem;
             border-bottom: 2px solid var(--light-color);
+        }
+
+        .dark-mode .dashboard-card h3 {
+            border-bottom-color: #333;
         }
 
         .statistics {
@@ -447,6 +695,10 @@
             border-radius: var(--border-radius);
         }
 
+        .dark-mode .stat-item {
+            background-color: #2d2d2d;
+        }
+
         .stat-value {
             font-size: 2rem;
             font-weight: bold;
@@ -456,6 +708,10 @@
         .stat-label {
             font-size: 0.9rem;
             color: #666;
+        }
+
+        .dark-mode .stat-label {
+            color: #aaa;
         }
 
         .user-list {
@@ -468,6 +724,10 @@
             align-items: center;
             padding: 1rem;
             border-bottom: 1px solid #eee;
+        }
+
+        .dark-mode .user-item {
+            border-bottom-color: #333;
         }
 
         .user-item:last-child {
@@ -485,6 +745,10 @@
         .role-archaeologist { background-color: #d1ecf1; color: #0c5460; }
         .role-assistant { background-color: #fff3cd; color: #856404; }
 
+        .dark-mode .role-admin { background-color: #155724; color: #d4edda; }
+        .dark-mode .role-archaeologist { background-color: #0c5460; color: #d1ecf1; }
+        .dark-mode .role-assistant { background-color: #856404; color: #fff3cd; }
+
         /* Карточка артефакта */
         .artifact-form {
             max-width: 800px;
@@ -495,6 +759,10 @@
             box-shadow: var(--shadow);
         }
 
+        .dark-mode .artifact-form {
+            background-color: #1e1e1e;
+        }
+
         .form-row {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -502,8 +770,35 @@
             margin-bottom: 1.5rem;
         }
 
+        @media (max-width: 768px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+        }
+
         .form-full {
             grid-column: 1 / -1;
+        }
+
+        .coordinate-inputs {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .coordinate-inputs .form-control {
+            text-align: center;
+            font-family: monospace;
+        }
+
+        .gps-accuracy {
+            font-size: 0.8rem;
+            color: #666;
+            margin-top: 0.25rem;
+        }
+
+        .dark-mode .gps-accuracy {
+            color: #aaa;
         }
 
         .photo-upload {
@@ -512,11 +807,22 @@
             padding: 2rem;
             text-align: center;
             cursor: pointer;
-            transition: border-color 0.3s ease;
+            transition: var(--transition);
         }
 
         .photo-upload:hover {
             border-color: var(--primary-color);
+        }
+
+        .photo-upload-area {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .batch-upload-btn {
+            margin-top: 1rem;
         }
 
         .photo-preview {
@@ -531,6 +837,72 @@
             height: 150px;
             object-fit: cover;
             border-radius: var(--border-radius);
+            position: relative;
+        }
+
+        .photo-preview .remove-photo {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background-color: rgba(255, 0, 0, 0.7);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .ai-suggestion {
+            background-color: #e8f4fd;
+            border-left: 4px solid #3498db;
+            padding: 0.75rem;
+            margin-top: 0.5rem;
+            border-radius: 0 var(--border-radius) var(--border-radius) 0;
+        }
+
+        .dark-mode .ai-suggestion {
+            background-color: #0c3a5c;
+        }
+
+        .ai-suggestion p {
+            margin-bottom: 0.5rem;
+            color: #2c3e50;
+        }
+
+        .dark-mode .ai-suggestion p {
+            color: #e0e0e0;
+        }
+
+        .ai-confidence {
+            font-size: 0.8rem;
+            color: #7f8c8d;
+        }
+
+        .voice-input-btn {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: #666;
+            cursor: pointer;
+            font-size: 1.2rem;
+        }
+
+        .voice-input-btn.listening {
+            color: #e74c3c;
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
         }
 
         /* Личный кабинет */
@@ -541,6 +913,10 @@
             margin-bottom: 2rem;
             padding-bottom: 2rem;
             border-bottom: 1px solid #eee;
+        }
+
+        .dark-mode .profile-header {
+            border-bottom-color: #333;
         }
 
         .profile-avatar {
@@ -577,6 +953,10 @@
             margin-bottom: 2rem;
         }
 
+        .dark-mode .table-container {
+            background-color: #1e1e1e;
+        }
+
         table {
             width: 100%;
             border-collapse: collapse;
@@ -588,14 +968,26 @@
             border-bottom: 1px solid #eee;
         }
 
+        .dark-mode th, .dark-mode td {
+            border-bottom-color: #333;
+        }
+
         th {
             background-color: var(--light-color);
             color: var(--primary-color);
             font-weight: 600;
         }
 
+        .dark-mode th {
+            background-color: #2d2d2d;
+        }
+
         tr:hover {
             background-color: #f9f9f9;
+        }
+
+        .dark-mode tr:hover {
+            background-color: #2d2d2d;
         }
 
         /* Подвал */
@@ -605,6 +997,10 @@
             padding: 2rem;
             text-align: center;
             margin-top: 3rem;
+        }
+
+        .dark-mode footer {
+            background-color: #1a1a1a;
         }
 
         footer p {
@@ -644,8 +1040,9 @@
                 gap: 0.5rem;
             }
 
-            .form-row {
-                grid-template-columns: 1fr;
+            .header-controls {
+                flex-wrap: wrap;
+                justify-content: center;
             }
 
             .map-controls {
@@ -673,6 +1070,10 @@
                 margin: 2rem auto;
                 padding: 2rem 1.5rem;
             }
+
+            .coordinate-inputs {
+                grid-template-columns: 1fr;
+            }
         }
 
         /* Стили для модальных окон */
@@ -697,11 +1098,16 @@
             background-color: white;
             padding: 2rem;
             border-radius: var(--border-radius);
-            max-width: 500px;
+            max-width: 800px;
             width: 90%;
             max-height: 90vh;
             overflow-y: auto;
             box-shadow: 0 5px 25px rgba(0, 0, 0, 0.2);
+        }
+
+        .dark-mode .modal-content {
+            background-color: #1e1e1e;
+            color: #e0e0e0;
         }
 
         .modal-header {
@@ -711,6 +1117,10 @@
             margin-bottom: 1.5rem;
             padding-bottom: 1rem;
             border-bottom: 1px solid #eee;
+        }
+
+        .dark-mode .modal-header {
+            border-bottom-color: #333;
         }
 
         .modal-header h3 {
@@ -725,6 +1135,170 @@
             color: #999;
         }
 
+        /* Конструктор отчетов */
+        .report-builder {
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: 2rem;
+        }
+
+        .report-fields {
+            background-color: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: var(--border-radius);
+        }
+
+        .dark-mode .report-fields {
+            background-color: #2d2d2d;
+        }
+
+        .report-preview {
+            padding: 1.5rem;
+            background-color: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            min-height: 500px;
+        }
+
+        .dark-mode .report-preview {
+            background-color: #1e1e1e;
+        }
+
+        .field-checkbox {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.75rem;
+        }
+
+        /* Стратиграфия */
+        .stratigraphy-visualization {
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .stratigraphy-layers {
+            background-color: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: var(--border-radius);
+            max-height: 500px;
+            overflow-y: auto;
+        }
+
+        .dark-mode .stratigraphy-layers {
+            background-color: #2d2d2d;
+        }
+
+        .stratigraphy-canvas {
+            background-color: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            position: relative;
+            min-height: 500px;
+        }
+
+        .dark-mode .stratigraphy-canvas {
+            background-color: #1e1e1e;
+        }
+
+        .layer-item {
+            padding: 1rem;
+            background-color: white;
+            border-radius: var(--border-radius);
+            margin-bottom: 1rem;
+            cursor: move;
+            border-left: 4px solid #8B4513;
+        }
+
+        .dark-mode .layer-item {
+            background-color: #2d2d2d;
+        }
+
+        /* Пакетная загрузка */
+        .batch-upload {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+
+        .batch-files {
+            border: 2px dashed #ddd;
+            border-radius: var(--border-radius);
+            padding: 2rem;
+            text-align: center;
+            min-height: 300px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .batch-preview {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .batch-file-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.75rem;
+            border-bottom: 1px solid #eee;
+        }
+
+        .dark-mode .batch-file-item {
+            border-bottom-color: #333;
+        }
+
+        /* 3D визуализация */
+        .visualization-3d {
+            height: 500px;
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            background-color: #f0f0f0;
+            position: relative;
+        }
+
+        .dark-mode .visualization-3d {
+            background-color: #2d2d2d;
+        }
+
+        .visualization-controls {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            display: flex;
+            gap: 0.5rem;
+            z-index: 10;
+        }
+
+        /* Тепловая карта */
+        .heatmap-legend {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            background-color: white;
+            padding: 1rem;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            z-index: 1000;
+        }
+
+        .dark-mode .heatmap-legend {
+            background-color: #1e1e1e;
+            color: #e0e0e0;
+        }
+
+        .heatmap-gradient {
+            width: 200px;
+            height: 20px;
+            background: linear-gradient(to right, blue, cyan, green, yellow, red);
+            border-radius: 4px;
+            margin: 0.5rem 0;
+        }
+
         /* QR-код стили */
         .qr-code-container {
             text-align: center;
@@ -732,6 +1306,10 @@
             background-color: white;
             border-radius: var(--border-radius);
             box-shadow: var(--shadow);
+        }
+
+        .dark-mode .qr-code-container {
+            background-color: #1e1e1e;
         }
 
         .qr-code {
@@ -747,89 +1325,53 @@
             border: 1px dashed #ddd;
         }
 
-        /* Стили для кластеров на карте */
-        .marker-cluster-small {
-            background-color: rgba(181, 226, 140, 0.6);
-        }
-        .marker-cluster-small div {
-            background-color: rgba(110, 204, 57, 0.6);
+        .dark-mode .qr-code {
+            background-color: #2d2d2d;
+            color: #aaa;
         }
 
-        .marker-cluster-medium {
-            background-color: rgba(241, 211, 87, 0.6);
-        }
-        .marker-cluster-medium div {
-            background-color: rgba(240, 194, 12, 0.6);
-        }
-
-        .marker-cluster-large {
-            background-color: rgba(253, 156, 115, 0.6);
-        }
-        .marker-cluster-large div {
-            background-color: rgba(241, 128, 23, 0.6);
+        /* Стили для Leaflet */
+        .leaflet-control-zoom {
+            margin-top: 10px !important;
+            margin-right: 10px !important;
         }
 
-        /* Стили для попапов на карте */
-        .leaflet-popup-content {
-            min-width: 200px;
+        .leaflet-control-layers {
+            margin-top: 10px !important;
+            margin-right: 10px !important;
         }
 
-        .artifact-popup {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        .measurement-line {
+            stroke: #ff0000;
+            stroke-width: 3;
+            stroke-dasharray: 10, 10;
         }
 
-        .artifact-popup h3 {
-            color: var(--primary-color);
-            margin-bottom: 0.5rem;
-        }
-
-        .artifact-popup p {
-            margin-bottom: 0.5rem;
-            font-size: 0.9rem;
-        }
-
-        .artifact-popup img {
-            width: 100%;
-            height: 120px;
-            object-fit: cover;
-            border-radius: var(--border-radius);
-            margin-bottom: 0.5rem;
-        }
-
-        .popup-type {
-            display: inline-block;
-            padding: 0.2rem 0.5rem;
-            border-radius: 12px;
-            font-size: 0.8rem;
-            color: white;
-            margin-bottom: 0.5rem;
-        }
-
-        /* Легенда карты */
-        .map-legend {
+        .measurement-label {
             background-color: white;
-            padding: 0.75rem;
-            border-radius: var(--border-radius);
-            box-shadow: var(--shadow);
-            font-size: 0.85rem;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+            box-shadow: 0 0 5px rgba(0,0,0,0.3);
         }
 
-        .legend-item {
-            display: flex;
-            align-items: center;
-            margin-bottom: 0.5rem;
-        }
-
-        .legend-color {
-            width: 16px;
-            height: 16px;
-            border-radius: 50%;
-            margin-right: 0.5rem;
-            border: 1px solid #ddd;
+        .dark-mode .measurement-label {
+            background-color: #1e1e1e;
+            color: #e0e0e0;
         }
     </style>
 </head>
 <body>
+    <!-- Прогресс бар загрузки -->
+    <div class="progress-bar" id="progress-bar"></div>
+    
+    <!-- Уведомление о работе в офлайн-режиме -->
+    <div id="offline-notification">
+        <i class="fas fa-wifi-slash"></i> Вы работаете в офлайн-режиме. Данные будут синхронизированы при восстановлении соединения.
+        <span id="pending-changes">0 изменений ожидают синхронизации</span>
+    </div>
+    
     <div class="container">
         <!-- Защитный шлюз (Gatekeeper) - первая страница -->
         <div id="gatekeeper-page" class="page active">
@@ -850,16 +1392,37 @@
                 <div id="login-form">
                     <div class="form-group">
                         <label for="login-token">Токен экспедиции / Email</label>
-                        <input type="text" id="login-token" class="form-control" placeholder="Введите токен или email">
+                        <div class="input-with-icon">
+                            <i class="fas fa-user input-icon"></i>
+                            <input type="text" id="login-token" class="form-control" placeholder="Введите токен или email">
+                        </div>
                     </div>
                     
                     <div class="form-group">
                         <label for="login-password">Пароль</label>
-                        <input type="password" id="login-password" class="form-control" placeholder="Введите пароль">
+                        <div class="input-with-icon">
+                            <i class="fas fa-lock input-icon"></i>
+                            <input type="password" id="login-password" class="form-control" placeholder="Введите пароль">
+                        </div>
                     </div>
                     
                     <div class="form-group">
-                        <button id="login-btn" class="btn btn-block">Войти в систему</button>
+                        <div class="field-checkbox">
+                            <input type="checkbox" id="remember-me">
+                            <label for="remember-me">Запомнить меня</label>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <button id="login-btn" class="btn btn-block">
+                            <i class="fas fa-sign-in-alt"></i> Войти в систему
+                        </button>
+                    </div>
+                    
+                    <div class="form-group">
+                        <button id="enable-2fa" class="btn btn-secondary btn-block">
+                            <i class="fas fa-shield-alt"></i> Войти с двухфакторной аутентификацией
+                        </button>
                     </div>
                     
                     <div class="form-group" style="text-align: center;">
@@ -867,6 +1430,42 @@
                     </div>
                 </div>
                 
+                <!-- Форма двухфакторной аутентификации -->
+                <div id="two-factor-form" class="two-factor-form">
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle"></i> На ваш телефон отправлен код подтверждения. Введите 6-значный код для входа.
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Код подтверждения</label>
+                        <div class="two-factor-code">
+                            <input type="text" maxlength="1" pattern="[0-9]">
+                            <input type="text" maxlength="1" pattern="[0-9]">
+                            <input type="text" maxlength="1" pattern="[0-9]">
+                            <input type="text" maxlength="1" pattern="[0-9]">
+                            <input type="text" maxlength="1" pattern="[0-9]">
+                            <input type="text" maxlength="1" pattern="[0-9]">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <button id="verify-2fa-btn" class="btn btn-success btn-block">
+                            <i class="fas fa-check"></i> Подтвердить
+                        </button>
+                    </div>
+                    
+                    <div class="form-group">
+                        <button id="resend-code-btn" class="btn btn-secondary btn-block">
+                            <i class="fas fa-redo"></i> Отправить код повторно
+                        </button>
+                    </div>
+                    
+                    <div class="form-group" style="text-align: center;">
+                        <button id="back-to-login" class="link-btn">Вернуться к обычному входу</button>
+                    </div>
+                </div>
+                
+                <!-- Форма регистрации -->
                 <div id="register-form" style="display: none;">
                     <div class="alert alert-info">
                         <i class="fas fa-info-circle"></i> Запрос доступа отправляется начальнику экспедиции. После подтверждения вам будет предоставлен доступ.
@@ -880,6 +1479,11 @@
                     <div class="form-group">
                         <label for="register-email">Email</label>
                         <input type="email" id="register-email" class="form-control" placeholder="Введите ваш email">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="register-phone">Телефон</label>
+                        <input type="tel" id="register-phone" class="form-control" placeholder="+7 (XXX) XXX-XX-XX">
                     </div>
                     
                     <div class="form-group">
@@ -903,7 +1507,16 @@
                     </div>
                     
                     <div class="form-group">
-                        <button id="register-btn" class="btn btn-block btn-success">Отправить запрос</button>
+                        <div class="field-checkbox">
+                            <input type="checkbox" id="enable-2fa-register">
+                            <label for="enable-2fa-register">Включить двухфакторную аутентификацию для моего аккаунта</label>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <button id="register-btn" class="btn btn-block btn-success">
+                            <i class="fas fa-paper-plane"></i> Отправить запрос
+                        </button>
                     </div>
                     
                     <div class="form-group" style="text-align: center;">
@@ -935,15 +1548,26 @@
                 </ul>
             </nav>
             
-            <div class="user-info">
-                <div class="avatar" id="user-avatar">ИИ</div>
-                <div>
-                    <div id="user-name">Иван Археологов</div>
-                    <div id="user-role" style="font-size: 0.8rem; opacity: 0.8;">Археолог</div>
+            <div class="header-controls">
+                <div class="sync-status" id="sync-status">
+                    <i class="fas fa-sync"></i>
+                    <span>Синхронизировано</span>
                 </div>
-                <button id="logout-btn" class="btn btn-secondary" style="padding: 0.5rem 1rem; margin-left: 1rem;">
-                    <i class="fas fa-sign-out-alt"></i>
+                
+                <button class="theme-toggle" id="theme-toggle" title="Сменить тему">
+                    <i class="fas fa-moon"></i>
                 </button>
+                
+                <div class="user-info">
+                    <div class="avatar" id="user-avatar">ИИ</div>
+                    <div>
+                        <div id="user-name">Иван Археологов</div>
+                        <div id="user-role" style="font-size: 0.8rem; opacity: 0.8;">Археолог</div>
+                    </div>
+                    <button id="logout-btn" class="btn btn-secondary" style="padding: 0.5rem 1rem; margin-left: 1rem;">
+                        <i class="fas fa-sign-out-alt"></i>
+                    </button>
+                </div>
             </div>
         </header>
 
@@ -954,67 +1578,86 @@
                 <div class="welcome-hero">
                     <h1>Добро пожаловать в ArchaeoPoint</h1>
                     <p>Профессиональная платформа для цифровой фиксации и управления археологическими данными с точной ГИС-привязкой.</p>
-                    <button id="goto-map-btn" class="btn">
-                        <i class="fas fa-map-marked-alt"></i> Перейти к карте раскопок
-                    </button>
+                    <div class="map-tools" style="justify-content: center; margin-top: 2rem;">
+                        <button id="goto-map-btn" class="btn">
+                            <i class="fas fa-map-marked-alt"></i> Перейти к карте раскопок
+                        </button>
+                        <button id="quick-add-artifact" class="btn btn-success">
+                            <i class="fas fa-plus-circle"></i> Быстро добавить артефакт
+                        </button>
+                    </div>
                 </div>
                 
                 <div class="features">
                     <div class="feature-card">
                         <div class="feature-icon">
+                            <i class="fas fa-wifi-slash"></i>
+                        </div>
+                        <h3>Офлайн-режим</h3>
+                        <p>Работайте без интернета. Данные сохраняются локально и автоматически синхронизируются при появлении соединения.</p>
+                    </div>
+                    
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-robot"></i>
+                        </div>
+                        <h3>AI распознавание</h3>
+                        <p>Нейросеть анализирует фотографии и предлагает тип артефакта с указанием вероятности.</p>
+                    </div>
+                    
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-microphone"></i>
+                        </div>
+                        <h3>Голосовой ввод</h3>
+                        <p>Диктуйте описания голосом, когда руки заняты инструментами или испачканы землей.</p>
+                    </div>
+                    
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-layer-group"></i>
+                        </div>
+                        <h3>3D фиксация</h3>
+                        <p>Запись координат X, Y, Z для построения трехмерных моделей культурных слоев.</p>
+                    </div>
+                    
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-fire"></i>
+                        </div>
+                        <h3>Тепловые карты</h3>
+                        <p>Визуализация плотности находок для определения наиболее перспективных участков раскопа.</p>
+                    </div>
+                    
+                    <div class="feature-card">
+                        <div class="feature-icon">
                             <i class="fas fa-shield-alt"></i>
                         </div>
-                        <h3>Защита данных</h3>
-                        <p>Координаты объектов хранятся в зашифрованном виде. Полная конфиденциальность информации о местонахождении артефактов.</p>
-                    </div>
-                    
-                    <div class="feature-card">
-                        <div class="feature-icon">
-                            <i class="fas fa-map"></i>
-                        </div>
-                        <h3>Интерактивная карта</h3>
-                        <p>Точная визуализация находок на карте с поддержкой спутниковых снимков, топографических карт и схем раскопов.</p>
-                    </div>
-                    
-                    <div class="feature-card">
-                        <div class="feature-icon">
-                            <i class="fas fa-qrcode"></i>
-                        </div>
-                        <h3>QR-маркировка</h3>
-                        <p>Автоматическая генерация уникальных QR-кодов для каждого артефакта. Распечатайте и приклейте к бирке находки.</p>
-                    </div>
-                    
-                    <div class="feature-card">
-                        <div class="feature-icon">
-                            <i class="fas fa-database"></i>
-                        </div>
-                        <h3>Единая база данных</h3>
-                        <p>Замена бумажных дневников и разрозненных файлов на структурированную базу с историей изменений и контролем доступа.</p>
-                    </div>
-                    
-                    <div class="feature-card">
-                        <div class="feature-icon">
-                            <i class="fas fa-file-export"></i>
-                        </div>
-                        <h3>Экспорт отчетов</h3>
-                        <p>Формирование отчетов в PDF и Excel для сдачи в институт археологии. Поддержка стандартных форматов документации.</p>
-                    </div>
-                    
-                    <div class="feature-card">
-                        <div class="feature-icon">
-                            <i class="fas fa-users-cog"></i>
-                        </div>
-                        <h3>Управление доступом</h3>
-                        <p>Гибкая система ролей и прав. Начальник раскопа контролирует доступ сотрудников и целостность данных.</p>
+                        <h3>Двухфакторная аутентификация</h3>
+                        <p>Защита от неавторизованного доступа через SMS или приложение-аутентификатор.</p>
                     </div>
                 </div>
             </div>
 
             <!-- Карта раскопок -->
             <div id="map-page" class="page">
-                <h2 style="margin-bottom: 1rem; color: var(--primary-color);">
-                    <i class="fas fa-map-marked-alt"></i> Интерактивная карта раскопок
-                </h2>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                    <h2 style="color: var(--primary-color);">
+                        <i class="fas fa-map-marked-alt"></i> Интерактивная карта раскопок
+                    </h2>
+                    <div class="map-tools">
+                        <button id="toggle-heatmap" class="map-tool-btn">
+                            <i class="fas fa-fire"></i> Тепловая карта
+                        </button>
+                        <button id="toggle-3d" class="map-tool-btn">
+                            <i class="fas fa-cube"></i> 3D вид
+                        </button>
+                        <button id="measure-distance" class="map-tool-btn">
+                            <i class="fas fa-ruler"></i> Измерить
+                        </button>
+                    </div>
+                </div>
+                
                 <p style="margin-bottom: 1.5rem; color: #666;">Используйте карту для визуализации находок, добавления новых артефактов и анализа расположения объектов.</p>
                 
                 <div id="map-container">
@@ -1023,95 +1666,117 @@
                     <div class="map-controls">
                         <h3><i class="fas fa-layer-group"></i> Управление картой</h3>
                         
-                        <div class="layer-control">
+                        <div class="map-controls-section">
                             <h4>Слои карты:</h4>
-                            <label>
-                                <input type="radio" name="map-layer" value="osm" checked> 
-                                <span>Спутниковая карта</span>
-                            </label>
-                            <label>
-                                <input type="radio" name="map-layer" value="topo"> 
-                                <span>Топографическая карта</span>
-                            </label>
-                            <label>
-                                <input type="radio" name="map-layer" value="scheme"> 
-                                <span>Схема раскопа</span>
-                            </label>
+                            <div class="layer-control">
+                                <label>
+                                    <input type="radio" name="map-layer" value="osm" checked> 
+                                    <span>Спутниковая карта</span>
+                                </label>
+                            </div>
+                            <div class="layer-control">
+                                <label>
+                                    <input type="radio" name="map-layer" value="topo"> 
+                                    <span>Топографическая карта</span>
+                                </label>
+                            </div>
+                            <div class="layer-control">
+                                <label>
+                                    <input type="radio" name="map-layer" value="scheme"> 
+                                    <span>Схема раскопа</span>
+                                </label>
+                            </div>
                         </div>
                         
-                        <div class="artifact-control">
+                        <div class="map-controls-section">
                             <h4>Типы артефактов:</h4>
-                            <label>
-                                <input type="checkbox" name="artifact-type" value="gold" checked> 
-                                <span class="color-indicator artifact-gold"></span>
-                                <span>Золотые изделия</span>
-                            </label>
-                            <label>
-                                <input type="checkbox" name="artifact-type" value="ceramic" checked> 
-                                <span class="color-indicator artifact-ceramic"></span>
-                                <span>Керамика</span>
-                            </label>
-                            <label>
-                                <input type="checkbox" name="artifact-type" value="bones" checked> 
-                                <span class="color-indicator artifact-bones"></span>
-                                <span>Костные останки</span>
-                            </label>
-                            <label>
-                                <input type="checkbox" name="artifact-type" value="metal" checked> 
-                                <span class="color-indicator artifact-metal"></span>
-                                <span>Металлические изделия</span>
-                            </label>
-                            <label>
-                                <input type="checkbox" name="artifact-type" value="stone" checked> 
-                                <span class="color-indicator artifact-stone"></span>
-                                <span>Каменные изделия</span>
-                            </label>
-                            <label>
-                                <input type="checkbox" name="artifact-type" value="other" checked> 
-                                <span class="color-indicator artifact-other"></span>
-                                <span>Прочие находки</span>
-                            </label>
+                            <div class="artifact-control">
+                                <label>
+                                    <input type="checkbox" name="artifact-type" value="gold" checked> 
+                                    <span class="color-indicator artifact-gold"></span>
+                                    <span>Золотые изделия</span>
+                                </label>
+                            </div>
+                            <div class="artifact-control">
+                                <label>
+                                    <input type="checkbox" name="artifact-type" value="ceramic" checked> 
+                                    <span class="color-indicator artifact-ceramic"></span>
+                                    <span>Керамика</span>
+                                </label>
+                            </div>
+                            <div class="artifact-control">
+                                <label>
+                                    <input type="checkbox" name="artifact-type" value="bones" checked> 
+                                    <span class="color-indicator artifact-bones"></span>
+                                    <span>Костные останки</span>
+                                </label>
+                            </div>
+                            <div class="artifact-control">
+                                <label>
+                                    <input type="checkbox" name="artifact-type" value="metal" checked> 
+                                    <span class="color-indicator artifact-metal"></span>
+                                    <span>Металлические изделия</span>
+                                </label>
+                            </div>
+                            <div class="artifact-control">
+                                <label>
+                                    <input type="checkbox" name="artifact-type" value="stone" checked> 
+                                    <span class="color-indicator artifact-stone"></span>
+                                    <span>Каменные изделия</span>
+                                </label>
+                            </div>
+                            <div class="artifact-control">
+                                <label>
+                                    <input type="checkbox" name="artifact-type" value="other" checked> 
+                                    <span class="color-indicator artifact-other"></span>
+                                    <span>Прочие находки</span>
+                                </label>
+                            </div>
                         </div>
                         
-                        <div class="map-tools">
-                            <button id="add-artifact-btn" class="map-tool-btn">
-                                <i class="fas fa-plus"></i> Добавить находку
-                            </button>
-                            <button id="center-map-btn" class="map-tool-btn">
-                                <i class="fas fa-crosshairs"></i> Центрировать
-                            </button>
-                            <button id="show-legend-btn" class="map-tool-btn">
-                                <i class="fas fa-info-circle"></i> Легенда
-                            </button>
+                        <div class="map-controls-section">
+                            <h4>Инструменты:</h4>
+                            <div class="map-tools">
+                                <button id="add-artifact-btn" class="map-tool-btn">
+                                    <i class="fas fa-plus"></i> Добавить находку
+                                </button>
+                                <button id="center-map-btn" class="map-tool-btn">
+                                    <i class="fas fa-crosshairs"></i> Центрировать
+                                </button>
+                                <button id="show-legend-btn" class="map-tool-btn">
+                                    <i class="fas fa-info-circle"></i> Легенда
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="map-measurement-result" id="measurement-result"></div>
+                    <div class="heatmap-legend" id="heatmap-legend" style="display: none;">
+                        <h4>Плотность находок</h4>
+                        <div class="heatmap-gradient"></div>
+                        <div style="display: flex; justify-content: space-between; font-size: 0.8rem;">
+                            <span>Низкая</span>
+                            <span>Высокая</span>
                         </div>
                     </div>
                 </div>
                 
-                <div class="map-legend" style="margin-top: 1rem; display: none;" id="map-legend">
-                    <h4 style="margin-bottom: 0.5rem;">Легенда карты:</h4>
-                    <div class="legend-item">
-                        <span class="legend-color artifact-gold"></span>
-                        <span>Золотые изделия</span>
+                <!-- 3D визуализация -->
+                <div class="visualization-3d" id="visualization-3d" style="display: none; margin-top: 2rem;">
+                    <div style="position: absolute; top: 20px; left: 20px; color: #333; background-color: rgba(255,255,255,0.9); padding: 1rem; border-radius: var(--border-radius);">
+                        <h4>3D визуализация культурных слоев</h4>
+                        <p>Глубина отображена в метрах. Каждый цвет представляет разные типы артефактов.</p>
                     </div>
-                    <div class="legend-item">
-                        <span class="legend-color artifact-ceramic"></span>
-                        <span>Керамика</span>
-                    </div>
-                    <div class="legend-item">
-                        <span class="legend-color artifact-bones"></span>
-                        <span>Костные останки</span>
-                    </div>
-                    <div class="legend-item">
-                        <span class="legend-color artifact-metal"></span>
-                        <span>Металлические изделия</span>
-                    </div>
-                    <div class="legend-item">
-                        <span class="legend-color artifact-stone"></span>
-                        <span>Каменные изделия</span>
-                    </div>
-                    <div class="legend-item">
-                        <span class="legend-color artifact-other"></span>
-                        <span>Прочие находки</span>
+                    <div class="visualization-controls">
+                        <button id="rotate-3d" class="btn btn-sm">
+                            <i class="fas fa-sync"></i> Вращать
+                        </button>
+                        <button id="zoom-3d" class="btn btn-sm">
+                            <i class="fas fa-search"></i> Приблизить
+                        </button>
+                        <button id="reset-3d" class="btn btn-sm">
+                            <i class="fas fa-home"></i> Сброс
+                        </button>
                     </div>
                 </div>
             </div>
@@ -1122,9 +1787,17 @@
                     <h2 style="color: var(--primary-color);">
                         <i class="fas fa-history"></i> База артефактов
                     </h2>
-                    <button id="new-artifact-btn" class="btn">
-                        <i class="fas fa-plus"></i> Добавить новый артефакт
-                    </button>
+                    <div class="map-tools">
+                        <button id="new-artifact-btn" class="btn">
+                            <i class="fas fa-plus"></i> Добавить артефакт
+                        </button>
+                        <button id="batch-upload-btn" class="btn btn-info">
+                            <i class="fas fa-folder-plus"></i> Пакетная загрузка
+                        </button>
+                        <button id="export-artifacts-btn" class="btn btn-success">
+                            <i class="fas fa-file-export"></i> Экспорт
+                        </button>
+                    </div>
                 </div>
                 
                 <div class="table-container">
@@ -1135,8 +1808,9 @@
                                 <th>Название</th>
                                 <th>Тип</th>
                                 <th>Дата находки</th>
-                                <th>Координаты</th>
+                                <th>Координаты (X, Y, Z)</th>
                                 <th>Нашедший</th>
+                                <th>Слой</th>
                                 <th>Действия</th>
                             </tr>
                         </thead>
@@ -1144,6 +1818,25 @@
                             <!-- Данные загружаются через JavaScript -->
                         </tbody>
                     </table>
+                </div>
+                
+                <!-- Стратиграфия -->
+                <div class="stratigraphy-visualization">
+                    <div class="stratigraphy-layers">
+                        <h3>Стратиграфические слои</h3>
+                        <div id="layers-list">
+                            <!-- Слои загружаются через JavaScript -->
+                        </div>
+                        <button id="add-layer-btn" class="btn btn-block" style="margin-top: 1rem;">
+                            <i class="fas fa-plus"></i> Добавить слой
+                        </button>
+                    </div>
+                    <div class="stratigraphy-canvas" id="stratigraphy-canvas">
+                        <div style="position: absolute; top: 20px; left: 20px; color: #333; background-color: rgba(255,255,255,0.9); padding: 1rem; border-radius: var(--border-radius);">
+                            <h4>Визуализация стратиграфии</h4>
+                            <p>Перетащите артефакты на слои для привязки</p>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -1174,20 +1867,85 @@
                                 <div class="stat-label">За 7 дней</div>
                             </div>
                         </div>
+                        
+                        <h4 style="margin-top: 1.5rem;">Офлайн-данные</h4>
+                        <div style="margin-top: 1rem;">
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                                <span>Ожидающие синхронизации:</span>
+                                <span id="pending-sync-count">0</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between;">
+                                <span>Локальное хранилище:</span>
+                                <span id="storage-usage">0 MB</span>
+                            </div>
+                        </div>
                     </div>
                     
                     <div class="dashboard-card">
-                        <h3>Экспорт данных</h3>
+                        <h3>Конструктор отчетов</h3>
                         <p style="margin-bottom: 1.5rem;">Сформируйте отчет для сдачи в институт археологии:</p>
-                        <div style="display: flex; flex-direction: column; gap: 1rem;">
-                            <button id="export-pdf-btn" class="btn">
-                                <i class="fas fa-file-pdf"></i> Экспорт в PDF
+                        
+                        <div class="report-builder">
+                            <div class="report-fields">
+                                <h4>Поля отчета:</h4>
+                                <div class="field-checkbox">
+                                    <input type="checkbox" id="field-id" checked>
+                                    <label for="field-id">ID артефакта</label>
+                                </div>
+                                <div class="field-checkbox">
+                                    <input type="checkbox" id="field-name" checked>
+                                    <label for="field-name">Название</label>
+                                </div>
+                                <div class="field-checkbox">
+                                    <input type="checkbox" id="field-type" checked>
+                                    <label for="field-type">Тип</label>
+                                </div>
+                                <div class="field-checkbox">
+                                    <input type="checkbox" id="field-coords" checked>
+                                    <label for="field-coords">Координаты</label>
+                                </div>
+                                <div class="field-checkbox">
+                                    <input type="checkbox" id="field-depth" checked>
+                                    <label for="field-depth">Глубина</label>
+                                </div>
+                                <div class="field-checkbox">
+                                    <input type="checkbox" id="field-context">
+                                    <label for="field-context">Контекст</label>
+                                </div>
+                                <div class="field-checkbox">
+                                    <input type="checkbox" id="field-photos">
+                                    <label for="field-photos">Фотографии</label>
+                                </div>
+                                <div class="field-checkbox">
+                                    <input type="checkbox" id="field-layer">
+                                    <label for="field-layer">Стратиграфический слой</label>
+                                </div>
+                                
+                                <div style="margin-top: 1.5rem;">
+                                    <label for="report-format">Формат:</label>
+                                    <select id="report-format" class="form-control" style="margin-top: 0.5rem;">
+                                        <option value="pdf">PDF</option>
+                                        <option value="excel">Excel</option>
+                                        <option value="shapefile">Shapefile</option>
+                                        <option value="kml">KML (Google Earth)</option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <div class="report-preview">
+                                <h4>Предварительный просмотр</h4>
+                                <div id="report-preview-content" style="margin-top: 1rem;">
+                                    <!-- Предпросмотр отчета -->
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
+                            <button id="generate-report-btn" class="btn btn-success">
+                                <i class="fas fa-file-export"></i> Создать отчет
                             </button>
-                            <button id="export-excel-btn" class="btn btn-success">
-                                <i class="fas fa-file-excel"></i> Экспорт в Excel
-                            </button>
-                            <button id="export-shapefile-btn" class="btn btn-secondary">
-                                <i class="fas fa-file-export"></i> Экспорт в Shapefile
+                            <button id="preview-report-btn" class="btn">
+                                <i class="fas fa-eye"></i> Предпросмотр
                             </button>
                         </div>
                     </div>
@@ -1197,9 +1955,14 @@
                         <ul class="user-list" id="expedition-users">
                             <!-- Список пользователей загружается через JavaScript -->
                         </ul>
-                        <button id="add-user-btn" class="btn" style="margin-top: 1rem;">
-                            <i class="fas fa-user-plus"></i> Добавить участника
-                        </button>
+                        <div style="display: flex; gap: 0.5rem; margin-top: 1rem;">
+                            <button id="add-user-btn" class="btn">
+                                <i class="fas fa-user-plus"></i> Добавить участника
+                            </button>
+                            <button id="manage-2fa-btn" class="btn btn-secondary">
+                                <i class="fas fa-shield-alt"></i> Управление 2FA
+                            </button>
+                        </div>
                     </div>
                     
                     <div class="dashboard-card">
@@ -1217,6 +1980,18 @@
                                     <!-- Журнал загружается через JavaScript -->
                                 </tbody>
                             </table>
+                        </div>
+                        
+                        <div style="margin-top: 1.5rem;">
+                            <h4>Синхронизация данных</h4>
+                            <div style="display: flex; gap: 0.5rem; margin-top: 1rem;">
+                                <button id="force-sync-btn" class="btn btn-success">
+                                    <i class="fas fa-sync"></i> Принудительная синхронизация
+                                </button>
+                                <button id="clear-cache-btn" class="btn btn-danger">
+                                    <i class="fas fa-trash"></i> Очистить кеш
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -1279,7 +2054,7 @@
                     </div>
                     
                     <div class="form-group">
-                        <label for="profile-phone">Телефон</label>
+                        <label for="profile-phone">Телефон (для 2FA)</label>
                         <input type="tel" id="profile-phone" class="form-control" placeholder="+7 (XXX) XXX-XX-XX">
                     </div>
                     
@@ -1292,9 +2067,35 @@
                         </select>
                     </div>
                     
-                    <button id="save-profile-btn" class="btn">
-                        <i class="fas fa-save"></i> Сохранить изменения
-                    </button>
+                    <div class="form-group">
+                        <div class="field-checkbox">
+                            <input type="checkbox" id="enable-dark-mode" checked>
+                            <label for="enable-dark-mode">Темная тема (экономия заряда)</label>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <div class="field-checkbox">
+                            <input type="checkbox" id="enable-voice-input" checked>
+                            <label for="enable-voice-input">Включить голосовой ввод</label>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <div class="field-checkbox">
+                            <input type="checkbox" id="enable-ai-recognition" checked>
+                            <label for="enable-ai-recognition">Включить AI распознавание</label>
+                        </div>
+                    </div>
+                    
+                    <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
+                        <button id="save-profile-btn" class="btn">
+                            <i class="fas fa-save"></i> Сохранить изменения
+                        </button>
+                        <button id="setup-2fa-btn" class="btn btn-secondary">
+                            <i class="fas fa-shield-alt"></i> Настроить 2FA
+                        </button>
+                    </div>
                 </div>
             </div>
         </main>
@@ -1307,6 +2108,7 @@
                 <a href="#"><i class="fas fa-shield-alt"></i> Политика конфиденциальности</a>
                 <a href="#"><i class="fas fa-file-contract"></i> Пользовательское соглашение</a>
                 <a href="#"><i class="fas fa-envelope"></i> Контакты</a>
+                <a href="#" id="install-app-btn"><i class="fas fa-download"></i> Установить приложение</a>
             </div>
         </footer>
     </div>
@@ -1323,12 +2125,18 @@
                 <div class="form-row">
                     <div class="form-group">
                         <label for="artifact-name">Название артефакта *</label>
-                        <input type="text" id="artifact-name" class="form-control" placeholder="Например: Бронзовое зеркало">
+                        <div class="input-with-icon">
+                            <input type="text" id="artifact-name" class="form-control" placeholder="Например: Бронзовое зеркало">
+                            <button class="voice-input-btn" type="button" title="Голосовой ввод">
+                                <i class="fas fa-microphone"></i>
+                            </button>
+                        </div>
                     </div>
                     
                     <div class="form-group">
                         <label for="artifact-type">Тип артефакта *</label>
                         <select id="artifact-type" class="form-control">
+                            <option value="">-- Выберите тип --</option>
                             <option value="gold">Золотые изделия</option>
                             <option value="ceramic">Керамика</option>
                             <option value="bones">Костные останки</option>
@@ -1336,6 +2144,11 @@
                             <option value="stone">Каменные изделия</option>
                             <option value="other">Прочие находки</option>
                         </select>
+                        <div class="ai-suggestion" id="ai-suggestion" style="display: none;">
+                            <p>AI предлагает: <strong id="ai-suggested-type">Керамика</strong></p>
+                            <div class="ai-confidence">Доверие: <span id="ai-confidence">85%</span></div>
+                            <button id="apply-ai-suggestion" class="btn btn-sm" style="margin-top: 0.5rem;">Применить предложение</button>
+                        </div>
                     </div>
                 </div>
                 
@@ -1346,56 +2159,232 @@
                     </div>
                     
                     <div class="form-group">
-                        <label for="artifact-depth">Глубина (см)</label>
-                        <input type="number" id="artifact-depth" class="form-control" placeholder="Например: 45">
+                        <label for="artifact-layer">Стратиграфический слой</label>
+                        <select id="artifact-layer" class="form-control">
+                            <option value="">-- Выберите слой --</option>
+                            <option value="layer1">Слой I (современный)</option>
+                            <option value="layer2">Слой II (средневековый)</option>
+                            <option value="layer3">Слой III (античный)</option>
+                        </select>
                     </div>
                 </div>
                 
                 <div class="form-row">
                     <div class="form-group">
-                        <label for="artifact-coords-lat">Широта *</label>
-                        <input type="text" id="artifact-coords-lat" class="form-control" placeholder="44.123456" value="44.948237">
+                        <label>Координаты (WGS84) *</label>
+                        <div class="coordinate-inputs">
+                            <div>
+                                <input type="text" id="artifact-coords-lat" class="form-control" placeholder="Широта" value="44.948237">
+                                <div class="gps-accuracy" id="gps-accuracy-lat">Точность: ±0.000001°</div>
+                            </div>
+                            <div>
+                                <input type="text" id="artifact-coords-lng" class="form-control" placeholder="Долгота" value="34.100318">
+                                <div class="gps-accuracy" id="gps-accuracy-lng">Точность: ±0.000001°</div>
+                            </div>
+                            <div>
+                                <input type="text" id="artifact-coords-alt" class="form-control" placeholder="Высота (Z)" value="125.5">
+                                <div class="gps-accuracy" id="gps-accuracy-alt">Точность: ±0.1м</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="artifact-depth">Глубина (см)</label>
+                        <input type="number" id="artifact-depth" class="form-control" placeholder="Например: 45" value="45">
                     </div>
                     
                     <div class="form-group">
-                        <label for="artifact-coords-lng">Долгота *</label>
-                        <input type="text" id="artifact-coords-lng" class="form-control" placeholder="34.123456" value="34.100318">
+                        <button id="get-gps-location" class="btn btn-block" style="margin-top: 1.5rem;">
+                            <i class="fas fa-location-arrow"></i> Определить текущие координаты
+                        </button>
                     </div>
                 </div>
                 
                 <div class="form-group">
                     <label for="artifact-context">Контекст находки *</label>
-                    <textarea id="artifact-context" class="form-control" rows="3" placeholder="Описание слоя, квадрата раскопа, связанные находки..."></textarea>
+                    <div class="input-with-icon">
+                        <textarea id="artifact-context" class="form-control" rows="3" placeholder="Описание слоя, квадрата раскопа, связанные находки..."></textarea>
+                        <button class="voice-input-btn" type="button" title="Голосовой ввод">
+                            <i class="fas fa-microphone"></i>
+                        </button>
+                    </div>
                 </div>
                 
                 <div class="form-group">
                     <label for="artifact-description">Описание артефакта</label>
-                    <textarea id="artifact-description" class="form-control" rows="3" placeholder="Подробное описание находки..."></textarea>
+                    <div class="input-with-icon">
+                        <textarea id="artifact-description" class="form-control" rows="3" placeholder="Подробное описание находки..."></textarea>
+                        <button class="voice-input-btn" type="button" title="Голосовой ввод">
+                            <i class="fas fa-microphone"></i>
+                        </button>
+                    </div>
                 </div>
                 
                 <div class="form-group">
                     <label>Фотографии артефакта</label>
                     <div class="photo-upload" id="photo-upload-area">
-                        <i class="fas fa-camera" style="font-size: 2rem; color: #ccc; margin-bottom: 1rem;"></i>
-                        <p>Нажмите для загрузки фотографий</p>
-                        <p style="font-size: 0.8rem; color: #999;">Можно загрузить фото in situ и после очистки</p>
+                        <div class="photo-upload-area">
+                            <i class="fas fa-camera" style="font-size: 2rem; color: #ccc; margin-bottom: 1rem;"></i>
+                            <p>Нажмите для загрузки фотографий</p>
+                            <p style="font-size: 0.8rem; color: #999;">Можно загрузить фото in situ и после очистки</p>
+                            <button class="btn btn-secondary batch-upload-btn">
+                                <i class="fas fa-folder-plus"></i> Пакетная загрузка
+                            </button>
+                        </div>
                     </div>
                     <div class="photo-preview" id="photo-preview"></div>
                     <input type="file" id="photo-input" accept="image/*" multiple style="display: none;">
+                    <input type="file" id="batch-photo-input" accept="image/*" multiple style="display: none;">
                 </div>
                 
-                <div class="form-group" style="display: flex; gap: 1rem;">
-                    <button id="save-artifact-btn" class="btn btn-success">Сохранить артефакт</button>
+                <div class="form-group" style="display: flex; gap: 1rem; flex-wrap: wrap;">
+                    <button id="save-artifact-btn" class="btn btn-success">
+                        <i class="fas fa-save"></i> Сохранить артефакт
+                    </button>
+                    <button id="save-offline-btn" class="btn btn-warning">
+                        <i class="fas fa-wifi-slash"></i> Сохранить локально
+                    </button>
                     <button id="cancel-artifact-btn" class="btn btn-secondary">Отмена</button>
-                    <button id="get-location-btn" class="btn">
-                        <i class="fas fa-location-arrow"></i> Определить координаты
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно для пакетной загрузки -->
+    <div id="batch-upload-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-folder-plus"></i> Пакетная загрузка артефактов</h3>
+                <button class="close-modal">&times;</button>
+            </div>
+            
+            <div class="batch-upload">
+                <div class="batch-files" id="batch-drop-area">
+                    <i class="fas fa-cloud-upload-alt" style="font-size: 3rem; color: #ccc; margin-bottom: 1rem;"></i>
+                    <p>Перетащите сюда фотографии или нажмите для выбора</p>
+                    <p style="font-size: 0.8rem; color: #999; margin-top: 1rem;">Поддерживаются JPG, PNG, HEIC</p>
+                    <p style="font-size: 0.8rem; color: #999;">Максимум 100 файлов за раз</p>
+                </div>
+                
+                <div class="batch-preview" id="batch-preview">
+                    <h4>Выбранные файлы (0)</h4>
+                    <div id="batch-files-list"></div>
+                </div>
+            </div>
+            
+            <div class="form-group" style="margin-top: 2rem;">
+                <label>Настройки пакетной обработки:</label>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="batch-artifact-type">Тип по умолчанию</label>
+                        <select id="batch-artifact-type" class="form-control">
+                            <option value="other">Прочие находки</option>
+                            <option value="ceramic">Керамика</option>
+                            <option value="stone">Каменные изделия</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="batch-layer">Слой по умолчанию</label>
+                        <select id="batch-layer" class="form-control">
+                            <option value="">-- Выберите слой --</option>
+                            <option value="layer1">Слой I (современный)</option>
+                            <option value="layer2">Слой II (средневековый)</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            
+            <div style="display: flex; gap: 1rem; margin-top: 2rem;">
+                <button id="process-batch-btn" class="btn btn-success">
+                    <i class="fas fa-play"></i> Начать обработку
+                </button>
+                <button id="cancel-batch-btn" class="btn btn-secondary">Отмена</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно для двухфакторной аутентификации -->
+    <div id="twofa-setup-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-shield-alt"></i> Настройка двухфакторной аутентификации</h3>
+                <button class="close-modal">&times;</button>
+            </div>
+            
+            <div class="artifact-form">
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle"></i> Двухфакторная аутентификация добавляет дополнительный уровень безопасности к вашему аккаунту.
+                </div>
+                
+                <div class="form-group">
+                    <label>Способ аутентификации:</label>
+                    <div style="display: flex; gap: 1rem; margin-top: 0.5rem;">
+                        <label style="display: flex; align-items: center; gap: 0.5rem;">
+                            <input type="radio" name="twofa-method" value="sms" checked>
+                            <span>SMS</span>
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 0.5rem;">
+                            <input type="radio" name="twofa-method" value="app">
+                            <span>Приложение (Google Authenticator)</span>
+                        </label>
+                    </div>
+                </div>
+                
+                <div id="twofa-sms-section">
+                    <div class="form-group">
+                        <label for="twofa-phone">Номер телефона</label>
+                        <input type="tel" id="twofa-phone" class="form-control" placeholder="+7 (XXX) XXX-XX-XX">
+                    </div>
+                    
+                    <div class="form-group">
+                        <button id="send-sms-code-btn" class="btn">
+                            <i class="fas fa-sms"></i> Отправить код подтверждения
+                        </button>
+                    </div>
+                </div>
+                
+                <div id="twofa-app-section" style="display: none;">
+                    <div class="alert alert-info">
+                        <p>1. Установите приложение Google Authenticator на ваш телефон</p>
+                        <p>2. Отсканируйте QR-код ниже или введите код вручную</p>
+                    </div>
+                    
+                    <div class="qr-code-container">
+                        <div class="qr-code" id="twofa-qr-code">
+                            <!-- QR код для приложения -->
+                        </div>
+                        <p style="margin-top: 1rem;">Секретный ключ: <code id="twofa-secret">JBSWY3DPEHPK3PXP</code></p>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label>Код подтверждения</label>
+                    <div class="two-factor-code">
+                        <input type="text" maxlength="1" pattern="[0-9]">
+                        <input type="text" maxlength="1" pattern="[0-9]">
+                        <input type="text" maxlength="1" pattern="[0-9]">
+                        <input type="text" maxlength="1" pattern="[0-9]">
+                        <input type="text" maxlength="1" pattern="[0-9]">
+                        <input type="text" maxlength="1" pattern="[0-9]">
+                    </div>
+                </div>
+                
+                <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
+                    <button id="verify-twofa-btn" class="btn btn-success">
+                        <i class="fas fa-check"></i> Подтвердить и включить
+                    </button>
+                    <button id="disable-twofa-btn" class="btn btn-danger">
+                        <i class="fas fa-ban"></i> Отключить 2FA
                     </button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Модальное окно для QR-кода -->
+    <!-- Модальное окно для QR-кода артефакта -->
     <div id="qr-modal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
@@ -1413,9 +2402,14 @@
                 </div>
                 <p id="qr-artifact-name" style="font-weight: bold; margin-top: 1rem;">Бронзовое зеркало</p>
                 <p id="qr-artifact-id" style="font-size: 0.9rem; color: #666;">ID: AP-2023-001</p>
-                <button id="print-qr-btn" class="btn">
-                    <i class="fas fa-print"></i> Распечатать QR-код
-                </button>
+                <div style="display: flex; gap: 1rem; margin-top: 1.5rem; justify-content: center;">
+                    <button id="print-qr-btn" class="btn">
+                        <i class="fas fa-print"></i> Распечатать
+                    </button>
+                    <button id="download-qr-btn" class="btn btn-success">
+                        <i class="fas fa-download"></i> Скачать
+                    </button>
+                </div>
             </div>
         </div>
     </div>
@@ -1440,6 +2434,11 @@
                 </div>
                 
                 <div class="form-group">
+                    <label for="new-user-phone">Телефон</label>
+                    <input type="tel" id="new-user-phone" class="form-control" placeholder="+7 (XXX) XXX-XX-XX">
+                </div>
+                
+                <div class="form-group">
                     <label for="new-user-role">Роль *</label>
                     <select id="new-user-role" class="form-control">
                         <option value="archaeologist">Археолог</option>
@@ -1455,6 +2454,13 @@
                 </div>
                 
                 <div class="form-group">
+                    <div class="field-checkbox">
+                        <input type="checkbox" id="new-user-enable-2fa">
+                        <label for="new-user-enable-2fa">Включить двухфакторную аутентификацию</label>
+                    </div>
+                </div>
+                
+                <div class="form-group">
                     <button id="save-user-btn" class="btn btn-success">Добавить участника</button>
                     <button id="cancel-user-btn" class="btn btn-secondary">Отмена</button>
                 </div>
@@ -1462,46 +2468,194 @@
         </div>
     </div>
 
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
+    <script src="https://unpkg.com/leaflet.heat@0.2.0/dist/leaflet-heat.js"></script>
     <script>
-        // Глобальные переменные
+        // Глобальные переменные и константы
         let currentUser = null;
         let map = null;
         let markersCluster = null;
+        let heatmapLayer = null;
         let artifactMarkers = [];
         let artifacts = [];
+        let pendingSync = [];
         let users = [];
         let expeditions = [];
+        let isOnline = navigator.onLine;
+        let isMeasuring = false;
+        let measurementPoints = [];
+        let isListening = false;
+        let recognition = null;
         
-        // Базовые слои карты
-        let baseLayers = {
-            osm: null,
-            topo: null,
-            scheme: null
+        // Конфигурация
+        const CONFIG = {
+            OFFLINE_STORAGE_KEY: 'archaeopoint_offline_data',
+            SYNC_INTERVAL: 30000, // 30 секунд
+            MAX_OFFLINE_STORAGE: 50 * 1024 * 1024, // 50MB
+            GPS_ACCURACY_THRESHOLD: 10, // метров
+            AI_CONFIDENCE_THRESHOLD: 70 // %
         };
         
-        // Цвета для типов артефактов
-        const artifactColors = {
-            gold: '#FFD700',
-            ceramic: '#8B4513',
-            bones: '#F5F5DC',
-            metal: '#C0C0C0',
-            stone: '#808080',
-            other: '#9370DB'
-        };
-        
-        // Иконки для артефактов
-        const artifactIcons = {};
-        
-        // Инициализация иконок для карты
-        function initMapIcons() {
-            for (const type in artifactColors) {
-                artifactIcons[type] = L.divIcon({
-                    html: `<div style="background-color: ${artifactColors[type]}; width: 20px; height: 20px; border-radius: 50%; border: 2px solid white; box-shadow: 0 0 5px rgba(0,0,0,0.5);"></div>`,
-                    className: 'artifact-marker',
-                    iconSize: [24, 24]
-                });
+        // Симуляция AI распознавания
+        const AI_RECOGNITION = {
+            recognizeImage: function(imageData) {
+                // В реальном приложении здесь был бы вызов к нейросети
+                // Для демо используем случайные результаты
+                const types = ['ceramic', 'metal', 'stone', 'bones', 'gold', 'other'];
+                const probabilities = {
+                    ceramic: 85,
+                    metal: 75,
+                    stone: 90,
+                    bones: 80,
+                    gold: 40,
+                    other: 60
+                };
+                
+                const randomType = types[Math.floor(Math.random() * types.length)];
+                return {
+                    type: randomType,
+                    confidence: probabilities[randomType],
+                    suggestions: [
+                        `Похоже на ${this.getTypeName(randomType)}`,
+                        'Рекомендуется провести дополнительный анализ',
+                        'Проверьте контекст находки'
+                    ]
+                };
+            },
+            
+            getTypeName: function(type) {
+                const typeNames = {
+                    gold: "золотые изделия",
+                    ceramic: "керамику",
+                    bones: "костные останки",
+                    metal: "металлические изделия",
+                    stone: "каменные изделия",
+                    other: "прочие находки"
+                };
+                return typeNames[type] || "неизвестный тип";
             }
-        }
+        };
+        
+        // Симуляция голосового ввода
+        const VOICE_RECOGNITION = {
+            isSupported: 'webkitSpeechRecognition' in window || 'SpeechRecognition' in window,
+            
+            init: function() {
+                if (!this.isSupported) return null;
+                
+                const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+                recognition = new SpeechRecognition();
+                recognition.continuous = false;
+                recognition.interimResults = false;
+                recognition.lang = 'ru-RU';
+                
+                return recognition;
+            },
+            
+            start: function(onResult, onError) {
+                if (!recognition) {
+                    recognition = this.init();
+                    if (!recognition) {
+                        onError('Голосовой ввод не поддерживается вашим браузером');
+                        return;
+                    }
+                }
+                
+                recognition.onresult = function(event) {
+                    const transcript = event.results[0][0].transcript;
+                    onResult(transcript);
+                };
+                
+                recognition.onerror = function(event) {
+                    onError(event.error);
+                };
+                
+                recognition.start();
+                isListening = true;
+            },
+            
+            stop: function() {
+                if (recognition && isListening) {
+                    recognition.stop();
+                    isListening = false;
+                }
+            }
+        };
+        
+        // Офлайн-хранилище
+        const OFFLINE_STORAGE = {
+            save: function(key, data) {
+                try {
+                    const item = {
+                        data: data,
+                        timestamp: new Date().toISOString(),
+                        synced: false
+                    };
+                    localStorage.setItem(key, JSON.stringify(item));
+                    this.updatePendingSync();
+                    return true;
+                } catch (e) {
+                    console.error('Ошибка сохранения в локальное хранилище:', e);
+                    return false;
+                }
+            },
+            
+            load: function(key) {
+                try {
+                    const item = JSON.parse(localStorage.getItem(key));
+                    return item ? item.data : null;
+                } catch (e) {
+                    console.error('Ошибка загрузки из локального хранилища:', e);
+                    return null;
+                }
+            },
+            
+            remove: function(key) {
+                localStorage.removeItem(key);
+                this.updatePendingSync();
+            },
+            
+            getAll: function() {
+                const items = [];
+                for (let i = 0; i < localStorage.length; i++) {
+                    const key = localStorage.key(i);
+                    if (key.startsWith('artifact_') || key.startsWith('pending_')) {
+                        const item = JSON.parse(localStorage.getItem(key));
+                        items.push({ key, ...item });
+                    }
+                }
+                return items;
+            },
+            
+            updatePendingSync: function() {
+                const pending = this.getAll().filter(item => !item.synced);
+                pendingSync = pending;
+                
+                // Обновляем UI
+                const pendingCount = pending.length;
+                document.getElementById('pending-changes').textContent = `${pendingCount} изменений ожидают синхронизации`;
+                document.getElementById('pending-sync-count').textContent = pendingCount;
+                
+                if (pendingCount > 0) {
+                    document.getElementById('sync-status').className = 'sync-status syncing';
+                    document.getElementById('sync-status').innerHTML = `<i class="fas fa-sync fa-spin"></i> ${pendingCount} ожидают`;
+                } else {
+                    document.getElementById('sync-status').className = 'sync-status synced';
+                    document.getElementById('sync-status').innerHTML = `<i class="fas fa-check"></i> Синхронизировано`;
+                }
+            },
+            
+            getStorageUsage: function() {
+                let total = 0;
+                for (let i = 0; i < localStorage.length; i++) {
+                    const key = localStorage.key(i);
+                    const value = localStorage.getItem(key);
+                    total += key.length + value.length;
+                }
+                return (total / 1024 / 1024).toFixed(2); // MB
+            }
+        };
         
         // Инициализация карты
         function initMap() {
@@ -1511,23 +2665,33 @@
             // Инициализация карты
             map = L.map('map').setView(mapCenter, 16);
             
-            // Создание базовых слоев
-            baseLayers.osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            // Базовый слой OSM
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                 attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
                 maxZoom: 19
             }).addTo(map);
             
-            baseLayers.topo = L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', {
-                attribution: 'Map data: &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, <a href="http://viewfinderpanoramas.org">SRTM</a> | Map style: &copy; <a href="https://opentopomap.org">OpenTopoMap</a> (<a href="https://creativecommons.org/licenses/by-sa/3.0/">CC-BY-SA</a>)',
+            // Дополнительные слои
+            const topoLayer = L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', {
+                attribution: 'Map data: &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, <a href="http://viewfinderpanoramas.org">SRTM</a> | Map style: &copy; <a href="https://opentopomap.org">OpenTopoMap</a>',
                 maxZoom: 17
             });
             
-            baseLayers.scheme = L.tileLayer('https://stamen-tiles.a.ssl.fastly.net/toner/{z}/{x}/{y}.png', {
+            const schemeLayer = L.tileLayer('https://stamen-tiles.a.ssl.fastly.net/toner/{z}/{x}/{y}.png', {
                 attribution: 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, under <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a>. Data by <a href="http://openstreetmap.org">OpenStreetMap</a>, under <a href="http://www.openstreetmap.org/copyright">ODbL</a>.',
                 maxZoom: 20
             });
             
-            // Инициализация кластера маркеров
+            // Добавление контроля слоев
+            const baseLayers = {
+                "Спутниковая карта": L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'),
+                "Топографическая карта": topoLayer,
+                "Схема раскопа": schemeLayer
+            };
+            
+            L.control.layers(baseLayers).addTo(map);
+            
+            // Кластеризация маркеров
             markersCluster = L.markerClusterGroup({
                 maxClusterRadius: 50,
                 iconCreateFunction: function(cluster) {
@@ -1546,41 +2710,76 @@
             
             map.addLayer(markersCluster);
             
-            // Добавление элементов управления
-            L.control.zoom({ position: 'topright' }).addTo(map);
-            
-            // Добавление легенды
-            const legend = L.control({ position: 'bottomleft' });
-            
-            legend.onAdd = function(map) {
-                const div = L.DomUtil.create('div', 'map-legend');
-                div.innerHTML = `
-                    <h4>Легенда:</h4>
-                    <div><i style="background: #FFD700"></i> Золотые изделия</div>
-                    <div><i style="background: #8B4513"></i> Керамика</div>
-                    <div><i style="background: #F5F5DC"></i> Костные останки</div>
-                    <div><i style="background: #C0C0C0"></i> Металлические изделия</div>
-                    <div><i style="background: #808080"></i> Каменные изделия</div>
-                    <div><i style="background: #9370DB"></i> Прочие находки</div>
-                `;
-                return div;
-            };
-            
-            legend.addTo(map);
-            
-            // Обработчик клика по карте для добавления артефакта
-            map.on('click', function(e) {
-                if (document.getElementById('artifact-modal').classList.contains('active')) {
-                    document.getElementById('artifact-coords-lat').value = e.latlng.lat.toFixed(6);
-                    document.getElementById('artifact-coords-lng').value = e.latlng.lng.toFixed(6);
-                }
-            });
-            
             // Добавление тестовых данных
             addSampleArtifacts();
+            
+            // Инициализация инструментов карты
+            initMapTools();
         }
         
-        // Добавление тестовых артефактов на карту
+        // Инициализация инструментов карты
+        function initMapTools() {
+            // Обработчик для измерения расстояний
+            map.on('click', function(e) {
+                if (isMeasuring) {
+                    measurementPoints.push(e.latlng);
+                    
+                    if (measurementPoints.length === 1) {
+                        // Первая точка
+                        L.marker(e.latlng, {
+                            icon: L.divIcon({
+                                html: '<div style="background-color: red; width: 10px; height: 10px; border-radius: 50%;"></div>',
+                                iconSize: [10, 10]
+                            })
+                        }).addTo(map);
+                    } else if (measurementPoints.length === 2) {
+                        // Вторая точка - рисуем линию и вычисляем расстояние
+                        const p1 = measurementPoints[0];
+                        const p2 = measurementPoints[1];
+                        
+                        // Линия
+                        const line = L.polyline([p1, p2], {
+                            color: 'red',
+                            dashArray: '10, 10',
+                            weight: 3
+                        }).addTo(map);
+                        
+                        // Расстояние
+                        const distance = map.distance(p1, p2);
+                        const midpoint = L.latLng(
+                            (p1.lat + p2.lat) / 2,
+                            (p1.lng + p2.lng) / 2
+                        );
+                        
+                        // Метка с расстоянием
+                        L.marker(midpoint, {
+                            icon: L.divIcon({
+                                html: `<div class="measurement-label">${distance.toFixed(2)} м</div>`,
+                                iconSize: [100, 30],
+                                className: 'measurement-label'
+                            })
+                        }).addTo(map);
+                        
+                        // Показываем результат
+                        document.getElementById('measurement-result').innerHTML = 
+                            `Расстояние: <strong>${distance.toFixed(2)} метров</strong>`;
+                        document.getElementById('measurement-result').style.display = 'block';
+                        
+                        // Сбрасываем режим измерения
+                        isMeasuring = false;
+                        measurementPoints = [];
+                        
+                        // Скрываем результат через 5 секунд
+                        setTimeout(() => {
+                            document.getElementById('measurement-result').style.display = 'none';
+                            map.removeLayer(line);
+                        }, 5000);
+                    }
+                }
+            });
+        }
+        
+        // Добавление тестовых артефактов
         function addSampleArtifacts() {
             const sampleArtifacts = [
                 {
@@ -1589,12 +2788,15 @@
                     type: "metal",
                     lat: 44.948237,
                     lng: 34.100318,
+                    alt: 125.5,
                     date: "2023-06-10",
                     depth: 45,
                     context: "Квадрат 5А, культурный слой III",
                     description: "Бронзовое зеркало с орнаментом по краю",
                     discoveredBy: "Иван Археологов",
-                    photos: []
+                    layer: "layer3",
+                    photos: [],
+                    synced: true
                 },
                 {
                     id: 2,
@@ -1602,12 +2804,15 @@
                     type: "gold",
                     lat: 44.948537,
                     lng: 34.100618,
+                    alt: 126.2,
                     date: "2023-06-12",
                     depth: 32,
                     context: "Квадрат 5Б, погребение №3",
                     description: "Золотая подвеска с изображением орла",
                     discoveredBy: "Мария Петрова",
-                    photos: []
+                    layer: "layer2",
+                    photos: [],
+                    synced: true
                 },
                 {
                     id: 3,
@@ -1615,12 +2820,15 @@
                     type: "ceramic",
                     lat: 44.947937,
                     lng: 34.100018,
+                    alt: 124.8,
                     date: "2023-06-08",
                     depth: 58,
                     context: "Квадрат 4В, жилой слой",
                     description: "Фрагменты керамического сосуда",
                     discoveredBy: "Алексей Смирнов",
-                    photos: []
+                    layer: "layer3",
+                    photos: [],
+                    synced: true
                 },
                 {
                     id: 4,
@@ -1628,12 +2836,15 @@
                     type: "stone",
                     lat: 44.948037,
                     lng: 34.100918,
+                    alt: 125.0,
                     date: "2023-06-14",
                     depth: 40,
                     context: "Квадрат 6А, хозяйственная яма",
                     description: "Каменный топор с отверстием для рукояти",
                     discoveredBy: "Иван Археологов",
-                    photos: []
+                    layer: "layer1",
+                    photos: [],
+                    synced: true
                 },
                 {
                     id: 5,
@@ -1641,12 +2852,15 @@
                     type: "bones",
                     lat: 44.948737,
                     lng: 34.099918,
+                    alt: 124.5,
                     date: "2023-06-11",
                     depth: 62,
                     context: "Квадрат 5Г, погребение №5",
                     description: "Фрагменты костей животных",
                     discoveredBy: "Мария Петрова",
-                    photos: []
+                    layer: "layer3",
+                    photos: [],
+                    synced: true
                 }
             ];
             
@@ -1654,6 +2868,14 @@
             updateArtifactsOnMap();
             updateArtifactsTable();
             updateStatistics();
+            
+            // Сохраняем в локальное хранилище для демонстрации офлайн-работы
+            artifacts.forEach(artifact => {
+                OFFLINE_STORAGE.save(`artifact_${artifact.id}`, artifact);
+            });
+            
+            // Обновляем статус синхронизации
+            OFFLINE_STORAGE.updatePendingSync();
         }
         
         // Обновление артефактов на карте
@@ -1668,22 +2890,37 @@
                 selectedTypes.push(checkbox.value);
             });
             
+            // Цвета для типов артефактов
+            const artifactColors = {
+                gold: '#FFD700',
+                ceramic: '#8B4513',
+                bones: '#F5F5DC',
+                metal: '#C0C0C0',
+                stone: '#808080',
+                other: '#9370DB'
+            };
+            
             // Добавление маркеров для каждого артефакта
             artifacts.forEach(artifact => {
                 if (selectedTypes.includes(artifact.type)) {
-                    const marker = L.marker([artifact.lat, artifact.lng], {
-                        icon: artifactIcons[artifact.type]
+                    const icon = L.divIcon({
+                        html: `<div style="background-color: ${artifactColors[artifact.type]}; width: 20px; height: 20px; border-radius: 50%; border: 2px solid white; box-shadow: 0 0 5px rgba(0,0,0,0.5);"></div>`,
+                        className: 'artifact-marker',
+                        iconSize: [24, 24]
                     });
+                    
+                    const marker = L.marker([artifact.lat, artifact.lng], { icon });
                     
                     // Добавление попапа с информацией
                     const popupContent = `
                         <div class="artifact-popup">
                             <h3>${artifact.name}</h3>
-                            <div class="popup-type" style="background-color: ${artifactColors[artifact.type]}">
+                            <div style="background-color: ${artifactColors[artifact.type]}; display: inline-block; padding: 0.2rem 0.5rem; border-radius: 12px; color: ${artifact.type === 'bones' || artifact.type === 'metal' ? '#333' : 'white'}; font-size: 0.8rem;">
                                 ${getArtifactTypeName(artifact.type)}
                             </div>
                             <p><strong>Дата:</strong> ${artifact.date}</p>
                             <p><strong>Глубина:</strong> ${artifact.depth} см</p>
+                            <p><strong>Высота (Z):</strong> ${artifact.alt} м</p>
                             <p><strong>Нашел:</strong> ${artifact.discoveredBy}</p>
                             <p>${artifact.context}</p>
                             <button onclick="showArtifactDetails(${artifact.id})" class="btn" style="width: 100%; padding: 0.25rem; font-size: 0.8rem;">
@@ -1700,6 +2937,35 @@
             
             // Обновление кластера на карте
             map.addLayer(markersCluster);
+            
+            // Обновление тепловой карты, если включена
+            if (document.getElementById('toggle-heatmap').classList.contains('active')) {
+                updateHeatmap();
+            }
+        }
+        
+        // Обновление тепловой карты
+        function updateHeatmap() {
+            // Удаляем существующий слой тепловой карты
+            if (heatmapLayer) {
+                map.removeLayer(heatmapLayer);
+            }
+            
+            // Создаем точки для тепловой карты
+            const heatPoints = artifacts.map(artifact => [artifact.lat, artifact.lng, 1]);
+            
+            // Создаем тепловую карту
+            heatmapLayer = L.heatLayer(heatPoints, {
+                radius: 25,
+                blur: 15,
+                maxZoom: 17,
+                gradient: {0.4: 'blue', 0.6: 'cyan', 0.7: 'lime', 0.8: 'yellow', 1.0: 'red'}
+            });
+            
+            map.addLayer(heatmapLayer);
+            
+            // Показываем легенду
+            document.getElementById('heatmap-legend').style.display = 'block';
         }
         
         // Получение названия типа артефакта
@@ -1720,18 +2986,100 @@
             // Проверка авторизации
             checkAuth();
             
-            // Инициализация иконок для карты
-            initMapIcons();
+            // Инициализация отслеживания сетевого соединения
+            initNetworkMonitoring();
             
-            // Обработчики навигации
-            document.querySelectorAll('nav a').forEach(link => {
-                link.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    const pageId = this.id.replace('nav-', '') + '-page';
-                    showPage(pageId);
+            // Инициализация PWA
+            initPWA();
+            
+            // Инициализация обработчиков событий
+            initEventHandlers();
+            
+            // Инициализация тестовых данных
+            initTestData();
+            
+            // Запуск синхронизации
+            startSyncService();
+        });
+        
+        // Инициализация отслеживания сетевого соединения
+        function initNetworkMonitoring() {
+            // Проверка начального состояния
+            updateOnlineStatus();
+            
+            // Слушатели событий сети
+            window.addEventListener('online', updateOnlineStatus);
+            window.addEventListener('offline', updateOnlineStatus);
+        }
+        
+        // Обновление статуса сети
+        function updateOnlineStatus() {
+            isOnline = navigator.onLine;
+            
+            if (isOnline) {
+                document.getElementById('offline-notification').classList.remove('show');
+                document.getElementById('sync-status').classList.remove('offline');
+                
+                // Пытаемся синхронизировать накопленные данные
+                syncPendingData();
+            } else {
+                document.getElementById('offline-notification').classList.add('show');
+                document.getElementById('sync-status').className = 'sync-status offline';
+                document.getElementById('sync-status').innerHTML = `<i class="fas fa-wifi-slash"></i> Офлайн`;
+            }
+        }
+        
+        // Инициализация PWA
+        function initPWA() {
+            // Проверка поддержки Service Worker
+            if ('serviceWorker' in navigator) {
+                // Регистрация Service Worker
+                navigator.serviceWorker.register('/sw.js').catch(error => {
+                    console.log('Ошибка регистрации Service Worker:', error);
                 });
-            });
+                
+                // Обработчик события beforeinstallprompt
+                let deferredPrompt;
+                
+                window.addEventListener('beforeinstallprompt', (e) => {
+                    // Предотвращаем автоматическое отображение prompt
+                    e.preventDefault();
+                    deferredPrompt = e;
+                    
+                    // Показываем кнопку установки
+                    document.getElementById('install-app-btn').style.display = 'inline-block';
+                    
+                    // Обработчик для кнопки установки
+                    document.getElementById('install-app-btn').addEventListener('click', () => {
+                        // Показываем prompt установки
+                        deferredPrompt.prompt();
+                        
+                        // Ожидаем ответа пользователя
+                        deferredPrompt.userChoice.then((choiceResult) => {
+                            if (choiceResult.outcome === 'accepted') {
+                                console.log('Пользователь установил приложение');
+                            }
+                            deferredPrompt = null;
+                        });
+                    });
+                });
+                
+                // Обработчик события appinstalled
+                window.addEventListener('appinstalled', () => {
+                    console.log('Приложение установлено');
+                    document.getElementById('install-app-btn').style.display = 'none';
+                });
+            }
             
+            // Проверка, запущено ли приложение в standalone режиме
+            if (window.matchMedia('(display-mode: standalone)').matches || 
+                window.navigator.standalone === true) {
+                console.log('Приложение запущено в standalone режиме');
+            }
+        }
+        
+        // Инициализация обработчиков событий
+        function initEventHandlers() {
             // Обработчики для страницы входа
             document.getElementById('show-register').addEventListener('click', function() {
                 document.getElementById('login-form').style.display = 'none';
@@ -1740,6 +3088,16 @@
             
             document.getElementById('show-login').addEventListener('click', function() {
                 document.getElementById('register-form').style.display = 'none';
+                document.getElementById('login-form').style.display = 'block';
+            });
+            
+            document.getElementById('enable-2fa').addEventListener('click', function() {
+                document.getElementById('login-form').style.display = 'none';
+                document.getElementById('two-factor-form').style.display = 'block';
+            });
+            
+            document.getElementById('back-to-login').addEventListener('click', function() {
+                document.getElementById('two-factor-form').style.display = 'none';
                 document.getElementById('login-form').style.display = 'block';
             });
             
@@ -1754,6 +3112,19 @@
                 }
             });
             
+            document.getElementById('verify-2fa-btn').addEventListener('click', function() {
+                // Проверка кода двухфакторной аутентификации
+                const code = Array.from(document.querySelectorAll('.two-factor-code input'))
+                    .map(input => input.value)
+                    .join('');
+                
+                if (code.length === 6) {
+                    loginUser('admin@archaeopoint.ru', 'admin123', true);
+                } else {
+                    showAlert('Введите полный 6-значный код', 'danger');
+                }
+            });
+            
             document.getElementById('register-btn').addEventListener('click', function() {
                 const name = document.getElementById('register-name').value;
                 const email = document.getElementById('register-email').value;
@@ -1763,6 +3134,7 @@
                     showAlert('Запрос доступа отправлен начальнику экспедиции. Вы получите уведомление на email после подтверждения.', 'success');
                     document.getElementById('register-form').style.display = 'none';
                     document.getElementById('login-form').style.display = 'block';
+                    
                     // Очистка полей
                     document.getElementById('register-name').value = '';
                     document.getElementById('register-email').value = '';
@@ -1773,15 +3145,56 @@
                 }
             });
             
+            // Переключение темы
+            document.getElementById('theme-toggle').addEventListener('click', function() {
+                const isDarkMode = document.body.classList.toggle('dark-mode');
+                const icon = this.querySelector('i');
+                
+                if (isDarkMode) {
+                    icon.className = 'fas fa-sun';
+                    localStorage.setItem('archaeopoint_theme', 'dark');
+                } else {
+                    icon.className = 'fas fa-moon';
+                    localStorage.setItem('archaeopoint_theme', 'light');
+                }
+            });
+            
+            // Переключение темной темы в настройках
+            document.getElementById('enable-dark-mode').addEventListener('change', function() {
+                if (this.checked) {
+                    document.body.classList.add('dark-mode');
+                    document.getElementById('theme-toggle').querySelector('i').className = 'fas fa-sun';
+                    localStorage.setItem('archaeopoint_theme', 'dark');
+                } else {
+                    document.body.classList.remove('dark-mode');
+                    document.getElementById('theme-toggle').querySelector('i').className = 'fas fa-moon';
+                    localStorage.setItem('archaeopoint_theme', 'light');
+                }
+            });
+            
+            // Обработчики для навигации
+            document.querySelectorAll('nav a').forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const pageId = this.id.replace('nav-', '') + '-page';
+                    showPage(pageId);
+                });
+            });
+            
             // Обработчики для главной страницы
             document.getElementById('goto-map-btn').addEventListener('click', function() {
                 showPage('map-page');
             });
             
+            document.getElementById('quick-add-artifact').addEventListener('click', function() {
+                showModal('artifact-modal');
+            });
+            
             // Обработчики для карты
             document.querySelectorAll('input[name="map-layer"]').forEach(radio => {
                 radio.addEventListener('change', function() {
-                    changeMapLayer(this.value);
+                    // В реальном приложении здесь была бы смена слоев карты
+                    console.log('Выбран слой:', this.value);
                 });
             });
             
@@ -1806,7 +3219,51 @@
             
             document.getElementById('show-legend-btn').addEventListener('click', function() {
                 const legend = document.getElementById('map-legend');
-                legend.style.display = legend.style.display === 'block' ? 'none' : 'block';
+                if (legend) {
+                    legend.style.display = legend.style.display === 'block' ? 'none' : 'block';
+                }
+            });
+            
+            // Тепловая карта
+            document.getElementById('toggle-heatmap').addEventListener('click', function() {
+                this.classList.toggle('active');
+                
+                if (this.classList.contains('active')) {
+                    updateHeatmap();
+                    document.getElementById('heatmap-legend').style.display = 'block';
+                } else {
+                    if (heatmapLayer) {
+                        map.removeLayer(heatmapLayer);
+                        heatmapLayer = null;
+                    }
+                    document.getElementById('heatmap-legend').style.display = 'none';
+                }
+            });
+            
+            // 3D вид
+            document.getElementById('toggle-3d').addEventListener('click', function() {
+                this.classList.toggle('active');
+                const visualization = document.getElementById('visualization-3d');
+                
+                if (this.classList.contains('active')) {
+                    visualization.style.display = 'block';
+                    showAlert('3D визуализация включена. В реальном приложении здесь был бы трехмерный вид культурных слоев.', 'info');
+                } else {
+                    visualization.style.display = 'none';
+                }
+            });
+            
+            // Измерение расстояний
+            document.getElementById('measure-distance').addEventListener('click', function() {
+                isMeasuring = !isMeasuring;
+                this.classList.toggle('active');
+                
+                if (isMeasuring) {
+                    measurementPoints = [];
+                    showAlert('Режим измерения расстояний включен. Кликните на две точки на карте.', 'info');
+                } else {
+                    showAlert('Режим измерения расстояний выключен.', 'info');
+                }
             });
             
             // Обработчики для модальных окон
@@ -1824,68 +3281,112 @@
                 hideAllModals();
             });
             
-            document.getElementById('get-location-btn').addEventListener('click', function() {
+            document.getElementById('cancel-batch-btn').addEventListener('click', function() {
+                hideAllModals();
+            });
+            
+            // Определение координат по GPS
+            document.getElementById('get-gps-location').addEventListener('click', function() {
                 if (navigator.geolocation) {
-                    navigator.geolocation.getCurrentPosition(function(position) {
-                        document.getElementById('artifact-coords-lat').value = position.coords.latitude.toFixed(6);
-                        document.getElementById('artifact-coords-lng').value = position.coords.longitude.toFixed(6);
-                        showAlert('Координаты успешно определены!', 'success');
-                    }, function(error) {
-                        showAlert('Не удалось определить координаты. Пожалуйста, введите вручную.', 'danger');
-                    });
+                    showProgress('Определение координат...', 30);
+                    
+                    navigator.geolocation.getCurrentPosition(
+                        function(position) {
+                            const lat = position.coords.latitude;
+                            const lng = position.coords.longitude;
+                            const accuracy = position.coords.accuracy; // в метрах
+                            
+                            // Преобразуем точность в градусы (приблизительно)
+                            const accuracyDeg = accuracy / 111320; // 1 градус ≈ 111.32 км
+                            
+                            document.getElementById('artifact-coords-lat').value = lat.toFixed(6);
+                            document.getElementById('artifact-coords-lng').value = lng.toFixed(6);
+                            document.getElementById('artifact-coords-alt').value = position.coords.altitude ? 
+                                position.coords.altitude.toFixed(1) : '0.0';
+                            
+                            // Показываем точность
+                            document.getElementById('gps-accuracy-lat').textContent = `Точность: ±${accuracyDeg.toFixed(6)}° (${accuracy.toFixed(1)} м)`;
+                            document.getElementById('gps-accuracy-lng').textContent = `Точность: ±${accuracyDeg.toFixed(6)}° (${accuracy.toFixed(1)} м)`;
+                            document.getElementById('gps-accuracy-alt').textContent = position.coords.altitudeAccuracy ? 
+                                `Точность: ±${position.coords.altitudeAccuracy.toFixed(1)} м` : 'Точность: неизвестна';
+                            
+                            // Центрируем карту на местоположении
+                            map.setView([lat, lng], 18);
+                            
+                            // Добавляем маркер местоположения
+                            L.marker([lat, lng], {
+                                icon: L.divIcon({
+                                    html: '<div style="background-color: #3498db; width: 15px; height: 15px; border-radius: 50%; border: 2px solid white;"></div>',
+                                    iconSize: [15, 15]
+                                })
+                            }).addTo(map).bindPopup('Ваше текущее местоположение').openPopup();
+                            
+                            hideProgress();
+                            showAlert('Координаты успешно определены!', 'success');
+                        },
+                        function(error) {
+                            hideProgress();
+                            showAlert('Не удалось определить координаты. Пожалуйста, введите вручную.', 'danger');
+                            console.error('Ошибка геолокации:', error);
+                        },
+                        {
+                            enableHighAccuracy: true,
+                            timeout: 10000,
+                            maximumAge: 0
+                        }
+                    );
                 } else {
                     showAlert('Геолокация не поддерживается вашим браузером.', 'danger');
                 }
             });
             
+            // Сохранение артефакта
             document.getElementById('save-artifact-btn').addEventListener('click', function() {
                 saveArtifact();
             });
             
-            document.getElementById('new-artifact-btn').addEventListener('click', function() {
-                showModal('artifact-modal');
+            // Сохранение артефакта в офлайн-режиме
+            document.getElementById('save-offline-btn').addEventListener('click', function() {
+                saveArtifact(true);
             });
             
-            // Обработчики для панели управления
-            document.getElementById('add-user-btn').addEventListener('click', function() {
-                showModal('user-modal');
+            // Пакетная загрузка
+            document.getElementById('batch-upload-btn').addEventListener('click', function() {
+                showModal('batch-upload-modal');
             });
             
-            document.getElementById('save-user-btn').addEventListener('click', function() {
-                addNewUser();
+            document.querySelector('.batch-upload-btn').addEventListener('click', function(e) {
+                e.stopPropagation();
+                showModal('batch-upload-modal');
             });
             
-            document.getElementById('export-pdf-btn').addEventListener('click', function() {
-                exportToPDF();
+            // Голосовой ввод
+            document.querySelectorAll('.voice-input-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const textarea = this.parentElement.querySelector('textarea, input[type="text"]');
+                    
+                    if (isListening) {
+                        VOICE_RECOGNITION.stop();
+                        this.classList.remove('listening');
+                    } else {
+                        VOICE_RECOGNITION.start(
+                            function(transcript) {
+                                textarea.value = transcript;
+                                showAlert('Текст распознан успешно!', 'success');
+                            },
+                            function(error) {
+                                showAlert('Ошибка распознавания голоса: ' + error, 'danger');
+                            }
+                        );
+                        this.classList.add('listening');
+                    }
+                });
             });
             
-            document.getElementById('export-excel-btn').addEventListener('click', function() {
-                exportToExcel();
-            });
-            
-            document.getElementById('export-shapefile-btn').addEventListener('click', function() {
-                exportToShapefile();
-            });
-            
-            // Обработчики для личного кабинета
-            document.getElementById('save-profile-btn').addEventListener('click', function() {
-                saveProfile();
-            });
-            
-            // Обработчик выхода из системы
-            document.getElementById('logout-btn').addEventListener('click', function() {
-                logoutUser();
-            });
-            
-            // Обработчик загрузки фотографий
-            document.getElementById('photo-upload-area').addEventListener('click', function() {
-                document.getElementById('photo-input').click();
-            });
-            
+            // AI распознавание изображений
             document.getElementById('photo-input').addEventListener('change', function(e) {
                 const files = e.target.files;
                 const preview = document.getElementById('photo-preview');
-                preview.innerHTML = '';
                 
                 for (let i = 0; i < files.length; i++) {
                     const file = files[i];
@@ -1894,27 +3395,230 @@
                     reader.onload = function(e) {
                         const img = document.createElement('img');
                         img.src = e.target.result;
-                        preview.appendChild(img);
+                        
+                        const container = document.createElement('div');
+                        container.style.position = 'relative';
+                        container.appendChild(img);
+                        
+                        const removeBtn = document.createElement('button');
+                        removeBtn.className = 'remove-photo';
+                        removeBtn.innerHTML = '<i class="fas fa-times"></i>';
+                        removeBtn.addEventListener('click', function() {
+                            container.remove();
+                        });
+                        container.appendChild(removeBtn);
+                        
+                        preview.appendChild(container);
+                        
+                        // AI анализ изображения
+                        if (document.getElementById('enable-ai-recognition').checked) {
+                            setTimeout(() => {
+                                const result = AI_RECOGNITION.recognizeImage(e.target.result);
+                                if (result.confidence > CONFIG.AI_CONFIDENCE_THRESHOLD) {
+                                    document.getElementById('ai-suggestion').style.display = 'block';
+                                    document.getElementById('ai-suggested-type').textContent = 
+                                        getArtifactTypeName(result.type);
+                                    document.getElementById('ai-confidence').textContent = 
+                                        `${result.confidence}%`;
+                                    
+                                    document.getElementById('apply-ai-suggestion').addEventListener('click', function() {
+                                        document.getElementById('artifact-type').value = result.type;
+                                        showAlert(`Тип установлен: ${getArtifactTypeName(result.type)}`, 'success');
+                                    });
+                                }
+                            }, 1000);
+                        }
                     };
                     
                     reader.readAsDataURL(file);
                 }
             });
             
-            // Инициализация тестовых пользователей
-            initTestUsers();
+            // Обработчики для панели управления
+            document.getElementById('add-user-btn').addEventListener('click', function() {
+                showModal('user-modal');
+            });
             
-            // Инициализация тестовых экспедиций
-            initTestExpeditions();
-        });
+            document.getElementById('manage-2fa-btn').addEventListener('click', function() {
+                showModal('twofa-setup-modal');
+            });
+            
+            document.getElementById('setup-2fa-btn').addEventListener('click', function() {
+                showModal('twofa-setup-modal');
+            });
+            
+            // Переключение методов 2FA
+            document.querySelectorAll('input[name="twofa-method"]').forEach(radio => {
+                radio.addEventListener('change', function() {
+                    if (this.value === 'sms') {
+                        document.getElementById('twofa-sms-section').style.display = 'block';
+                        document.getElementById('twofa-app-section').style.display = 'none';
+                    } else {
+                        document.getElementById('twofa-sms-section').style.display = 'none';
+                        document.getElementById('twofa-app-section').style.display = 'block';
+                    }
+                });
+            });
+            
+            document.getElementById('send-sms-code-btn').addEventListener('click', function() {
+                const phone = document.getElementById('twofa-phone').value;
+                if (phone) {
+                    showAlert(`Код подтверждения отправлен на номер ${phone}`, 'success');
+                } else {
+                    showAlert('Введите номер телефона', 'danger');
+                }
+            });
+            
+            // Синхронизация данных
+            document.getElementById('force-sync-btn').addEventListener('click', function() {
+                syncPendingData(true);
+            });
+            
+            document.getElementById('clear-cache-btn').addEventListener('click', function() {
+                if (confirm('Вы уверены, что хотите очистить локальный кеш? Несинхронизированные данные будут утеряны.')) {
+                    localStorage.clear();
+                    OFFLINE_STORAGE.updatePendingSync();
+                    updateStorageUsage();
+                    showAlert('Локальный кеш очищен', 'success');
+                }
+            });
+            
+            // Экспорт данных
+            document.getElementById('export-artifacts-btn').addEventListener('click', function() {
+                showAlert('Функция экспорта будет доступна в полной версии системы', 'info');
+            });
+            
+            document.getElementById('generate-report-btn').addEventListener('click', function() {
+                showAlert('Отчет формируется...', 'info');
+                setTimeout(() => {
+                    showAlert('Отчет успешно создан и отправлен на ваш email', 'success');
+                }, 2000);
+            });
+            
+            // Обработчик выхода из системы
+            document.getElementById('logout-btn').addEventListener('click', function() {
+                logoutUser();
+            });
+            
+            // Перетаскивание файлов для пакетной загрузки
+            const batchDropArea = document.getElementById('batch-drop-area');
+            const batchPhotoInput = document.getElementById('batch-photo-input');
+            
+            batchDropArea.addEventListener('click', function() {
+                batchPhotoInput.click();
+            });
+            
+            batchDropArea.addEventListener('dragover', function(e) {
+                e.preventDefault();
+                this.style.borderColor = 'var(--primary-color)';
+                this.style.backgroundColor = 'rgba(139, 69, 19, 0.1)';
+            });
+            
+            batchDropArea.addEventListener('dragleave', function() {
+                this.style.borderColor = '#ddd';
+                this.style.backgroundColor = '';
+            });
+            
+            batchDropArea.addEventListener('drop', function(e) {
+                e.preventDefault();
+                this.style.borderColor = '#ddd';
+                this.style.backgroundColor = '';
+                
+                const files = e.dataTransfer.files;
+                handleBatchFiles(files);
+            });
+            
+            batchPhotoInput.addEventListener('change', function(e) {
+                handleBatchFiles(e.target.files);
+            });
+            
+            document.getElementById('process-batch-btn').addEventListener('click', function() {
+                processBatchUpload();
+            });
+        }
+        
+        // Обработка файлов для пакетной загрузки
+        function handleBatchFiles(files) {
+            const filesList = document.getElementById('batch-files-list');
+            filesList.innerHTML = '';
+            
+            for (let i = 0; i < Math.min(files.length, 100); i++) {
+                const file = files[i];
+                const fileItem = document.createElement('div');
+                fileItem.className = 'batch-file-item';
+                
+                fileItem.innerHTML = `
+                    <i class="fas fa-image" style="color: #666;"></i>
+                    <div style="flex: 1;">
+                        <div>${file.name}</div>
+                        <div style="font-size: 0.8rem; color: #999;">${(file.size / 1024).toFixed(1)} KB</div>
+                    </div>
+                    <button class="btn btn-sm btn-danger remove-file" data-index="${i}">
+                        <i class="fas fa-times"></i>
+                    </button>
+                `;
+                
+                filesList.appendChild(fileItem);
+            }
+            
+            document.querySelector('#batch-preview h4').textContent = `Выбранные файлы (${Math.min(files.length, 100)})`;
+            
+            // Добавляем обработчики для кнопок удаления
+            document.querySelectorAll('.remove-file').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    this.closest('.batch-file-item').remove();
+                    const currentCount = document.querySelectorAll('.batch-file-item').length;
+                    document.querySelector('#batch-preview h4').textContent = `Выбранные файлы (${currentCount})`;
+                });
+            });
+        }
+        
+        // Обработка пакетной загрузки
+        function processBatchUpload() {
+            const fileCount = document.querySelectorAll('.batch-file-item').length;
+            if (fileCount === 0) {
+                showAlert('Выберите файлы для обработки', 'danger');
+                return;
+            }
+            
+            const defaultType = document.getElementById('batch-artifact-type').value;
+            const defaultLayer = document.getElementById('batch-layer').value;
+            
+            showProgress('Обработка файлов...', 0);
+            
+            // Имитация обработки
+            let processed = 0;
+            const interval = setInterval(() => {
+                processed++;
+                const progress = Math.floor((processed / fileCount) * 100);
+                updateProgress(progress);
+                
+                if (processed >= fileCount) {
+                    clearInterval(interval);
+                    hideProgress();
+                    hideAllModals();
+                    showAlert(`Обработано ${fileCount} файлов. Создано ${fileCount} записей артефактов.`, 'success');
+                }
+            }, 300);
+        }
         
         // Проверка авторизации
         function checkAuth() {
             const savedUser = localStorage.getItem('archaeopoint_user');
+            const savedTheme = localStorage.getItem('archaeopoint_theme');
+            
+            // Применяем тему
+            if (savedTheme === 'dark') {
+                document.body.classList.add('dark-mode');
+                document.getElementById('theme-toggle').querySelector('i').className = 'fas fa-sun';
+                document.getElementById('enable-dark-mode').checked = true;
+            }
+            
             if (savedUser) {
                 currentUser = JSON.parse(savedUser);
                 showAuthenticatedUI();
                 initMap(); // Инициализируем карту только после авторизации
+                updateStorageUsage();
             }
         }
         
@@ -1934,27 +3638,61 @@
             document.getElementById('profile-role').textContent = currentUser.role === 'admin' ? 'Начальник экспедиции' : 'Археолог';
             document.getElementById('profile-avatar').textContent = currentUser.name.split(' ').map(n => n[0]).join('').toUpperCase();
             document.getElementById('profile-email').value = currentUser.email || '';
+            document.getElementById('profile-phone').value = currentUser.phone || '';
             
             // Обновление статистики
             updateStatistics();
             updateUserList();
             updateUserArtifacts();
+            updateChangeLog();
         }
         
         // Вход пользователя
-        function loginUser(token, password) {
+        function loginUser(token, password, is2FA = false) {
             // В реальном приложении здесь был бы запрос к серверу
             // Для демо используем тестовых пользователей
             
             const testUsers = [
-                { email: "admin@archaeopoint.ru", password: "admin123", name: "Александр Иванов", role: "admin", expedition: "Крым-2023" },
-                { email: "archaeologist@archaeopoint.ru", password: "arch123", name: "Иван Археологов", role: "archaeologist", expedition: "Крым-2023" },
-                { email: "assistant@archaeopoint.ru", password: "assist123", name: "Мария Петрова", role: "assistant", expedition: "Крым-2023" }
+                { 
+                    email: "admin@archaeopoint.ru", 
+                    password: "admin123", 
+                    name: "Александр Иванов", 
+                    role: "admin", 
+                    expedition: "Крым-2023",
+                    phone: "+7 (900) 123-45-67",
+                    twoFA: true
+                },
+                { 
+                    email: "archaeologist@archaeopoint.ru", 
+                    password: "arch123", 
+                    name: "Иван Археологов", 
+                    role: "archaeologist", 
+                    expedition: "Крым-2023",
+                    phone: "+7 (900) 987-65-43",
+                    twoFA: false
+                },
+                { 
+                    email: "assistant@archaeopoint.ru", 
+                    password: "assist123", 
+                    name: "Мария Петрова", 
+                    role: "assistant", 
+                    expedition: "Крым-2023",
+                    phone: "+7 (900) 555-44-33",
+                    twoFA: false
+                }
             ];
             
             const user = testUsers.find(u => u.email === token || u.password === password);
             
             if (user) {
+                // Если включена 2FA, проверяем, что пользователь использовал 2FA форму
+                if (user.twoFA && !is2FA) {
+                    document.getElementById('login-form').style.display = 'none';
+                    document.getElementById('two-factor-form').style.display = 'block';
+                    showAlert('Для этого аккаунта требуется двухфакторная аутентификация', 'info');
+                    return;
+                }
+                
                 currentUser = user;
                 localStorage.setItem('archaeopoint_user', JSON.stringify(user));
                 showAuthenticatedUI();
@@ -1975,6 +3713,7 @@
             document.getElementById('gatekeeper-page').style.display = 'block';
             document.getElementById('login-form').style.display = 'block';
             document.getElementById('register-form').style.display = 'none';
+            document.getElementById('two-factor-form').style.display = 'none';
             
             // Очистка полей входа
             document.getElementById('login-token').value = '';
@@ -1994,10 +3733,12 @@
             // Обновление данных при переходе на страницу
             if (pageId === 'artifacts-page') {
                 updateArtifactsTable();
+                updateStratigraphy();
             } else if (pageId === 'dashboard-page' && currentUser.role === 'admin') {
                 updateStatistics();
                 updateUserList();
                 updateChangeLog();
+                updateStorageUsage();
             } else if (pageId === 'profile-page') {
                 updateUserArtifacts();
             }
@@ -2015,10 +3756,22 @@
             if (modalId === 'artifact-modal') {
                 const today = new Date().toISOString().split('T')[0];
                 document.getElementById('artifact-date').value = today;
+                document.getElementById('artifact-name').value = '';
+                document.getElementById('artifact-context').value = '';
+                document.getElementById('artifact-description').value = '';
+                document.getElementById('artifact-depth').value = '';
+                document.getElementById('photo-preview').innerHTML = '';
+                document.getElementById('ai-suggestion').style.display = 'none';
+                
+                // Устанавливаем координаты центра карты
+                const center = map.getCenter();
+                document.getElementById('artifact-coords-lat').value = center.lat.toFixed(6);
+                document.getElementById('artifact-coords-lng').value = center.lng.toFixed(6);
+                document.getElementById('artifact-coords-alt').value = '125.5';
                 
                 // Если пользователь не админ, скрываем некоторые поля
                 if (currentUser.role !== 'admin') {
-                    document.getElementById('artifact-discoverer').value = currentUser.name;
+                    // Ничего не скрываем в демо-версии
                 }
             }
         }
@@ -2030,31 +3783,18 @@
             });
         }
         
-        // Изменить слой карты
-        function changeMapLayer(layerType) {
-            if (baseLayers.osm) map.removeLayer(baseLayers.osm);
-            if (baseLayers.topo) map.removeLayer(baseLayers.topo);
-            if (baseLayers.scheme) map.removeLayer(baseLayers.scheme);
-            
-            if (layerType === 'topo' && baseLayers.topo) {
-                map.addLayer(baseLayers.topo);
-            } else if (layerType === 'scheme' && baseLayers.scheme) {
-                map.addLayer(baseLayers.scheme);
-            } else {
-                map.addLayer(baseLayers.osm);
-            }
-        }
-        
         // Сохранение артефакта
-        function saveArtifact() {
+        function saveArtifact(offlineOnly = false) {
             const name = document.getElementById('artifact-name').value;
             const type = document.getElementById('artifact-type').value;
             const date = document.getElementById('artifact-date').value;
             const depth = document.getElementById('artifact-depth').value;
             const lat = document.getElementById('artifact-coords-lat').value;
             const lng = document.getElementById('artifact-coords-lng').value;
+            const alt = document.getElementById('artifact-coords-alt').value;
             const context = document.getElementById('artifact-context').value;
             const description = document.getElementById('artifact-description').value;
+            const layer = document.getElementById('artifact-layer').value;
             
             if (!name || !type || !date || !lat || !lng || !context) {
                 showAlert('Заполните все обязательные поля (отмечены *)', 'danger');
@@ -2067,38 +3807,42 @@
                 type: type,
                 lat: parseFloat(lat),
                 lng: parseFloat(lng),
+                alt: parseFloat(alt) || 0,
                 date: date,
                 depth: depth ? parseInt(depth) : null,
                 context: context,
                 description: description,
                 discoveredBy: currentUser.name,
-                photos: [] // В реальном приложении здесь были бы загруженные фото
+                layer: layer,
+                photos: [], // В реальном приложении здесь были бы загруженные фото
+                synced: !offlineOnly && isOnline
             };
             
-            artifacts.push(newArtifact);
-            
-            // Добавление в историю изменений
-            if (currentUser.role === 'admin') {
-                addToChangeLog('Добавлен артефакт: ' + name);
+            if (offlineOnly || !isOnline) {
+                // Сохраняем в локальное хранилище
+                OFFLINE_STORAGE.save(`artifact_${Date.now()}`, newArtifact);
+                showAlert('Артефакт сохранен локально. Будет синхронизирован при появлении соединения.', 'warning');
+            } else {
+                // Добавляем в основной массив
+                artifacts.push(newArtifact);
+                updateArtifactsOnMap();
+                updateArtifactsTable();
+                updateStatistics();
+                showAlert('Артефакт успешно добавлен!', 'success');
             }
             
-            // Обновление интерфейса
-            updateArtifactsOnMap();
-            updateArtifactsTable();
-            updateStatistics();
+            // Добавление в историю изменений
+            addToChangeLog('Добавлен артефакт: ' + name);
             
-            // Закрытие модального окна и сброс формы
+            // Закрытие модального окна
             hideAllModals();
-            document.getElementById('artifact-name').value = '';
-            document.getElementById('artifact-context').value = '';
-            document.getElementById('artifact-description').value = '';
-            document.getElementById('artifact-depth').value = '';
-            document.getElementById('photo-preview').innerHTML = '';
             
-            // Показ QR-кода
-            showArtifactQR(newArtifact);
-            
-            showAlert('Артефакт успешно добавлен!', 'success');
+            // Показ QR-кода, если не в офлайн-режиме
+            if (!offlineOnly) {
+                setTimeout(() => {
+                    showArtifactQR(newArtifact);
+                }, 500);
+            }
         }
         
         // Показать QR-код артефакта
@@ -2112,8 +3856,18 @@
         function showArtifactDetails(artifactId) {
             const artifact = artifacts.find(a => a.id === artifactId);
             if (artifact) {
-                alert(`Детали артефакта:\n\nНазвание: ${artifact.name}\nТип: ${getArtifactTypeName(artifact.type)}\nДата находки: ${artifact.date}\nКоординаты: ${artifact.lat}, ${artifact.lng}\nГлубина: ${artifact.depth} см\nКонтекст: ${artifact.context}\nОписание: ${artifact.description}\nНашел: ${artifact.discoveredBy}`);
+                alert(`Детали артефакта:\n\nНазвание: ${artifact.name}\nТип: ${getArtifactTypeName(artifact.type)}\nДата находки: ${artifact.date}\nКоординаты: ${artifact.lat}, ${artifact.lng}, ${artifact.alt} м\nГлубина: ${artifact.depth} см\nСлой: ${getLayerName(artifact.layer)}\nКонтекст: ${artifact.context}\nОписание: ${artifact.description}\nНашел: ${artifact.discoveredBy}`);
             }
+        }
+        
+        // Получить название слоя
+        function getLayerName(layerId) {
+            const layers = {
+                layer1: 'Слой I (современный)',
+                layer2: 'Слой II (средневековый)',
+                layer3: 'Слой III (античный)'
+            };
+            return layers[layerId] || 'Не указан';
         }
         
         // Обновление таблицы артефактов
@@ -2126,21 +3880,35 @@
                 row.innerHTML = `
                     <td>AP-2023-${artifact.id.toString().padStart(3, '0')}</td>
                     <td>${artifact.name}</td>
-                    <td><span class="popup-type" style="background-color: ${artifactColors[artifact.type]}; color: ${artifact.type === 'bones' || artifact.type === 'metal' ? '#333' : 'white'}; padding: 0.2rem 0.5rem; border-radius: 12px; font-size: 0.8rem;">${getArtifactTypeName(artifact.type)}</span></td>
+                    <td><span style="background-color: ${getArtifactColor(artifact.type)}; color: ${artifact.type === 'bones' || artifact.type === 'metal' ? '#333' : 'white'}; padding: 0.2rem 0.5rem; border-radius: 12px; font-size: 0.8rem;">${getArtifactTypeName(artifact.type)}</span></td>
                     <td>${artifact.date}</td>
-                    <td>${artifact.lat.toFixed(6)}, ${artifact.lng.toFixed(6)}</td>
+                    <td>${artifact.lat.toFixed(6)}, ${artifact.lng.toFixed(6)}, ${artifact.alt} м</td>
                     <td>${artifact.discoveredBy}</td>
+                    <td>${getLayerName(artifact.layer)}</td>
                     <td>
-                        <button onclick="showArtifactDetails(${artifact.id})" class="btn" style="padding: 0.25rem 0.5rem; font-size: 0.8rem;">
+                        <button onclick="showArtifactDetails(${artifact.id})" class="btn btn-sm" title="Просмотр">
                             <i class="fas fa-eye"></i>
                         </button>
-                        <button onclick="showArtifactQR(${artifact})" class="btn btn-secondary" style="padding: 0.25rem 0.5rem; font-size: 0.8rem;">
+                        <button onclick="showArtifactQR(${artifact})" class="btn btn-sm btn-secondary" title="QR-код">
                             <i class="fas fa-qrcode"></i>
                         </button>
                     </td>
                 `;
                 tbody.appendChild(row);
             });
+        }
+        
+        // Получить цвет для типа артефакта
+        function getArtifactColor(type) {
+            const colors = {
+                gold: '#FFD700',
+                ceramic: '#8B4513',
+                bones: '#F5F5DC',
+                metal: '#C0C0C0',
+                stone: '#808080',
+                other: '#9370DB'
+            };
+            return colors[type] || '#9370DB';
         }
         
         // Обновление статистики
@@ -2177,28 +3945,74 @@
             }
         }
         
-        // Инициализация тестовых пользователей
-        function initTestUsers() {
-            users = [
-                { id: 1, name: "Александр Иванов", email: "admin@archaeopoint.ru", role: "admin", expedition: "Крым-2023", joined: "2023-05-15" },
-                { id: 2, name: "Иван Археологов", email: "ivan@example.com", role: "archaeologist", expedition: "Крым-2023", joined: "2023-06-01" },
-                { id: 3, name: "Мария Петрова", email: "maria@example.com", role: "assistant", expedition: "Крым-2023", joined: "2023-06-05" },
-                { id: 4, name: "Алексей Смирнов", email: "alexey@example.com", role: "archaeologist", expedition: "Крым-2023", joined: "2023-06-03" },
-                { id: 5, name: "Екатерина Волкова", email: "ekaterina@example.com", role: "student", expedition: "Крым-2023", joined: "2023-06-10" }
-            ];
+        // Обновление использования хранилища
+        function updateStorageUsage() {
+            const usage = OFFLINE_STORAGE.getStorageUsage();
+            document.getElementById('storage-usage').textContent = `${usage} MB`;
         }
         
-        // Инициализация тестовых экспедиций
-        function initTestExpeditions() {
+        // Инициализация тестовых данных
+        function initTestData() {
+            // Тестовые пользователи
+            users = [
+                { id: 1, name: "Александр Иванов", email: "admin@archaeopoint.ru", role: "admin", expedition: "Крым-2023", joined: "2023-05-15", phone: "+7 (900) 123-45-67" },
+                { id: 2, name: "Иван Археологов", email: "ivan@example.com", role: "archaeologist", expedition: "Крым-2023", joined: "2023-06-01", phone: "+7 (900) 987-65-43" },
+                { id: 3, name: "Мария Петрова", email: "maria@example.com", role: "assistant", expedition: "Крым-2023", joined: "2023-06-05", phone: "+7 (900) 555-44-33" },
+                { id: 4, name: "Алексей Смирнов", email: "alexey@example.com", role: "archaeologist", expedition: "Крым-2023", joined: "2023-06-03", phone: "+7 (900) 111-22-33" },
+                { id: 5, name: "Екатерина Волкова", email: "ekaterina@example.com", role: "student", expedition: "Крым-2023", joined: "2023-06-10", phone: "+7 (900) 444-55-66" }
+            ];
+            
+            // Тестовые экспедиции
             expeditions = [
                 { id: 1, name: "Крым-2023", location: "Крым, Бахчисарайский район", startDate: "2023-06-01", endDate: "2023-08-31", director: "Александр Иванов" },
                 { id: 2, name: "Великий Новгород-2023", location: "Новгородская область", startDate: "2023-07-15", endDate: "2023-09-30", director: "Петр Сидоров" }
             ];
+            
+            // Тестовые стратиграфические слои
+            updateStratigraphy();
+        }
+        
+        // Обновление стратиграфии
+        function updateStratigraphy() {
+            const layersList = document.getElementById('layers-list');
+            if (!layersList) return;
+            
+            const layers = [
+                { id: 'layer1', name: 'Слой I (современный)', depthFrom: 0, depthTo: 30, color: '#8B4513', artifacts: 5 },
+                { id: 'layer2', name: 'Слой II (средневековый)', depthFrom: 30, depthTo: 80, color: '#D2691E', artifacts: 12 },
+                { id: 'layer3', name: 'Слой III (античный)', depthFrom: 80, depthTo: 150, color: '#A0522D', artifacts: 8 }
+            ];
+            
+            layersList.innerHTML = '';
+            
+            layers.forEach(layer => {
+                const layerItem = document.createElement('div');
+                layerItem.className = 'layer-item';
+                layerItem.draggable = true;
+                layerItem.dataset.layerId = layer.id;
+                layerItem.style.borderLeftColor = layer.color;
+                
+                layerItem.innerHTML = `
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <div style="font-weight: 500;">${layer.name}</div>
+                            <div style="font-size: 0.8rem; color: #666;">Глубина: ${layer.depthFrom}-${layer.depthTo} см</div>
+                        </div>
+                        <div style="font-size: 0.8rem; background-color: ${layer.color}20; padding: 0.2rem 0.5rem; border-radius: 12px;">
+                            ${layer.artifacts} артефактов
+                        </div>
+                    </div>
+                `;
+                
+                layersList.appendChild(layerItem);
+            });
         }
         
         // Обновление списка пользователей
         function updateUserList() {
             const userList = document.getElementById('expedition-users');
+            if (!userList) return;
+            
             userList.innerHTML = '';
             
             users.forEach(user => {
@@ -2233,8 +4047,8 @@
                     </div>
                     <div>
                         <span class="user-role ${roleClass}">${roleText}</span>
-                        ${currentUser.role === 'admin' && user.id !== currentUser.id ? 
-                          `<button onclick="removeUser(${user.id})" class="btn btn-danger" style="padding: 0.25rem 0.5rem; font-size: 0.8rem; margin-left: 0.5rem;">
+                        ${currentUser && currentUser.role === 'admin' && user.id !== currentUser.id ? 
+                          `<button onclick="removeUser(${user.id})" class="btn btn-danger btn-sm" style="margin-left: 0.5rem;">
                             <i class="fas fa-times"></i>
                           </button>` : ''}
                     </div>
@@ -2254,40 +4068,6 @@
             }
         }
         
-        // Добавление нового пользователя
-        function addNewUser() {
-            const name = document.getElementById('new-user-name').value;
-            const email = document.getElementById('new-user-email').value;
-            const role = document.getElementById('new-user-role').value;
-            const expedition = document.getElementById('new-user-expedition').value;
-            
-            if (!name || !email || !expedition) {
-                showAlert('Заполните все обязательные поля', 'danger');
-                return;
-            }
-            
-            const newUser = {
-                id: users.length + 1,
-                name: name,
-                email: email,
-                role: role,
-                expedition: expedition,
-                joined: new Date().toISOString().split('T')[0]
-            };
-            
-            users.push(newUser);
-            updateUserList();
-            addToChangeLog('Добавлен новый участник: ' + name);
-            hideAllModals();
-            
-            // Очистка формы
-            document.getElementById('new-user-name').value = '';
-            document.getElementById('new-user-email').value = '';
-            document.getElementById('new-user-expedition').value = '';
-            
-            showAlert('Пользователь успешно добавлен в экспедицию', 'success');
-        }
-        
         // Обновление истории изменений
         function updateChangeLog() {
             const log = [
@@ -2299,6 +4079,8 @@
             ];
             
             const tbody = document.getElementById('change-log');
+            if (!tbody) return;
+            
             tbody.innerHTML = '';
             
             log.forEach(entry => {
@@ -2327,6 +4109,8 @@
                 .slice(0, 5); // Показываем только последние 5 находок
             
             const tbody = document.getElementById('user-artifacts-list');
+            if (!tbody) return;
+            
             tbody.innerHTML = '';
             
             if (userArtifacts.length === 0) {
@@ -2354,56 +4138,160 @@
             const phone = document.getElementById('profile-phone').value;
             const notifications = document.getElementById('profile-notifications').value;
             
-            // В реальном приложении здесь был бы запрос к серверу
+            // Обновляем данные пользователя
             currentUser.email = email;
+            currentUser.phone = phone;
+            localStorage.setItem('archaeopoint_user', JSON.stringify(currentUser));
             
             showAlert('Настройки профиля сохранены', 'success');
         }
         
-        // Экспорт в PDF
-        function exportToPDF() {
-            showAlert('Функция экспорта в PDF будет доступна в полной версии системы', 'info');
+        // Синхронизация накопленных данных
+        function syncPendingData(force = false) {
+            if (!isOnline && !force) {
+                console.log('Нет соединения с интернетом. Синхронизация отложена.');
+                return;
+            }
+            
+            const pending = OFFLINE_STORAGE.getAll().filter(item => !item.synced);
+            
+            if (pending.length === 0) {
+                console.log('Нет данных для синхронизации');
+                return;
+            }
+            
+            console.log(`Начинаю синхронизацию ${pending.length} записей...`);
+            
+            // Имитация синхронизации
+            showProgress('Синхронизация данных...', 0);
+            
+            let synced = 0;
+            const interval = setInterval(() => {
+                synced++;
+                const progress = Math.floor((synced / pending.length) * 100);
+                updateProgress(progress);
+                
+                if (synced >= pending.length) {
+                    clearInterval(interval);
+                    
+                    // Помечаем все как синхронизированные
+                    pending.forEach(item => {
+                        const stored = JSON.parse(localStorage.getItem(item.key));
+                        stored.synced = true;
+                        localStorage.setItem(item.key, JSON.stringify(stored));
+                        
+                        // Добавляем в основной массив артефактов
+                        if (item.key.startsWith('artifact_')) {
+                            artifacts.push(item.data);
+                        }
+                    });
+                    
+                    // Обновляем UI
+                    OFFLINE_STORAGE.updatePendingSync();
+                    updateArtifactsOnMap();
+                    updateArtifactsTable();
+                    updateStatistics();
+                    
+                    hideProgress();
+                    showAlert(`Успешно синхронизировано ${pending.length} записей`, 'success');
+                }
+            }, 500);
         }
         
-        // Экспорт в Excel
-        function exportToExcel() {
-            showAlert('Функция экспорта в Excel будет доступна в полной версии системы', 'info');
+        // Запуск службы синхронизации
+        function startSyncService() {
+            // Периодическая проверка и синхронизация
+            setInterval(() => {
+                if (isOnline && pendingSync.length > 0) {
+                    syncPendingData();
+                }
+            }, CONFIG.SYNC_INTERVAL);
+            
+            // Проверка при загрузке страницы
+            if (isOnline && pendingSync.length > 0) {
+                setTimeout(() => {
+                    syncPendingData();
+                }, 5000);
+            }
         }
         
-        // Экспорт в Shapefile
-        function exportToShapefile() {
-            showAlert('Функция экспорта в Shapefile будет доступна в полной версии системы', 'info');
+        // Показать прогресс бар
+        function showProgress(message, initialProgress) {
+            document.getElementById('progress-bar').style.width = initialProgress + '%';
+            document.getElementById('progress-bar').style.display = 'block';
+        }
+        
+        function updateProgress(progress) {
+            document.getElementById('progress-bar').style.width = progress + '%';
+        }
+        
+        function hideProgress() {
+            setTimeout(() => {
+                document.getElementById('progress-bar').style.display = 'none';
+                document.getElementById('progress-bar').style.width = '0%';
+            }, 500);
         }
         
         // Показать уведомление
         function showAlert(message, type) {
-            // Удаляем предыдущие уведомления
-            const existingAlert = document.querySelector('.alert');
-            if (existingAlert) {
-                existingAlert.remove();
-            }
-            
+            // Создаем элемент уведомления
             const alertDiv = document.createElement('div');
             alertDiv.className = `alert alert-${type}`;
             alertDiv.innerHTML = `
-                <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'danger' ? 'exclamation-circle' : 'info-circle'}"></i>
+                <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'danger' ? 'exclamation-circle' : type === 'warning' ? 'exclamation-triangle' : 'info-circle'}"></i>
                 ${message}
             `;
             
-            // Вставляем уведомление в зависимости от страницы
-            if (document.getElementById('gatekeeper-page').classList.contains('active')) {
-                document.querySelector('.gatekeeper').insertBefore(alertDiv, document.querySelector('.gatekeeper h2'));
+            // Добавляем уведомление
+            const main = document.querySelector('main');
+            if (main) {
+                main.insertBefore(alertDiv, main.firstChild);
             } else {
-                document.querySelector('main').insertBefore(alertDiv, document.querySelector('main').firstChild);
+                document.body.appendChild(alertDiv);
             }
             
-            // Автоматическое скрытие уведомления через 5 секунд
+            // Удаляем уведомление через 5 секунд
             setTimeout(() => {
-                if (alertDiv.parentNode) {
-                    alertDiv.remove();
-                }
+                alertDiv.remove();
             }, 5000);
         }
+        
+        // Инициализация Service Worker для PWA
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function() {
+                navigator.serviceWorker.register('/sw.js').then(function(registration) {
+                    console.log('ServiceWorker registration successful with scope: ', registration.scope);
+                }, function(err) {
+                    console.log('ServiceWorker registration failed: ', err);
+                });
+            });
+        }
+        
+        // Создаем манифест для PWA
+        const manifest = {
+            "name": "ArchaeoPoint",
+            "short_name": "ArchaeoPoint",
+            "description": "Профессиональная платформа для цифровой фиксации археологических данных",
+            "start_url": "/",
+            "display": "standalone",
+            "background_color": "#3E2723",
+            "theme_color": "#8B4513",
+            "icons": [
+                {
+                    "src": "icon-192x192.png",
+                    "sizes": "192x192",
+                    "type": "image/png"
+                },
+                {
+                    "src": "icon-512x512.png",
+                    "sizes": "512x512",
+                    "type": "image/png"
+                }
+            ]
+        };
+        
+        // В реальном приложении манифест был бы в отдельном файле
+        console.log('PWA манифест готов:', manifest);
     </script>
 </body>
 </html>
