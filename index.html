@@ -1,0 +1,2409 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ArchaeoPoint - От раскопа до карты в один клик</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css" />
+    <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
+    <style>
+        /* Основные стили */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        :root {
+            --primary-color: #8B4513;
+            --secondary-color: #D2691E;
+            --accent-color: #F4A460;
+            --dark-color: #3E2723;
+            --light-color: #FAF3E0;
+            --success-color: #27ae60;
+            --danger-color: #e74c3c;
+            --warning-color: #f39c12;
+            --info-color: #3498db;
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            --border-radius: 8px;
+        }
+
+        body {
+            background-color: #f5f5f5;
+            color: #333;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .container {
+            width: 100%;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Шапка */
+        header {
+            background: linear-gradient(135deg, var(--dark-color), var(--primary-color));
+            color: white;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: var(--shadow);
+            z-index: 1000;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .logo h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+        }
+
+        .logo .tagline {
+            font-size: 0.9rem;
+            opacity: 0.9;
+            font-style: italic;
+        }
+
+        .logo-icon {
+            font-size: 2rem;
+            color: var(--accent-color);
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+
+        nav a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            border-radius: var(--border-radius);
+            transition: all 0.3s ease;
+        }
+
+        nav a:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .avatar {
+            width: 40px;
+            height: 40px;
+            background-color: var(--accent-color);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        /* Основной контент */
+        main {
+            flex: 1;
+            padding: 2rem;
+        }
+
+        /* Стили для страниц */
+        .page {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        /* Защитный шлюз / Вход */
+        .gatekeeper {
+            max-width: 500px;
+            margin: 4rem auto;
+            padding: 3rem;
+            background-color: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            text-align: center;
+        }
+
+        .gatekeeper h2 {
+            margin-bottom: 1rem;
+            color: var(--primary-color);
+        }
+
+        .gatekeeper p {
+            margin-bottom: 2rem;
+            color: #666;
+            line-height: 1.6;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+            text-align: left;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--dark-color);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 1px solid #ddd;
+            border-radius: var(--border-radius);
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 0.75rem 2rem;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: var(--border-radius);
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+
+        .btn:hover {
+            background-color: var(--secondary-color);
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background-color: #6c757d;
+        }
+
+        .btn-secondary:hover {
+            background-color: #5a6268;
+        }
+
+        .btn-success {
+            background-color: var(--success-color);
+        }
+
+        .btn-danger {
+            background-color: var(--danger-color);
+        }
+
+        .btn-warning {
+            background-color: var(--warning-color);
+        }
+
+        .btn-block {
+            width: 100%;
+        }
+
+        .link-btn {
+            background: none;
+            border: none;
+            color: var(--primary-color);
+            cursor: pointer;
+            text-decoration: underline;
+            font-size: 0.9rem;
+        }
+
+        .alert {
+            padding: 1rem;
+            border-radius: var(--border-radius);
+            margin-bottom: 1.5rem;
+        }
+
+        .alert-success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .alert-danger {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .alert-info {
+            background-color: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+
+        /* Добро пожаловать */
+        .welcome-hero {
+            text-align: center;
+            padding: 3rem 2rem;
+            background: linear-gradient(135deg, var(--light-color), #fff);
+            border-radius: var(--border-radius);
+            margin-bottom: 3rem;
+            box-shadow: var(--shadow);
+        }
+
+        .welcome-hero h1 {
+            font-size: 2.5rem;
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+        }
+
+        .welcome-hero p {
+            font-size: 1.2rem;
+            color: #555;
+            max-width: 800px;
+            margin: 0 auto 2rem;
+            line-height: 1.6;
+        }
+
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .feature-card {
+            background-color: white;
+            padding: 2rem;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            transition: transform 0.3s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .feature-icon {
+            font-size: 2.5rem;
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+        }
+
+        .feature-card h3 {
+            margin-bottom: 1rem;
+            color: var(--dark-color);
+        }
+
+        /* Интерактивная карта */
+        #map-container {
+            height: 600px;
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            margin-bottom: 2rem;
+            position: relative;
+        }
+
+        #map {
+            height: 100%;
+            width: 100%;
+            z-index: 1;
+        }
+
+        .map-controls {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            z-index: 1000;
+            background-color: white;
+            padding: 1rem;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            width: 280px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .map-controls h3 {
+            margin-bottom: 1rem;
+            color: var(--primary-color);
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .layer-control, .artifact-control {
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #eee;
+        }
+
+        .layer-control label, .artifact-control label {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+            cursor: pointer;
+        }
+
+        .color-indicator {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: inline-block;
+            border: 1px solid #ddd;
+        }
+
+        .artifact-gold { background-color: #FFD700; }
+        .artifact-ceramic { background-color: #8B4513; }
+        .artifact-bones { background-color: #F5F5DC; }
+        .artifact-metal { background-color: #C0C0C0; }
+        .artifact-stone { background-color: #808080; }
+        .artifact-other { background-color: #9370DB; }
+
+        .map-tools {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .map-tool-btn {
+            padding: 0.5rem 1rem;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .map-tool-btn:hover {
+            background-color: var(--secondary-color);
+        }
+
+        .leaflet-control-zoom {
+            margin-top: 10px !important;
+            margin-right: 10px !important;
+        }
+
+        /* Панель управления */
+        .dashboard {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .dashboard-card {
+            background-color: white;
+            padding: 2rem;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+        }
+
+        .dashboard-card h3 {
+            margin-bottom: 1.5rem;
+            color: var(--primary-color);
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--light-color);
+        }
+
+        .statistics {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 1rem;
+            background-color: var(--light-color);
+            border-radius: var(--border-radius);
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        .user-list {
+            list-style: none;
+        }
+
+        .user-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            border-bottom: 1px solid #eee;
+        }
+
+        .user-item:last-child {
+            border-bottom: none;
+        }
+
+        .user-role {
+            padding: 0.25rem 0.5rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        .role-admin { background-color: #d4edda; color: #155724; }
+        .role-archaeologist { background-color: #d1ecf1; color: #0c5460; }
+        .role-assistant { background-color: #fff3cd; color: #856404; }
+
+        /* Карточка артефакта */
+        .artifact-form {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 2rem;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .form-full {
+            grid-column: 1 / -1;
+        }
+
+        .photo-upload {
+            border: 2px dashed #ddd;
+            border-radius: var(--border-radius);
+            padding: 2rem;
+            text-align: center;
+            cursor: pointer;
+            transition: border-color 0.3s ease;
+        }
+
+        .photo-upload:hover {
+            border-color: var(--primary-color);
+        }
+
+        .photo-preview {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .photo-preview img {
+            width: 150px;
+            height: 150px;
+            object-fit: cover;
+            border-radius: var(--border-radius);
+        }
+
+        /* Личный кабинет */
+        .profile-header {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+            margin-bottom: 2rem;
+            padding-bottom: 2rem;
+            border-bottom: 1px solid #eee;
+        }
+
+        .profile-avatar {
+            width: 120px;
+            height: 120px;
+            background-color: var(--accent-color);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            color: white;
+            font-weight: bold;
+        }
+
+        .profile-info h2 {
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .profile-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        /* Таблицы */
+        .table-container {
+            overflow-x: auto;
+            background-color: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            margin-bottom: 2rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+
+        th {
+            background-color: var(--light-color);
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+
+        tr:hover {
+            background-color: #f9f9f9;
+        }
+
+        /* Подвал */
+        footer {
+            background-color: var(--dark-color);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+            margin-top: 3rem;
+        }
+
+        footer p {
+            margin-bottom: 1rem;
+            opacity: 0.8;
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-top: 1.5rem;
+        }
+
+        .footer-links a {
+            color: white;
+            text-decoration: none;
+            opacity: 0.8;
+            transition: opacity 0.3s ease;
+        }
+
+        .footer-links a:hover {
+            opacity: 1;
+        }
+
+        /* Мобильная адаптация */
+        @media (max-width: 768px) {
+            header {
+                flex-direction: column;
+                gap: 1rem;
+                padding: 1rem;
+            }
+
+            nav ul {
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 0.5rem;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .map-controls {
+                position: relative;
+                top: 0;
+                right: 0;
+                width: 100%;
+                margin-bottom: 1rem;
+                max-height: 300px;
+            }
+
+            #map-container {
+                height: 400px;
+            }
+
+            .welcome-hero h1 {
+                font-size: 1.8rem;
+            }
+
+            .welcome-hero p {
+                font-size: 1rem;
+            }
+
+            .gatekeeper {
+                margin: 2rem auto;
+                padding: 2rem 1.5rem;
+            }
+        }
+
+        /* Стили для модальных окон */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background-color: white;
+            padding: 2rem;
+            border-radius: var(--border-radius);
+            max-width: 500px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 5px 25px rgba(0, 0, 0, 0.2);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #eee;
+        }
+
+        .modal-header h3 {
+            color: var(--primary-color);
+        }
+
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #999;
+        }
+
+        /* QR-код стили */
+        .qr-code-container {
+            text-align: center;
+            padding: 1.5rem;
+            background-color: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+        }
+
+        .qr-code {
+            width: 200px;
+            height: 200px;
+            margin: 1rem auto;
+            background-color: #f5f5f5;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: #666;
+            border: 1px dashed #ddd;
+        }
+
+        /* Стили для кластеров на карте */
+        .marker-cluster-small {
+            background-color: rgba(181, 226, 140, 0.6);
+        }
+        .marker-cluster-small div {
+            background-color: rgba(110, 204, 57, 0.6);
+        }
+
+        .marker-cluster-medium {
+            background-color: rgba(241, 211, 87, 0.6);
+        }
+        .marker-cluster-medium div {
+            background-color: rgba(240, 194, 12, 0.6);
+        }
+
+        .marker-cluster-large {
+            background-color: rgba(253, 156, 115, 0.6);
+        }
+        .marker-cluster-large div {
+            background-color: rgba(241, 128, 23, 0.6);
+        }
+
+        /* Стили для попапов на карте */
+        .leaflet-popup-content {
+            min-width: 200px;
+        }
+
+        .artifact-popup {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .artifact-popup h3 {
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .artifact-popup p {
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .artifact-popup img {
+            width: 100%;
+            height: 120px;
+            object-fit: cover;
+            border-radius: var(--border-radius);
+            margin-bottom: 0.5rem;
+        }
+
+        .popup-type {
+            display: inline-block;
+            padding: 0.2rem 0.5rem;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            color: white;
+            margin-bottom: 0.5rem;
+        }
+
+        /* Легенда карты */
+        .map-legend {
+            background-color: white;
+            padding: 0.75rem;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            font-size: 0.85rem;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .legend-color {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            margin-right: 0.5rem;
+            border: 1px solid #ddd;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Защитный шлюз (Gatekeeper) - первая страница -->
+        <div id="gatekeeper-page" class="page active">
+            <div class="gatekeeper">
+                <div class="logo" style="justify-content: center; margin-bottom: 2rem;">
+                    <div class="logo-icon">
+                        <i class="fas fa-map-marked-alt"></i>
+                    </div>
+                    <div>
+                        <h1>ArchaeoPoint</h1>
+                        <div class="tagline">От раскопа до карты в один клик</div>
+                    </div>
+                </div>
+                
+                <h2>Защищенный доступ к данным</h2>
+                <p>Введите токен экспедиции или данные для входа в систему. Доступ предоставляется только авторизованным участникам археологических исследований.</p>
+                
+                <div id="login-form">
+                    <div class="form-group">
+                        <label for="login-token">Токен экспедиции / Email</label>
+                        <input type="text" id="login-token" class="form-control" placeholder="Введите токен или email">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="login-password">Пароль</label>
+                        <input type="password" id="login-password" class="form-control" placeholder="Введите пароль">
+                    </div>
+                    
+                    <div class="form-group">
+                        <button id="login-btn" class="btn btn-block">Войти в систему</button>
+                    </div>
+                    
+                    <div class="form-group" style="text-align: center;">
+                        <button id="show-register" class="link-btn">Запросить доступ</button>
+                    </div>
+                </div>
+                
+                <div id="register-form" style="display: none;">
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle"></i> Запрос доступа отправляется начальнику экспедиции. После подтверждения вам будет предоставлен доступ.
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="register-name">ФИО</label>
+                        <input type="text" id="register-name" class="form-control" placeholder="Введите ваше полное имя">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="register-email">Email</label>
+                        <input type="email" id="register-email" class="form-control" placeholder="Введите ваш email">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="register-expedition">Название экспедиции</label>
+                        <input type="text" id="register-expedition" class="form-control" placeholder="Введите название экспедиции">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="register-role">Роль в экспедиции</label>
+                        <select id="register-role" class="form-control">
+                            <option value="archaeologist">Археолог</option>
+                            <option value="assistant">Помощник</option>
+                            <option value="student">Студент</option>
+                            <option value="researcher">Исследователь</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="register-message">Дополнительная информация</label>
+                        <textarea id="register-message" class="form-control" rows="3" placeholder="Расскажите о себе и причинах запроса доступа"></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <button id="register-btn" class="btn btn-block btn-success">Отправить запрос</button>
+                    </div>
+                    
+                    <div class="form-group" style="text-align: center;">
+                        <button id="show-login" class="link-btn">Вернуться ко входу</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Шапка сайта (видна только после авторизации) -->
+        <header id="site-header" style="display: none;">
+            <div class="logo">
+                <div class="logo-icon">
+                    <i class="fas fa-map-marked-alt"></i>
+                </div>
+                <div>
+                    <h1>ArchaeoPoint</h1>
+                    <div class="tagline">От раскопа до карты в один клик</div>
+                </div>
+            </div>
+            
+            <nav>
+                <ul>
+                    <li><a href="#" id="nav-welcome">Главная</a></li>
+                    <li><a href="#" id="nav-map">Карта раскопок</a></li>
+                    <li><a href="#" id="nav-artifacts">Артефакты</a></li>
+                    <li><a href="#" id="nav-dashboard">Панель управления</a></li>
+                    <li><a href="#" id="nav-profile">Личный кабинет</a></li>
+                </ul>
+            </nav>
+            
+            <div class="user-info">
+                <div class="avatar" id="user-avatar">ИИ</div>
+                <div>
+                    <div id="user-name">Иван Археологов</div>
+                    <div id="user-role" style="font-size: 0.8rem; opacity: 0.8;">Археолог</div>
+                </div>
+                <button id="logout-btn" class="btn btn-secondary" style="padding: 0.5rem 1rem; margin-left: 1rem;">
+                    <i class="fas fa-sign-out-alt"></i>
+                </button>
+            </div>
+        </header>
+
+        <!-- Основной контент (виден только после авторизации) -->
+        <main id="main-content" style="display: none;">
+            <!-- Главная страница -->
+            <div id="welcome-page" class="page active">
+                <div class="welcome-hero">
+                    <h1>Добро пожаловать в ArchaeoPoint</h1>
+                    <p>Профессиональная платформа для цифровой фиксации и управления археологическими данными с точной ГИС-привязкой.</p>
+                    <button id="goto-map-btn" class="btn">
+                        <i class="fas fa-map-marked-alt"></i> Перейти к карте раскопок
+                    </button>
+                </div>
+                
+                <div class="features">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-shield-alt"></i>
+                        </div>
+                        <h3>Защита данных</h3>
+                        <p>Координаты объектов хранятся в зашифрованном виде. Полная конфиденциальность информации о местонахождении артефактов.</p>
+                    </div>
+                    
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-map"></i>
+                        </div>
+                        <h3>Интерактивная карта</h3>
+                        <p>Точная визуализация находок на карте с поддержкой спутниковых снимков, топографических карт и схем раскопов.</p>
+                    </div>
+                    
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-qrcode"></i>
+                        </div>
+                        <h3>QR-маркировка</h3>
+                        <p>Автоматическая генерация уникальных QR-кодов для каждого артефакта. Распечатайте и приклейте к бирке находки.</p>
+                    </div>
+                    
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-database"></i>
+                        </div>
+                        <h3>Единая база данных</h3>
+                        <p>Замена бумажных дневников и разрозненных файлов на структурированную базу с историей изменений и контролем доступа.</p>
+                    </div>
+                    
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-file-export"></i>
+                        </div>
+                        <h3>Экспорт отчетов</h3>
+                        <p>Формирование отчетов в PDF и Excel для сдачи в институт археологии. Поддержка стандартных форматов документации.</p>
+                    </div>
+                    
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-users-cog"></i>
+                        </div>
+                        <h3>Управление доступом</h3>
+                        <p>Гибкая система ролей и прав. Начальник раскопа контролирует доступ сотрудников и целостность данных.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Карта раскопок -->
+            <div id="map-page" class="page">
+                <h2 style="margin-bottom: 1rem; color: var(--primary-color);">
+                    <i class="fas fa-map-marked-alt"></i> Интерактивная карта раскопок
+                </h2>
+                <p style="margin-bottom: 1.5rem; color: #666;">Используйте карту для визуализации находок, добавления новых артефактов и анализа расположения объектов.</p>
+                
+                <div id="map-container">
+                    <div id="map"></div>
+                    
+                    <div class="map-controls">
+                        <h3><i class="fas fa-layer-group"></i> Управление картой</h3>
+                        
+                        <div class="layer-control">
+                            <h4>Слои карты:</h4>
+                            <label>
+                                <input type="radio" name="map-layer" value="osm" checked> 
+                                <span>Спутниковая карта</span>
+                            </label>
+                            <label>
+                                <input type="radio" name="map-layer" value="topo"> 
+                                <span>Топографическая карта</span>
+                            </label>
+                            <label>
+                                <input type="radio" name="map-layer" value="scheme"> 
+                                <span>Схема раскопа</span>
+                            </label>
+                        </div>
+                        
+                        <div class="artifact-control">
+                            <h4>Типы артефактов:</h4>
+                            <label>
+                                <input type="checkbox" name="artifact-type" value="gold" checked> 
+                                <span class="color-indicator artifact-gold"></span>
+                                <span>Золотые изделия</span>
+                            </label>
+                            <label>
+                                <input type="checkbox" name="artifact-type" value="ceramic" checked> 
+                                <span class="color-indicator artifact-ceramic"></span>
+                                <span>Керамика</span>
+                            </label>
+                            <label>
+                                <input type="checkbox" name="artifact-type" value="bones" checked> 
+                                <span class="color-indicator artifact-bones"></span>
+                                <span>Костные останки</span>
+                            </label>
+                            <label>
+                                <input type="checkbox" name="artifact-type" value="metal" checked> 
+                                <span class="color-indicator artifact-metal"></span>
+                                <span>Металлические изделия</span>
+                            </label>
+                            <label>
+                                <input type="checkbox" name="artifact-type" value="stone" checked> 
+                                <span class="color-indicator artifact-stone"></span>
+                                <span>Каменные изделия</span>
+                            </label>
+                            <label>
+                                <input type="checkbox" name="artifact-type" value="other" checked> 
+                                <span class="color-indicator artifact-other"></span>
+                                <span>Прочие находки</span>
+                            </label>
+                        </div>
+                        
+                        <div class="map-tools">
+                            <button id="add-artifact-btn" class="map-tool-btn">
+                                <i class="fas fa-plus"></i> Добавить находку
+                            </button>
+                            <button id="center-map-btn" class="map-tool-btn">
+                                <i class="fas fa-crosshairs"></i> Центрировать
+                            </button>
+                            <button id="show-legend-btn" class="map-tool-btn">
+                                <i class="fas fa-info-circle"></i> Легенда
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="map-legend" style="margin-top: 1rem; display: none;" id="map-legend">
+                    <h4 style="margin-bottom: 0.5rem;">Легенда карты:</h4>
+                    <div class="legend-item">
+                        <span class="legend-color artifact-gold"></span>
+                        <span>Золотые изделия</span>
+                    </div>
+                    <div class="legend-item">
+                        <span class="legend-color artifact-ceramic"></span>
+                        <span>Керамика</span>
+                    </div>
+                    <div class="legend-item">
+                        <span class="legend-color artifact-bones"></span>
+                        <span>Костные останки</span>
+                    </div>
+                    <div class="legend-item">
+                        <span class="legend-color artifact-metal"></span>
+                        <span>Металлические изделия</span>
+                    </div>
+                    <div class="legend-item">
+                        <span class="legend-color artifact-stone"></span>
+                        <span>Каменные изделия</span>
+                    </div>
+                    <div class="legend-item">
+                        <span class="legend-color artifact-other"></span>
+                        <span>Прочие находки</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Список артефактов -->
+            <div id="artifacts-page" class="page">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                    <h2 style="color: var(--primary-color);">
+                        <i class="fas fa-history"></i> База артефактов
+                    </h2>
+                    <button id="new-artifact-btn" class="btn">
+                        <i class="fas fa-plus"></i> Добавить новый артефакт
+                    </button>
+                </div>
+                
+                <div class="table-container">
+                    <table id="artifacts-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Название</th>
+                                <th>Тип</th>
+                                <th>Дата находки</th>
+                                <th>Координаты</th>
+                                <th>Нашедший</th>
+                                <th>Действия</th>
+                            </tr>
+                        </thead>
+                        <tbody id="artifacts-table-body">
+                            <!-- Данные загружаются через JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Панель управления -->
+            <div id="dashboard-page" class="page">
+                <h2 style="margin-bottom: 1.5rem; color: var(--primary-color);">
+                    <i class="fas fa-tachometer-alt"></i> Панель управления экспедицией
+                </h2>
+                
+                <div class="dashboard">
+                    <div class="dashboard-card">
+                        <h3>Статистика экспедиции</h3>
+                        <div class="statistics">
+                            <div class="stat-item">
+                                <div class="stat-value" id="total-artifacts">0</div>
+                                <div class="stat-label">Всего артефактов</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-value" id="total-users">0</div>
+                                <div class="stat-label">Участников</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-value" id="today-artifacts">0</div>
+                                <div class="stat-label">Находок сегодня</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-value" id="last-week">0</div>
+                                <div class="stat-label">За 7 дней</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="dashboard-card">
+                        <h3>Экспорт данных</h3>
+                        <p style="margin-bottom: 1.5rem;">Сформируйте отчет для сдачи в институт археологии:</p>
+                        <div style="display: flex; flex-direction: column; gap: 1rem;">
+                            <button id="export-pdf-btn" class="btn">
+                                <i class="fas fa-file-pdf"></i> Экспорт в PDF
+                            </button>
+                            <button id="export-excel-btn" class="btn btn-success">
+                                <i class="fas fa-file-excel"></i> Экспорт в Excel
+                            </button>
+                            <button id="export-shapefile-btn" class="btn btn-secondary">
+                                <i class="fas fa-file-export"></i> Экспорт в Shapefile
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="dashboard-card">
+                        <h3>Участники экспедиции</h3>
+                        <ul class="user-list" id="expedition-users">
+                            <!-- Список пользователей загружается через JavaScript -->
+                        </ul>
+                        <button id="add-user-btn" class="btn" style="margin-top: 1rem;">
+                            <i class="fas fa-user-plus"></i> Добавить участника
+                        </button>
+                    </div>
+                    
+                    <div class="dashboard-card">
+                        <h3>Журнал изменений</h3>
+                        <div style="max-height: 300px; overflow-y: auto;">
+                            <table style="width: 100%;">
+                                <thead>
+                                    <tr>
+                                        <th>Дата</th>
+                                        <th>Действие</th>
+                                        <th>Пользователь</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="change-log">
+                                    <!-- Журнал загружается через JavaScript -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Личный кабинет -->
+            <div id="profile-page" class="page">
+                <div class="profile-header">
+                    <div class="profile-avatar" id="profile-avatar">ИИ</div>
+                    <div class="profile-info">
+                        <h2 id="profile-name">Иван Археологов</h2>
+                        <div id="profile-role" style="margin-bottom: 0.5rem; color: var(--secondary-color); font-weight: 500;">Археолог</div>
+                        <div id="profile-expedition" style="color: #666;">Экспедиция "Крым-2023"</div>
+                    </div>
+                </div>
+                
+                <div class="profile-stats">
+                    <div class="stat-item">
+                        <div class="stat-value" id="user-artifacts">0</div>
+                        <div class="stat-label">Найденных артефактов</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="user-days">0</div>
+                        <div class="stat-label">Дней в экспедиции</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="user-last">-</div>
+                        <div class="stat-label">Последняя находка</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="user-joined">01.06.2023</div>
+                        <div class="stat-label">Дата присоединения</div>
+                    </div>
+                </div>
+                
+                <div class="dashboard-card" style="margin-bottom: 2rem;">
+                    <h3>Мои последние находки</h3>
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Артефакт</th>
+                                    <th>Тип</th>
+                                    <th>Дата</th>
+                                    <th>Координаты</th>
+                                </tr>
+                            </thead>
+                            <tbody id="user-artifacts-list">
+                                <!-- Данные загружаются через JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <div class="dashboard-card">
+                    <h3>Настройки профиля</h3>
+                    <div class="form-group">
+                        <label for="profile-email">Email</label>
+                        <input type="email" id="profile-email" class="form-control" value="ivan@example.com">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="profile-phone">Телефон</label>
+                        <input type="tel" id="profile-phone" class="form-control" placeholder="+7 (XXX) XXX-XX-XX">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="profile-notifications">Уведомления</label>
+                        <select id="profile-notifications" class="form-control">
+                            <option value="all">Все уведомления</option>
+                            <option value="important">Только важные</option>
+                            <option value="none">Не получать</option>
+                        </select>
+                    </div>
+                    
+                    <button id="save-profile-btn" class="btn">
+                        <i class="fas fa-save"></i> Сохранить изменения
+                    </button>
+                </div>
+            </div>
+        </main>
+
+        <!-- Подвал сайта (виден только после авторизации) -->
+        <footer id="site-footer" style="display: none;">
+            <p>&copy; 2023 ArchaeoPoint. Все права защищены.</p>
+            <p>Система защиты археологических данных с точной ГИС-привязкой</p>
+            <div class="footer-links">
+                <a href="#"><i class="fas fa-shield-alt"></i> Политика конфиденциальности</a>
+                <a href="#"><i class="fas fa-file-contract"></i> Пользовательское соглашение</a>
+                <a href="#"><i class="fas fa-envelope"></i> Контакты</a>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Модальное окно для добавления артефакта -->
+    <div id="artifact-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-plus-circle"></i> Добавление нового артефакта</h3>
+                <button class="close-modal">&times;</button>
+            </div>
+            
+            <div class="artifact-form">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="artifact-name">Название артефакта *</label>
+                        <input type="text" id="artifact-name" class="form-control" placeholder="Например: Бронзовое зеркало">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="artifact-type">Тип артефакта *</label>
+                        <select id="artifact-type" class="form-control">
+                            <option value="gold">Золотые изделия</option>
+                            <option value="ceramic">Керамика</option>
+                            <option value="bones">Костные останки</option>
+                            <option value="metal">Металлические изделия</option>
+                            <option value="stone">Каменные изделия</option>
+                            <option value="other">Прочие находки</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="artifact-date">Дата находки *</label>
+                        <input type="date" id="artifact-date" class="form-control" value="2023-06-15">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="artifact-depth">Глубина (см)</label>
+                        <input type="number" id="artifact-depth" class="form-control" placeholder="Например: 45">
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="artifact-coords-lat">Широта *</label>
+                        <input type="text" id="artifact-coords-lat" class="form-control" placeholder="44.123456" value="44.948237">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="artifact-coords-lng">Долгота *</label>
+                        <input type="text" id="artifact-coords-lng" class="form-control" placeholder="34.123456" value="34.100318">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="artifact-context">Контекст находки *</label>
+                    <textarea id="artifact-context" class="form-control" rows="3" placeholder="Описание слоя, квадрата раскопа, связанные находки..."></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label for="artifact-description">Описание артефакта</label>
+                    <textarea id="artifact-description" class="form-control" rows="3" placeholder="Подробное описание находки..."></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label>Фотографии артефакта</label>
+                    <div class="photo-upload" id="photo-upload-area">
+                        <i class="fas fa-camera" style="font-size: 2rem; color: #ccc; margin-bottom: 1rem;"></i>
+                        <p>Нажмите для загрузки фотографий</p>
+                        <p style="font-size: 0.8rem; color: #999;">Можно загрузить фото in situ и после очистки</p>
+                    </div>
+                    <div class="photo-preview" id="photo-preview"></div>
+                    <input type="file" id="photo-input" accept="image/*" multiple style="display: none;">
+                </div>
+                
+                <div class="form-group" style="display: flex; gap: 1rem;">
+                    <button id="save-artifact-btn" class="btn btn-success">Сохранить артефакт</button>
+                    <button id="cancel-artifact-btn" class="btn btn-secondary">Отмена</button>
+                    <button id="get-location-btn" class="btn">
+                        <i class="fas fa-location-arrow"></i> Определить координаты
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно для QR-кода -->
+    <div id="qr-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-qrcode"></i> QR-код артефакта</h3>
+                <button class="close-modal">&times;</button>
+            </div>
+            
+            <div class="qr-code-container">
+                <p>QR-код для маркировки артефакта. Распечатайте и приклейте к бирке находки.</p>
+                <div class="qr-code" id="qr-code-display">
+                    <div style="text-align: center;">
+                        <div style="font-size: 3rem; color: #333;">QR</div>
+                        <div style="font-size: 0.8rem;">ArchaeoPoint</div>
+                    </div>
+                </div>
+                <p id="qr-artifact-name" style="font-weight: bold; margin-top: 1rem;">Бронзовое зеркало</p>
+                <p id="qr-artifact-id" style="font-size: 0.9rem; color: #666;">ID: AP-2023-001</p>
+                <button id="print-qr-btn" class="btn">
+                    <i class="fas fa-print"></i> Распечатать QR-код
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно для добавления пользователя -->
+    <div id="user-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-user-plus"></i> Добавление участника экспедиции</h3>
+                <button class="close-modal">&times;</button>
+            </div>
+            
+            <div class="artifact-form">
+                <div class="form-group">
+                    <label for="new-user-name">ФИО *</label>
+                    <input type="text" id="new-user-name" class="form-control" placeholder="Введите полное имя">
+                </div>
+                
+                <div class="form-group">
+                    <label for="new-user-email">Email *</label>
+                    <input type="email" id="new-user-email" class="form-control" placeholder="Введите email">
+                </div>
+                
+                <div class="form-group">
+                    <label for="new-user-role">Роль *</label>
+                    <select id="new-user-role" class="form-control">
+                        <option value="archaeologist">Археолог</option>
+                        <option value="assistant">Помощник</option>
+                        <option value="student">Студент</option>
+                        <option value="admin">Администратор</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="new-user-expedition">Экспедиция *</label>
+                    <input type="text" id="new-user-expedition" class="form-control" placeholder="Название экспедиции">
+                </div>
+                
+                <div class="form-group">
+                    <button id="save-user-btn" class="btn btn-success">Добавить участника</button>
+                    <button id="cancel-user-btn" class="btn btn-secondary">Отмена</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Глобальные переменные
+        let currentUser = null;
+        let map = null;
+        let markersCluster = null;
+        let artifactMarkers = [];
+        let artifacts = [];
+        let users = [];
+        let expeditions = [];
+        
+        // Базовые слои карты
+        let baseLayers = {
+            osm: null,
+            topo: null,
+            scheme: null
+        };
+        
+        // Цвета для типов артефактов
+        const artifactColors = {
+            gold: '#FFD700',
+            ceramic: '#8B4513',
+            bones: '#F5F5DC',
+            metal: '#C0C0C0',
+            stone: '#808080',
+            other: '#9370DB'
+        };
+        
+        // Иконки для артефактов
+        const artifactIcons = {};
+        
+        // Инициализация иконок для карты
+        function initMapIcons() {
+            for (const type in artifactColors) {
+                artifactIcons[type] = L.divIcon({
+                    html: `<div style="background-color: ${artifactColors[type]}; width: 20px; height: 20px; border-radius: 50%; border: 2px solid white; box-shadow: 0 0 5px rgba(0,0,0,0.5);"></div>`,
+                    className: 'artifact-marker',
+                    iconSize: [24, 24]
+                });
+            }
+        }
+        
+        // Инициализация карты
+        function initMap() {
+            // Центр карты - Крым (пример раскопок)
+            const mapCenter = [44.948237, 34.100318];
+            
+            // Инициализация карты
+            map = L.map('map').setView(mapCenter, 16);
+            
+            // Создание базовых слоев
+            baseLayers.osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+                maxZoom: 19
+            }).addTo(map);
+            
+            baseLayers.topo = L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', {
+                attribution: 'Map data: &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, <a href="http://viewfinderpanoramas.org">SRTM</a> | Map style: &copy; <a href="https://opentopomap.org">OpenTopoMap</a> (<a href="https://creativecommons.org/licenses/by-sa/3.0/">CC-BY-SA</a>)',
+                maxZoom: 17
+            });
+            
+            baseLayers.scheme = L.tileLayer('https://stamen-tiles.a.ssl.fastly.net/toner/{z}/{x}/{y}.png', {
+                attribution: 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, under <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a>. Data by <a href="http://openstreetmap.org">OpenStreetMap</a>, under <a href="http://www.openstreetmap.org/copyright">ODbL</a>.',
+                maxZoom: 20
+            });
+            
+            // Инициализация кластера маркеров
+            markersCluster = L.markerClusterGroup({
+                maxClusterRadius: 50,
+                iconCreateFunction: function(cluster) {
+                    const count = cluster.getChildCount();
+                    let size = 'small';
+                    if (count > 20) size = 'large';
+                    else if (count > 10) size = 'medium';
+                    
+                    return L.divIcon({
+                        html: `<div><span>${count}</span></div>`,
+                        className: `marker-cluster marker-cluster-${size}`,
+                        iconSize: L.point(40, 40)
+                    });
+                }
+            });
+            
+            map.addLayer(markersCluster);
+            
+            // Добавление элементов управления
+            L.control.zoom({ position: 'topright' }).addTo(map);
+            
+            // Добавление легенды
+            const legend = L.control({ position: 'bottomleft' });
+            
+            legend.onAdd = function(map) {
+                const div = L.DomUtil.create('div', 'map-legend');
+                div.innerHTML = `
+                    <h4>Легенда:</h4>
+                    <div><i style="background: #FFD700"></i> Золотые изделия</div>
+                    <div><i style="background: #8B4513"></i> Керамика</div>
+                    <div><i style="background: #F5F5DC"></i> Костные останки</div>
+                    <div><i style="background: #C0C0C0"></i> Металлические изделия</div>
+                    <div><i style="background: #808080"></i> Каменные изделия</div>
+                    <div><i style="background: #9370DB"></i> Прочие находки</div>
+                `;
+                return div;
+            };
+            
+            legend.addTo(map);
+            
+            // Обработчик клика по карте для добавления артефакта
+            map.on('click', function(e) {
+                if (document.getElementById('artifact-modal').classList.contains('active')) {
+                    document.getElementById('artifact-coords-lat').value = e.latlng.lat.toFixed(6);
+                    document.getElementById('artifact-coords-lng').value = e.latlng.lng.toFixed(6);
+                }
+            });
+            
+            // Добавление тестовых данных
+            addSampleArtifacts();
+        }
+        
+        // Добавление тестовых артефактов на карту
+        function addSampleArtifacts() {
+            const sampleArtifacts = [
+                {
+                    id: 1,
+                    name: "Бронзовое зеркало",
+                    type: "metal",
+                    lat: 44.948237,
+                    lng: 34.100318,
+                    date: "2023-06-10",
+                    depth: 45,
+                    context: "Квадрат 5А, культурный слой III",
+                    description: "Бронзовое зеркало с орнаментом по краю",
+                    discoveredBy: "Иван Археологов",
+                    photos: []
+                },
+                {
+                    id: 2,
+                    name: "Золотая подвеска",
+                    type: "gold",
+                    lat: 44.948537,
+                    lng: 34.100618,
+                    date: "2023-06-12",
+                    depth: 32,
+                    context: "Квадрат 5Б, погребение №3",
+                    description: "Золотая подвеска с изображением орла",
+                    discoveredBy: "Мария Петрова",
+                    photos: []
+                },
+                {
+                    id: 3,
+                    name: "Керамический сосуд",
+                    type: "ceramic",
+                    lat: 44.947937,
+                    lng: 34.100018,
+                    date: "2023-06-08",
+                    depth: 58,
+                    context: "Квадрат 4В, жилой слой",
+                    description: "Фрагменты керамического сосуда",
+                    discoveredBy: "Алексей Смирнов",
+                    photos: []
+                },
+                {
+                    id: 4,
+                    name: "Каменный топор",
+                    type: "stone",
+                    lat: 44.948037,
+                    lng: 34.100918,
+                    date: "2023-06-14",
+                    depth: 40,
+                    context: "Квадрат 6А, хозяйственная яма",
+                    description: "Каменный топор с отверстием для рукояти",
+                    discoveredBy: "Иван Археологов",
+                    photos: []
+                },
+                {
+                    id: 5,
+                    name: "Костные останки",
+                    type: "bones",
+                    lat: 44.948737,
+                    lng: 34.099918,
+                    date: "2023-06-11",
+                    depth: 62,
+                    context: "Квадрат 5Г, погребение №5",
+                    description: "Фрагменты костей животных",
+                    discoveredBy: "Мария Петрова",
+                    photos: []
+                }
+            ];
+            
+            artifacts = sampleArtifacts;
+            updateArtifactsOnMap();
+            updateArtifactsTable();
+            updateStatistics();
+        }
+        
+        // Обновление артефактов на карте
+        function updateArtifactsOnMap() {
+            // Очистка существующих маркеров
+            markersCluster.clearLayers();
+            artifactMarkers = [];
+            
+            // Получение выбранных типов артефактов
+            const selectedTypes = [];
+            document.querySelectorAll('input[name="artifact-type"]:checked').forEach(checkbox => {
+                selectedTypes.push(checkbox.value);
+            });
+            
+            // Добавление маркеров для каждого артефакта
+            artifacts.forEach(artifact => {
+                if (selectedTypes.includes(artifact.type)) {
+                    const marker = L.marker([artifact.lat, artifact.lng], {
+                        icon: artifactIcons[artifact.type]
+                    });
+                    
+                    // Добавление попапа с информацией
+                    const popupContent = `
+                        <div class="artifact-popup">
+                            <h3>${artifact.name}</h3>
+                            <div class="popup-type" style="background-color: ${artifactColors[artifact.type]}">
+                                ${getArtifactTypeName(artifact.type)}
+                            </div>
+                            <p><strong>Дата:</strong> ${artifact.date}</p>
+                            <p><strong>Глубина:</strong> ${artifact.depth} см</p>
+                            <p><strong>Нашел:</strong> ${artifact.discoveredBy}</p>
+                            <p>${artifact.context}</p>
+                            <button onclick="showArtifactDetails(${artifact.id})" class="btn" style="width: 100%; padding: 0.25rem; font-size: 0.8rem;">
+                                <i class="fas fa-info-circle"></i> Подробнее
+                            </button>
+                        </div>
+                    `;
+                    
+                    marker.bindPopup(popupContent);
+                    artifactMarkers.push(marker);
+                    markersCluster.addLayer(marker);
+                }
+            });
+            
+            // Обновление кластера на карте
+            map.addLayer(markersCluster);
+        }
+        
+        // Получение названия типа артефакта
+        function getArtifactTypeName(type) {
+            const typeNames = {
+                gold: "Золотые изделия",
+                ceramic: "Керамика",
+                bones: "Костные останки",
+                metal: "Металлические изделия",
+                stone: "Каменные изделия",
+                other: "Прочие находки"
+            };
+            return typeNames[type] || "Неизвестный тип";
+        }
+        
+        // Инициализация приложения
+        document.addEventListener('DOMContentLoaded', function() {
+            // Проверка авторизации
+            checkAuth();
+            
+            // Инициализация иконок для карты
+            initMapIcons();
+            
+            // Обработчики навигации
+            document.querySelectorAll('nav a').forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const pageId = this.id.replace('nav-', '') + '-page';
+                    showPage(pageId);
+                });
+            });
+            
+            // Обработчики для страницы входа
+            document.getElementById('show-register').addEventListener('click', function() {
+                document.getElementById('login-form').style.display = 'none';
+                document.getElementById('register-form').style.display = 'block';
+            });
+            
+            document.getElementById('show-login').addEventListener('click', function() {
+                document.getElementById('register-form').style.display = 'none';
+                document.getElementById('login-form').style.display = 'block';
+            });
+            
+            document.getElementById('login-btn').addEventListener('click', function() {
+                const token = document.getElementById('login-token').value;
+                const password = document.getElementById('login-password').value;
+                
+                if (token && password) {
+                    loginUser(token, password);
+                } else {
+                    showAlert('Заполните все поля для входа', 'danger');
+                }
+            });
+            
+            document.getElementById('register-btn').addEventListener('click', function() {
+                const name = document.getElementById('register-name').value;
+                const email = document.getElementById('register-email').value;
+                const expedition = document.getElementById('register-expedition').value;
+                
+                if (name && email && expedition) {
+                    showAlert('Запрос доступа отправлен начальнику экспедиции. Вы получите уведомление на email после подтверждения.', 'success');
+                    document.getElementById('register-form').style.display = 'none';
+                    document.getElementById('login-form').style.display = 'block';
+                    // Очистка полей
+                    document.getElementById('register-name').value = '';
+                    document.getElementById('register-email').value = '';
+                    document.getElementById('register-expedition').value = '';
+                    document.getElementById('register-message').value = '';
+                } else {
+                    showAlert('Заполните обязательные поля: ФИО, Email и Название экспедиции', 'danger');
+                }
+            });
+            
+            // Обработчики для главной страницы
+            document.getElementById('goto-map-btn').addEventListener('click', function() {
+                showPage('map-page');
+            });
+            
+            // Обработчики для карты
+            document.querySelectorAll('input[name="map-layer"]').forEach(radio => {
+                radio.addEventListener('change', function() {
+                    changeMapLayer(this.value);
+                });
+            });
+            
+            document.querySelectorAll('input[name="artifact-type"]').forEach(checkbox => {
+                checkbox.addEventListener('change', function() {
+                    updateArtifactsOnMap();
+                });
+            });
+            
+            document.getElementById('add-artifact-btn').addEventListener('click', function() {
+                showModal('artifact-modal');
+            });
+            
+            document.getElementById('center-map-btn').addEventListener('click', function() {
+                if (artifacts.length > 0) {
+                    const bounds = L.latLngBounds(artifacts.map(a => [a.lat, a.lng]));
+                    map.fitBounds(bounds, { padding: [50, 50] });
+                } else {
+                    map.setView([44.948237, 34.100318], 16);
+                }
+            });
+            
+            document.getElementById('show-legend-btn').addEventListener('click', function() {
+                const legend = document.getElementById('map-legend');
+                legend.style.display = legend.style.display === 'block' ? 'none' : 'block';
+            });
+            
+            // Обработчики для модальных окон
+            document.querySelectorAll('.close-modal').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    hideAllModals();
+                });
+            });
+            
+            document.getElementById('cancel-artifact-btn').addEventListener('click', function() {
+                hideAllModals();
+            });
+            
+            document.getElementById('cancel-user-btn').addEventListener('click', function() {
+                hideAllModals();
+            });
+            
+            document.getElementById('get-location-btn').addEventListener('click', function() {
+                if (navigator.geolocation) {
+                    navigator.geolocation.getCurrentPosition(function(position) {
+                        document.getElementById('artifact-coords-lat').value = position.coords.latitude.toFixed(6);
+                        document.getElementById('artifact-coords-lng').value = position.coords.longitude.toFixed(6);
+                        showAlert('Координаты успешно определены!', 'success');
+                    }, function(error) {
+                        showAlert('Не удалось определить координаты. Пожалуйста, введите вручную.', 'danger');
+                    });
+                } else {
+                    showAlert('Геолокация не поддерживается вашим браузером.', 'danger');
+                }
+            });
+            
+            document.getElementById('save-artifact-btn').addEventListener('click', function() {
+                saveArtifact();
+            });
+            
+            document.getElementById('new-artifact-btn').addEventListener('click', function() {
+                showModal('artifact-modal');
+            });
+            
+            // Обработчики для панели управления
+            document.getElementById('add-user-btn').addEventListener('click', function() {
+                showModal('user-modal');
+            });
+            
+            document.getElementById('save-user-btn').addEventListener('click', function() {
+                addNewUser();
+            });
+            
+            document.getElementById('export-pdf-btn').addEventListener('click', function() {
+                exportToPDF();
+            });
+            
+            document.getElementById('export-excel-btn').addEventListener('click', function() {
+                exportToExcel();
+            });
+            
+            document.getElementById('export-shapefile-btn').addEventListener('click', function() {
+                exportToShapefile();
+            });
+            
+            // Обработчики для личного кабинета
+            document.getElementById('save-profile-btn').addEventListener('click', function() {
+                saveProfile();
+            });
+            
+            // Обработчик выхода из системы
+            document.getElementById('logout-btn').addEventListener('click', function() {
+                logoutUser();
+            });
+            
+            // Обработчик загрузки фотографий
+            document.getElementById('photo-upload-area').addEventListener('click', function() {
+                document.getElementById('photo-input').click();
+            });
+            
+            document.getElementById('photo-input').addEventListener('change', function(e) {
+                const files = e.target.files;
+                const preview = document.getElementById('photo-preview');
+                preview.innerHTML = '';
+                
+                for (let i = 0; i < files.length; i++) {
+                    const file = files[i];
+                    const reader = new FileReader();
+                    
+                    reader.onload = function(e) {
+                        const img = document.createElement('img');
+                        img.src = e.target.result;
+                        preview.appendChild(img);
+                    };
+                    
+                    reader.readAsDataURL(file);
+                }
+            });
+            
+            // Инициализация тестовых пользователей
+            initTestUsers();
+            
+            // Инициализация тестовых экспедиций
+            initTestExpeditions();
+        });
+        
+        // Проверка авторизации
+        function checkAuth() {
+            const savedUser = localStorage.getItem('archaeopoint_user');
+            if (savedUser) {
+                currentUser = JSON.parse(savedUser);
+                showAuthenticatedUI();
+                initMap(); // Инициализируем карту только после авторизации
+            }
+        }
+        
+        // Показать интерфейс для авторизованного пользователя
+        function showAuthenticatedUI() {
+            document.getElementById('gatekeeper-page').style.display = 'none';
+            document.getElementById('site-header').style.display = 'flex';
+            document.getElementById('main-content').style.display = 'block';
+            document.getElementById('site-footer').style.display = 'block';
+            
+            // Обновление информации о пользователе
+            document.getElementById('user-name').textContent = currentUser.name;
+            document.getElementById('user-role').textContent = currentUser.role === 'admin' ? 'Начальник экспедиции' : 'Археолог';
+            document.getElementById('user-avatar').textContent = currentUser.name.split(' ').map(n => n[0]).join('').toUpperCase();
+            
+            document.getElementById('profile-name').textContent = currentUser.name;
+            document.getElementById('profile-role').textContent = currentUser.role === 'admin' ? 'Начальник экспедиции' : 'Археолог';
+            document.getElementById('profile-avatar').textContent = currentUser.name.split(' ').map(n => n[0]).join('').toUpperCase();
+            document.getElementById('profile-email').value = currentUser.email || '';
+            
+            // Обновление статистики
+            updateStatistics();
+            updateUserList();
+            updateUserArtifacts();
+        }
+        
+        // Вход пользователя
+        function loginUser(token, password) {
+            // В реальном приложении здесь был бы запрос к серверу
+            // Для демо используем тестовых пользователей
+            
+            const testUsers = [
+                { email: "admin@archaeopoint.ru", password: "admin123", name: "Александр Иванов", role: "admin", expedition: "Крым-2023" },
+                { email: "archaeologist@archaeopoint.ru", password: "arch123", name: "Иван Археологов", role: "archaeologist", expedition: "Крым-2023" },
+                { email: "assistant@archaeopoint.ru", password: "assist123", name: "Мария Петрова", role: "assistant", expedition: "Крым-2023" }
+            ];
+            
+            const user = testUsers.find(u => u.email === token || u.password === password);
+            
+            if (user) {
+                currentUser = user;
+                localStorage.setItem('archaeopoint_user', JSON.stringify(user));
+                showAuthenticatedUI();
+                showAlert('Успешный вход в систему!', 'success');
+            } else {
+                showAlert('Неверный токен или пароль. Для демо используйте admin@archaeopoint.ru / admin123', 'danger');
+            }
+        }
+        
+        // Выход пользователя
+        function logoutUser() {
+            currentUser = null;
+            localStorage.removeItem('archaeopoint_user');
+            
+            document.getElementById('site-header').style.display = 'none';
+            document.getElementById('main-content').style.display = 'none';
+            document.getElementById('site-footer').style.display = 'none';
+            document.getElementById('gatekeeper-page').style.display = 'block';
+            document.getElementById('login-form').style.display = 'block';
+            document.getElementById('register-form').style.display = 'none';
+            
+            // Очистка полей входа
+            document.getElementById('login-token').value = '';
+            document.getElementById('login-password').value = '';
+            
+            showAlert('Вы вышли из системы', 'info');
+        }
+        
+        // Показать страницу
+        function showPage(pageId) {
+            document.querySelectorAll('.page').forEach(page => {
+                page.classList.remove('active');
+            });
+            
+            document.getElementById(pageId).classList.add('active');
+            
+            // Обновление данных при переходе на страницу
+            if (pageId === 'artifacts-page') {
+                updateArtifactsTable();
+            } else if (pageId === 'dashboard-page' && currentUser.role === 'admin') {
+                updateStatistics();
+                updateUserList();
+                updateChangeLog();
+            } else if (pageId === 'profile-page') {
+                updateUserArtifacts();
+            }
+        }
+        
+        // Показать модальное окно
+        function showModal(modalId) {
+            document.querySelectorAll('.modal').forEach(modal => {
+                modal.classList.remove('active');
+            });
+            
+            document.getElementById(modalId).classList.add('active');
+            
+            // Если открываем окно добавления артефакта, заполняем текущей датой
+            if (modalId === 'artifact-modal') {
+                const today = new Date().toISOString().split('T')[0];
+                document.getElementById('artifact-date').value = today;
+                
+                // Если пользователь не админ, скрываем некоторые поля
+                if (currentUser.role !== 'admin') {
+                    document.getElementById('artifact-discoverer').value = currentUser.name;
+                }
+            }
+        }
+        
+        // Скрыть все модальные окна
+        function hideAllModals() {
+            document.querySelectorAll('.modal').forEach(modal => {
+                modal.classList.remove('active');
+            });
+        }
+        
+        // Изменить слой карты
+        function changeMapLayer(layerType) {
+            if (baseLayers.osm) map.removeLayer(baseLayers.osm);
+            if (baseLayers.topo) map.removeLayer(baseLayers.topo);
+            if (baseLayers.scheme) map.removeLayer(baseLayers.scheme);
+            
+            if (layerType === 'topo' && baseLayers.topo) {
+                map.addLayer(baseLayers.topo);
+            } else if (layerType === 'scheme' && baseLayers.scheme) {
+                map.addLayer(baseLayers.scheme);
+            } else {
+                map.addLayer(baseLayers.osm);
+            }
+        }
+        
+        // Сохранение артефакта
+        function saveArtifact() {
+            const name = document.getElementById('artifact-name').value;
+            const type = document.getElementById('artifact-type').value;
+            const date = document.getElementById('artifact-date').value;
+            const depth = document.getElementById('artifact-depth').value;
+            const lat = document.getElementById('artifact-coords-lat').value;
+            const lng = document.getElementById('artifact-coords-lng').value;
+            const context = document.getElementById('artifact-context').value;
+            const description = document.getElementById('artifact-description').value;
+            
+            if (!name || !type || !date || !lat || !lng || !context) {
+                showAlert('Заполните все обязательные поля (отмечены *)', 'danger');
+                return;
+            }
+            
+            const newArtifact = {
+                id: artifacts.length + 1,
+                name: name,
+                type: type,
+                lat: parseFloat(lat),
+                lng: parseFloat(lng),
+                date: date,
+                depth: depth ? parseInt(depth) : null,
+                context: context,
+                description: description,
+                discoveredBy: currentUser.name,
+                photos: [] // В реальном приложении здесь были бы загруженные фото
+            };
+            
+            artifacts.push(newArtifact);
+            
+            // Добавление в историю изменений
+            if (currentUser.role === 'admin') {
+                addToChangeLog('Добавлен артефакт: ' + name);
+            }
+            
+            // Обновление интерфейса
+            updateArtifactsOnMap();
+            updateArtifactsTable();
+            updateStatistics();
+            
+            // Закрытие модального окна и сброс формы
+            hideAllModals();
+            document.getElementById('artifact-name').value = '';
+            document.getElementById('artifact-context').value = '';
+            document.getElementById('artifact-description').value = '';
+            document.getElementById('artifact-depth').value = '';
+            document.getElementById('photo-preview').innerHTML = '';
+            
+            // Показ QR-кода
+            showArtifactQR(newArtifact);
+            
+            showAlert('Артефакт успешно добавлен!', 'success');
+        }
+        
+        // Показать QR-код артефакта
+        function showArtifactQR(artifact) {
+            document.getElementById('qr-artifact-name').textContent = artifact.name;
+            document.getElementById('qr-artifact-id').textContent = `ID: AP-2023-${artifact.id.toString().padStart(3, '0')}`;
+            showModal('qr-modal');
+        }
+        
+        // Показать детали артефакта
+        function showArtifactDetails(artifactId) {
+            const artifact = artifacts.find(a => a.id === artifactId);
+            if (artifact) {
+                alert(`Детали артефакта:\n\nНазвание: ${artifact.name}\nТип: ${getArtifactTypeName(artifact.type)}\nДата находки: ${artifact.date}\nКоординаты: ${artifact.lat}, ${artifact.lng}\nГлубина: ${artifact.depth} см\nКонтекст: ${artifact.context}\nОписание: ${artifact.description}\nНашел: ${artifact.discoveredBy}`);
+            }
+        }
+        
+        // Обновление таблицы артефактов
+        function updateArtifactsTable() {
+            const tbody = document.getElementById('artifacts-table-body');
+            tbody.innerHTML = '';
+            
+            artifacts.forEach(artifact => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>AP-2023-${artifact.id.toString().padStart(3, '0')}</td>
+                    <td>${artifact.name}</td>
+                    <td><span class="popup-type" style="background-color: ${artifactColors[artifact.type]}; color: ${artifact.type === 'bones' || artifact.type === 'metal' ? '#333' : 'white'}; padding: 0.2rem 0.5rem; border-radius: 12px; font-size: 0.8rem;">${getArtifactTypeName(artifact.type)}</span></td>
+                    <td>${artifact.date}</td>
+                    <td>${artifact.lat.toFixed(6)}, ${artifact.lng.toFixed(6)}</td>
+                    <td>${artifact.discoveredBy}</td>
+                    <td>
+                        <button onclick="showArtifactDetails(${artifact.id})" class="btn" style="padding: 0.25rem 0.5rem; font-size: 0.8rem;">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                        <button onclick="showArtifactQR(${artifact})" class="btn btn-secondary" style="padding: 0.25rem 0.5rem; font-size: 0.8rem;">
+                            <i class="fas fa-qrcode"></i>
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+        
+        // Обновление статистики
+        function updateStatistics() {
+            document.getElementById('total-artifacts').textContent = artifacts.length;
+            document.getElementById('total-users').textContent = users.length;
+            
+            // Находки за сегодня
+            const today = new Date().toISOString().split('T')[0];
+            const todayArtifacts = artifacts.filter(a => a.date === today).length;
+            document.getElementById('today-artifacts').textContent = todayArtifacts;
+            
+            // Находки за 7 дней
+            const weekAgo = new Date();
+            weekAgo.setDate(weekAgo.getDate() - 7);
+            const lastWeekArtifacts = artifacts.filter(a => new Date(a.date) >= weekAgo).length;
+            document.getElementById('last-week').textContent = lastWeekArtifacts;
+            
+            // Статистика для личного кабинета
+            if (currentUser) {
+                const userArtifacts = artifacts.filter(a => a.discoveredBy === currentUser.name).length;
+                document.getElementById('user-artifacts').textContent = userArtifacts;
+                
+                // Дни в экспедиции (примерные)
+                const joinDate = new Date('2023-06-01');
+                const todayDate = new Date();
+                const daysInExpedition = Math.ceil((todayDate - joinDate) / (1000 * 60 * 60 * 24));
+                document.getElementById('user-days').textContent = daysInExpedition;
+                
+                // Последняя находка
+                const userLatest = artifacts.filter(a => a.discoveredBy === currentUser.name)
+                    .sort((a, b) => new Date(b.date) - new Date(a.date))[0];
+                document.getElementById('user-last').textContent = userLatest ? userLatest.date : '-';
+            }
+        }
+        
+        // Инициализация тестовых пользователей
+        function initTestUsers() {
+            users = [
+                { id: 1, name: "Александр Иванов", email: "admin@archaeopoint.ru", role: "admin", expedition: "Крым-2023", joined: "2023-05-15" },
+                { id: 2, name: "Иван Археологов", email: "ivan@example.com", role: "archaeologist", expedition: "Крым-2023", joined: "2023-06-01" },
+                { id: 3, name: "Мария Петрова", email: "maria@example.com", role: "assistant", expedition: "Крым-2023", joined: "2023-06-05" },
+                { id: 4, name: "Алексей Смирнов", email: "alexey@example.com", role: "archaeologist", expedition: "Крым-2023", joined: "2023-06-03" },
+                { id: 5, name: "Екатерина Волкова", email: "ekaterina@example.com", role: "student", expedition: "Крым-2023", joined: "2023-06-10" }
+            ];
+        }
+        
+        // Инициализация тестовых экспедиций
+        function initTestExpeditions() {
+            expeditions = [
+                { id: 1, name: "Крым-2023", location: "Крым, Бахчисарайский район", startDate: "2023-06-01", endDate: "2023-08-31", director: "Александр Иванов" },
+                { id: 2, name: "Великий Новгород-2023", location: "Новгородская область", startDate: "2023-07-15", endDate: "2023-09-30", director: "Петр Сидоров" }
+            ];
+        }
+        
+        // Обновление списка пользователей
+        function updateUserList() {
+            const userList = document.getElementById('expedition-users');
+            userList.innerHTML = '';
+            
+            users.forEach(user => {
+                const li = document.createElement('li');
+                li.className = 'user-item';
+                
+                let roleClass = '';
+                let roleText = '';
+                
+                switch(user.role) {
+                    case 'admin':
+                        roleClass = 'role-admin';
+                        roleText = 'Начальник';
+                        break;
+                    case 'archaeologist':
+                        roleClass = 'role-archaeologist';
+                        roleText = 'Археолог';
+                        break;
+                    case 'assistant':
+                        roleClass = 'role-assistant';
+                        roleText = 'Помощник';
+                        break;
+                    default:
+                        roleClass = '';
+                        roleText = user.role;
+                }
+                
+                li.innerHTML = `
+                    <div>
+                        <div style="font-weight: 500;">${user.name}</div>
+                        <div style="font-size: 0.8rem; color: #666;">${user.email}</div>
+                    </div>
+                    <div>
+                        <span class="user-role ${roleClass}">${roleText}</span>
+                        ${currentUser.role === 'admin' && user.id !== currentUser.id ? 
+                          `<button onclick="removeUser(${user.id})" class="btn btn-danger" style="padding: 0.25rem 0.5rem; font-size: 0.8rem; margin-left: 0.5rem;">
+                            <i class="fas fa-times"></i>
+                          </button>` : ''}
+                    </div>
+                `;
+                
+                userList.appendChild(li);
+            });
+        }
+        
+        // Удаление пользователя
+        function removeUser(userId) {
+            if (confirm('Вы уверены, что хотите удалить этого участника экспедиции?')) {
+                users = users.filter(u => u.id !== userId);
+                updateUserList();
+                addToChangeLog('Удален участник экспедиции (ID: ' + userId + ')');
+                showAlert('Пользователь удален из экспедиции', 'success');
+            }
+        }
+        
+        // Добавление нового пользователя
+        function addNewUser() {
+            const name = document.getElementById('new-user-name').value;
+            const email = document.getElementById('new-user-email').value;
+            const role = document.getElementById('new-user-role').value;
+            const expedition = document.getElementById('new-user-expedition').value;
+            
+            if (!name || !email || !expedition) {
+                showAlert('Заполните все обязательные поля', 'danger');
+                return;
+            }
+            
+            const newUser = {
+                id: users.length + 1,
+                name: name,
+                email: email,
+                role: role,
+                expedition: expedition,
+                joined: new Date().toISOString().split('T')[0]
+            };
+            
+            users.push(newUser);
+            updateUserList();
+            addToChangeLog('Добавлен новый участник: ' + name);
+            hideAllModals();
+            
+            // Очистка формы
+            document.getElementById('new-user-name').value = '';
+            document.getElementById('new-user-email').value = '';
+            document.getElementById('new-user-expedition').value = '';
+            
+            showAlert('Пользователь успешно добавлен в экспедицию', 'success');
+        }
+        
+        // Обновление истории изменений
+        function updateChangeLog() {
+            const log = [
+                { date: '2023-06-15 10:30', action: 'Добавлен артефакт "Бронзовое зеркало"', user: 'Иван Археологов' },
+                { date: '2023-06-15 09:15', action: 'Экспорт данных в PDF', user: 'Александр Иванов' },
+                { date: '2023-06-14 16:45', action: 'Добавлен участник экспедиции', user: 'Александр Иванов' },
+                { date: '2023-06-14 14:20', action: 'Добавлен артефакт "Золотая подвеска"', user: 'Мария Петрова' },
+                { date: '2023-06-13 11:10', action: 'Изменены настройки доступа', user: 'Александр Иванов' }
+            ];
+            
+            const tbody = document.getElementById('change-log');
+            tbody.innerHTML = '';
+            
+            log.forEach(entry => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${entry.date}</td>
+                    <td>${entry.action}</td>
+                    <td>${entry.user}</td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+        
+        // Добавление записи в историю изменений
+        function addToChangeLog(action) {
+            // В реальном приложении здесь была бы запись в базу данных
+            console.log('Запись в историю изменений:', action);
+        }
+        
+        // Обновление списка артефактов пользователя
+        function updateUserArtifacts() {
+            if (!currentUser) return;
+            
+            const userArtifacts = artifacts.filter(a => a.discoveredBy === currentUser.name)
+                .sort((a, b) => new Date(b.date) - new Date(a.date))
+                .slice(0, 5); // Показываем только последние 5 находок
+            
+            const tbody = document.getElementById('user-artifacts-list');
+            tbody.innerHTML = '';
+            
+            if (userArtifacts.length === 0) {
+                const row = document.createElement('tr');
+                row.innerHTML = `<td colspan="4" style="text-align: center; color: #666;">Вы еще не добавили ни одного артефакта</td>`;
+                tbody.appendChild(row);
+                return;
+            }
+            
+            userArtifacts.forEach(artifact => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${artifact.name}</td>
+                    <td>${getArtifactTypeName(artifact.type)}</td>
+                    <td>${artifact.date}</td>
+                    <td>${artifact.lat.toFixed(4)}, ${artifact.lng.toFixed(4)}</td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+        
+        // Сохранение профиля
+        function saveProfile() {
+            const email = document.getElementById('profile-email').value;
+            const phone = document.getElementById('profile-phone').value;
+            const notifications = document.getElementById('profile-notifications').value;
+            
+            // В реальном приложении здесь был бы запрос к серверу
+            currentUser.email = email;
+            
+            showAlert('Настройки профиля сохранены', 'success');
+        }
+        
+        // Экспорт в PDF
+        function exportToPDF() {
+            showAlert('Функция экспорта в PDF будет доступна в полной версии системы', 'info');
+        }
+        
+        // Экспорт в Excel
+        function exportToExcel() {
+            showAlert('Функция экспорта в Excel будет доступна в полной версии системы', 'info');
+        }
+        
+        // Экспорт в Shapefile
+        function exportToShapefile() {
+            showAlert('Функция экспорта в Shapefile будет доступна в полной версии системы', 'info');
+        }
+        
+        // Показать уведомление
+        function showAlert(message, type) {
+            // Удаляем предыдущие уведомления
+            const existingAlert = document.querySelector('.alert');
+            if (existingAlert) {
+                existingAlert.remove();
+            }
+            
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${type}`;
+            alertDiv.innerHTML = `
+                <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'danger' ? 'exclamation-circle' : 'info-circle'}"></i>
+                ${message}
+            `;
+            
+            // Вставляем уведомление в зависимости от страницы
+            if (document.getElementById('gatekeeper-page').classList.contains('active')) {
+                document.querySelector('.gatekeeper').insertBefore(alertDiv, document.querySelector('.gatekeeper h2'));
+            } else {
+                document.querySelector('main').insertBefore(alertDiv, document.querySelector('main').firstChild);
+            }
+            
+            // Автоматическое скрытие уведомления через 5 секунд
+            setTimeout(() => {
+                if (alertDiv.parentNode) {
+                    alertDiv.remove();
+                }
+            }, 5000);
+        }
+    </script>
+</body>
+</html>
