@@ -9,7 +9,6 @@
     <link rel="manifest" href="/manifest.json">
     <meta name="theme-color" content="#8B4513">
     <style>
-        /* Основные стили */
         * {
             margin: 0;
             padding: 0;
@@ -52,7 +51,6 @@
             flex-direction: column;
         }
 
-        /* Уведомление о работе в офлайн-режиме */
         #offline-notification {
             position: fixed;
             top: 0;
@@ -76,7 +74,6 @@
             to { transform: translateY(0); }
         }
 
-        /* Прогресс бар загрузки */
         .progress-bar {
             position: fixed;
             top: 0;
@@ -88,7 +85,6 @@
             transition: width 0.3s ease;
         }
 
-        /* Шапка */
         header {
             background: linear-gradient(135deg, var(--dark-color), var(--primary-color));
             color: white;
@@ -205,7 +201,6 @@
             font-weight: bold;
         }
 
-        /* Основной контент */
         main {
             flex: 1;
             padding: 2rem;
@@ -215,7 +210,6 @@
             background-color: #121212;
         }
 
-        /* Стили для страниц */
         .page {
             display: none;
             animation: fadeIn 0.5s ease;
@@ -230,7 +224,6 @@
             to { opacity: 1; }
         }
 
-        /* Защитный шлюз / Вход */
         .gatekeeper {
             max-width: 500px;
             margin: 4rem auto;
@@ -315,7 +308,6 @@
             color: #666;
         }
 
-        /* 2FA стили */
         .two-factor-form {
             display: none;
         }
@@ -446,7 +438,6 @@
             color: #d1ecf1;
         }
 
-        /* Добро пожаловать */
         .welcome-hero {
             text-align: center;
             padding: 3rem 2rem;
@@ -516,7 +507,6 @@
             color: #e0e0e0;
         }
 
-        /* Интерактивная карта */
         #map-container {
             height: 600px;
             border-radius: var(--border-radius);
@@ -653,7 +643,76 @@
             color: #e0e0e0;
         }
 
-        /* Панель управления */
+        .template-card {
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+        
+        .template-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .template-card .use-template-btn {
+            margin-top: 1rem;
+            width: 100%;
+        }
+        
+        #sketch-canvas {
+            touch-action: none;
+        }
+        
+        .recording {
+            animation: pulse 1.5s infinite;
+            color: #e74c3c !important;
+        }
+        
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+        
+        .attachment-item {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background-color: #f8f9fa;
+            border-radius: var(--border-radius);
+            margin-bottom: 0.5rem;
+        }
+        
+        .attachment-item i {
+            color: var(--primary-color);
+        }
+        
+        .audio-player {
+            width: 100%;
+            margin-top: 0.5rem;
+        }
+        
+        .visualizer {
+            height: 50px;
+            background-color: #f0f0f0;
+            border-radius: var(--border-radius);
+            margin-top: 1rem;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .visualizer-bar {
+            position: absolute;
+            bottom: 0;
+            width: 4px;
+            background-color: var(--primary-color);
+            border-radius: 2px 2px 0 0;
+        }
+        
+        .voice-input-active {
+            border-color: var(--primary-color) !important;
+            box-shadow: 0 0 0 0.2rem rgba(139, 69, 19, 0.25);
+        }
+
         .dashboard {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
@@ -744,12 +803,23 @@
         .role-admin { background-color: #d4edda; color: #155724; }
         .role-archaeologist { background-color: #d1ecf1; color: #0c5460; }
         .role-assistant { background-color: #fff3cd; color: #856404; }
+        .role-stratigraphy { background-color: #d1ecf1; color: #0c5460; }
+        .role-findings { background-color: #d4edda; color: #155724; }
+        .role-weather { background-color: #cce5ff; color: #004085; }
+        .role-observations { background-color: #fff3cd; color: #856404; }
+        .role-planning { background-color: #e2e3e5; color: #383d41; }
+        .role-problems { background-color: #f8d7da; color: #721c24; }
 
         .dark-mode .role-admin { background-color: #155724; color: #d4edda; }
         .dark-mode .role-archaeologist { background-color: #0c5460; color: #d1ecf1; }
         .dark-mode .role-assistant { background-color: #856404; color: #fff3cd; }
+        .dark-mode .role-stratigraphy { background-color: #0c5460; color: #d1ecf1; }
+        .dark-mode .role-findings { background-color: #155724; color: #d4edda; }
+        .dark-mode .role-weather { background-color: #004085; color: #cce5ff; }
+        .dark-mode .role-observations { background-color: #856404; color: #fff3cd; }
+        .dark-mode .role-planning { background-color: #383d41; color: #e2e3e5; }
+        .dark-mode .role-problems { background-color: #721c24; color: #f8d7da; }
 
-        /* Карточка артефакта */
         .artifact-form {
             max-width: 800px;
             margin: 0 auto;
@@ -899,13 +969,6 @@
             animation: pulse 1s infinite;
         }
 
-        @keyframes pulse {
-            0% { opacity: 1; }
-            50% { opacity: 0.5; }
-            100% { opacity: 1; }
-        }
-
-        /* Личный кабинет */
         .profile-header {
             display: flex;
             align-items: center;
@@ -944,7 +1007,6 @@
             margin-bottom: 2rem;
         }
 
-        /* Таблицы */
         .table-container {
             overflow-x: auto;
             background-color: white;
@@ -990,7 +1052,6 @@
             background-color: #2d2d2d;
         }
 
-        /* Подвал */
         footer {
             background-color: var(--dark-color);
             color: white;
@@ -1026,7 +1087,6 @@
             opacity: 1;
         }
 
-        /* Мобильная адаптация */
         @media (max-width: 768px) {
             header {
                 flex-direction: column;
@@ -1076,7 +1136,6 @@
             }
         }
 
-        /* Стили для модальных окон */
         .modal {
             display: none;
             position: fixed;
@@ -1135,7 +1194,6 @@
             color: #999;
         }
 
-        /* Конструктор отчетов */
         .report-builder {
             display: grid;
             grid-template-columns: 300px 1fr;
@@ -1171,7 +1229,6 @@
             margin-bottom: 0.75rem;
         }
 
-        /* Стратиграфия */
         .stratigraphy-visualization {
             display: grid;
             grid-template-columns: 300px 1fr;
@@ -1216,7 +1273,6 @@
             background-color: #2d2d2d;
         }
 
-        /* Пакетная загрузка */
         .batch-upload {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -1252,7 +1308,6 @@
             border-bottom-color: #333;
         }
 
-        /* 3D визуализация */
         .visualization-3d {
             height: 500px;
             border-radius: var(--border-radius);
@@ -1274,7 +1329,6 @@
             z-index: 10;
         }
 
-        /* Тепловая карта */
         .heatmap-legend {
             position: absolute;
             bottom: 20px;
@@ -1299,7 +1353,6 @@
             margin: 0.5rem 0;
         }
 
-        /* QR-код стили */
         .qr-code-container {
             text-align: center;
             padding: 1.5rem;
@@ -1330,7 +1383,6 @@
             color: #aaa;
         }
 
-        /* Стили для Leaflet */
         .leaflet-control-zoom {
             margin-top: 10px !important;
             margin-right: 10px !important;
@@ -1363,17 +1415,14 @@
     </style>
 </head>
 <body>
-    <!-- Прогресс бар загрузки -->
     <div class="progress-bar" id="progress-bar"></div>
     
-    <!-- Уведомление о работе в офлайн-режиме -->
     <div id="offline-notification">
         <i class="fas fa-wifi-slash"></i> Вы работаете в офлайн-режиме. Данные будут синхронизированы при восстановлении соединения.
         <span id="pending-changes">0 изменений ожидают синхронизации</span>
     </div>
     
     <div class="container">
-        <!-- Защитный шлюз (Gatekeeper) - первая страница -->
         <div id="gatekeeper-page" class="page active">
             <div class="gatekeeper">
                 <div class="logo" style="justify-content: center; margin-bottom: 2rem;">
@@ -1394,7 +1443,7 @@
                         <label for="login-token">Токен экспедиции / Email</label>
                         <div class="input-with-icon">
                             <i class="fas fa-user input-icon"></i>
-                            <input type="text" id="login-token" class="form-control" placeholder="Введите токен или email">
+                            <input type="text" id="login-token" class="form-control" placeholder="Введите admin@archaeopoint.ru">
                         </div>
                     </div>
                     
@@ -1402,7 +1451,7 @@
                         <label for="login-password">Пароль</label>
                         <div class="input-with-icon">
                             <i class="fas fa-lock input-icon"></i>
-                            <input type="password" id="login-password" class="form-control" placeholder="Введите пароль">
+                            <input type="password" id="login-password" class="form-control" placeholder="Введите admin123">
                         </div>
                     </div>
                     
@@ -1430,7 +1479,6 @@
                     </div>
                 </div>
                 
-                <!-- Форма двухфакторной аутентификации -->
                 <div id="two-factor-form" class="two-factor-form">
                     <div class="alert alert-info">
                         <i class="fas fa-info-circle"></i> На ваш телефон отправлен код подтверждения. Введите 6-значный код для входа.
@@ -1465,7 +1513,6 @@
                     </div>
                 </div>
                 
-                <!-- Форма регистрации -->
                 <div id="register-form" style="display: none;">
                     <div class="alert alert-info">
                         <i class="fas fa-info-circle"></i> Запрос доступа отправляется начальнику экспедиции. После подтверждения вам будет предоставлен доступ.
@@ -1526,7 +1573,6 @@
             </div>
         </div>
 
-        <!-- Шапка сайта (видна только после авторизации) -->
         <header id="site-header" style="display: none;">
             <div class="logo">
                 <div class="logo-icon">
@@ -1543,6 +1589,7 @@
                     <li><a href="#" id="nav-welcome">Главная</a></li>
                     <li><a href="#" id="nav-map">Карта раскопок</a></li>
                     <li><a href="#" id="nav-artifacts">Артефакты</a></li>
+                    
                     <li><a href="#" id="nav-dashboard">Панель управления</a></li>
                     <li><a href="#" id="nav-profile">Личный кабинет</a></li>
                 </ul>
@@ -1571,9 +1618,7 @@
             </div>
         </header>
 
-        <!-- Основной контент (виден только после авторизации) -->
         <main id="main-content" style="display: none;">
-            <!-- Главная страница -->
             <div id="welcome-page" class="page active">
                 <div class="welcome-hero">
                     <h1>Добро пожаловать в ArchaeoPoint</h1>
@@ -1636,10 +1681,25 @@
                         <h3>Двухфакторная аутентификация</h3>
                         <p>Защита от неавторизованного доступа через SMS или приложение-аутентификатор.</p>
                     </div>
+                    
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-book-open"></i>
+                        </div>
+                        <h3>Полевой журнал</h3>
+                        <p>Голосовые записи, AI-расшифровка речи и инструменты для создания чертежей.</p>
+                    </div>
+                    
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-paint-brush"></i>
+                        </div>
+                        <h3>Чертежи и схемы</h3>
+                        <p>Профессиональные инструменты для создания археологических чертежей прямо на планшете.</p>
+                    </div>
                 </div>
             </div>
 
-            <!-- Карта раскопок -->
             <div id="map-page" class="page">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
                     <h2 style="color: var(--primary-color);">
@@ -1761,7 +1821,6 @@
                     </div>
                 </div>
                 
-                <!-- 3D визуализация -->
                 <div class="visualization-3d" id="visualization-3d" style="display: none; margin-top: 2rem;">
                     <div style="position: absolute; top: 20px; left: 20px; color: #333; background-color: rgba(255,255,255,0.9); padding: 1rem; border-radius: var(--border-radius);">
                         <h4>3D визуализация культурных слоев</h4>
@@ -1781,7 +1840,6 @@
                 </div>
             </div>
 
-            <!-- Список артефактов -->
             <div id="artifacts-page" class="page">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
                     <h2 style="color: var(--primary-color);">
@@ -1815,17 +1873,14 @@
                             </tr>
                         </thead>
                         <tbody id="artifacts-table-body">
-                            <!-- Данные загружаются через JavaScript -->
                         </tbody>
                     </table>
                 </div>
                 
-                <!-- Стратиграфия -->
                 <div class="stratigraphy-visualization">
                     <div class="stratigraphy-layers">
                         <h3>Стратиграфические слои</h3>
                         <div id="layers-list">
-                            <!-- Слои загружаются через JavaScript -->
                         </div>
                         <button id="add-layer-btn" class="btn btn-block" style="margin-top: 1rem;">
                             <i class="fas fa-plus"></i> Добавить слой
@@ -1840,7 +1895,210 @@
                 </div>
             </div>
 
-            <!-- Панель управления -->
+            <div id="field-journal-page" class="page">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                    <h2 style="color: var(--primary-color);">
+                        <i class="fas fa-book-open"></i> Полевой журнал
+                    </h2>
+                    <div class="map-tools">
+                        <button id="new-journal-entry" class="btn">
+                            <i class="fas fa-plus"></i> Новая запись
+                        </button>
+                        <button id="export-journal-btn" class="btn btn-success">
+                            <i class="fas fa-file-export"></i> Экспорт журнала
+                        </button>
+                    </div>
+                </div>
+
+                <div class="dashboard" style="margin-bottom: 2rem;">
+                    <div class="dashboard-card">
+                        <h3><i class="fas fa-microphone"></i> Голосовой журнал</h3>
+                        <div style="text-align: center; padding: 2rem;">
+                            <div id="voice-recording-status" style="margin-bottom: 1.5rem;">
+                                <div id="voice-status-icon" style="font-size: 3rem; color: #ccc; margin-bottom: 1rem;">
+                                    <i class="fas fa-microphone"></i>
+                                </div>
+                                <div id="voice-status-text" style="color: #666; margin-bottom: 1rem;">
+                                    Нажмите кнопку ниже, чтобы начать запись
+                                </div>
+                                <div id="recording-timer" style="font-size: 1.5rem; font-weight: bold; display: none;">
+                                    00:00
+                                </div>
+                            </div>
+
+                            <div style="display: flex; gap: 1rem; justify-content: center; margin-bottom: 1.5rem;">
+                                <button id="start-recording-btn" class="btn btn-success">
+                                    <i class="fas fa-record-vinyl"></i> Начать запись
+                                </button>
+                                <button id="stop-recording-btn" class="btn btn-danger" style="display: none;">
+                                    <i class="fas fa-stop"></i> Остановить
+                                </button>
+                                <button id="pause-recording-btn" class="btn btn-warning" style="display: none;">
+                                    <i class="fas fa-pause"></i> Пауза
+                                </button>
+                            </div>
+
+                            <div class="alert alert-info" style="text-align: left; margin-top: 1rem;">
+                                <i class="fas fa-info-circle"></i> 
+                                <strong>Советы:</strong> Говорите четко, в тихой обстановке. Можно описывать находки, 
+                                стратиграфию, погодные условия, рабочие заметки.
+                            </div>
+                        </div>
+
+                        <div id="transcription-results" style="margin-top: 2rem; display: none;">
+                            <h4>Результат распознавания:</h4>
+                            <div class="ai-suggestion" style="margin-bottom: 1rem;">
+                                <div style="display: flex; justify-content: space-between; align-items: center;">
+                                    <div>
+                                        <strong>Доверие AI:</strong> 
+                                        <span id="transcription-confidence" style="color: var(--success-color);">95%</span>
+                                    </div>
+                                    <button id="apply-transcription-btn" class="btn btn-sm btn-success">
+                                        <i class="fas fa-check"></i> Использовать текст
+                                    </button>
+                                </div>
+                            </div>
+                            <div id="transcription-text" style="background-color: #f8f9fa; padding: 1rem; border-radius: var(--border-radius); min-height: 100px; max-height: 300px; overflow-y: auto;">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="dashboard-card">
+                        <h3><i class="fas fa-paint-brush"></i> Чертежи и схемы</h3>
+                        <div id="sketch-tools" style="margin-bottom: 1.5rem;">
+                            <div class="map-tools" style="justify-content: center;">
+                                <button id="pencil-tool" class="map-tool-btn active" data-tool="pencil">
+                                    <i class="fas fa-pencil-alt"></i> Карандаш
+                                </button>
+                                <button id="line-tool" class="map-tool-btn" data-tool="line">
+                                    <i class="fas fa-slash"></i> Линия
+                                </button>
+                                <button id="rectangle-tool" class="map-tool-btn" data-tool="rectangle">
+                                    <i class="fas fa-square"></i> Прямоугольник
+                                </button>
+                                <button id="circle-tool" class="map-tool-btn" data-tool="circle">
+                                    <i class="fas fa-circle"></i> Круг
+                                </button>
+                                <button id="text-tool" class="map-tool-btn" data-tool="text">
+                                    <i class="fas fa-font"></i> Текст
+                                </button>
+                                <button id="eraser-tool" class="map-tool-btn" data-tool="eraser">
+                                    <i class="fas fa-eraser"></i> Ластик
+                                </button>
+                            </div>
+
+                            <div style="display: flex; gap: 1rem; margin-top: 1rem; justify-content: center;">
+                                <div>
+                                    <label style="font-size: 0.9rem;">Цвет:</label>
+                                    <input type="color" id="drawing-color" value="#000000" style="width: 40px; height: 40px; border: none; border-radius: 50%;">
+                                </div>
+                                <div>
+                                    <label style="font-size: 0.9rem;">Толщина:</label>
+                                    <input type="range" id="drawing-width" min="1" max="10" value="2" style="width: 100px;">
+                                </div>
+                                <div>
+                                    <button id="clear-sketch-btn" class="btn btn-sm btn-danger">
+                                        <i class="fas fa-trash"></i> Очистить
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="sketch-container" style="background-color: white; border: 2px solid #eee; border-radius: var(--border-radius); height: 400px; position: relative; overflow: hidden;">
+                            <canvas id="sketch-canvas" width="800" height="400" style="cursor: crosshair; width: 100%; height: 100%;"></canvas>
+                            <div id="sketch-background" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-image: url('data:image/svg+xml;utf8,<svg width="100" height="100" xmlns="http://www.w3.org/2000/svg"><rect width="100" height="100" fill="%23ffffff"/><path d="M0 0 L100 100" stroke="%23f0f0f0" stroke-width="1"/><path d="M100 0 L0 100" stroke="%23f0f0f0" stroke-width="1"/></svg>'); background-size: 20px 20px; pointer-events: none;"></div>
+                        </div>
+
+                        <div style="display: flex; gap: 1rem; margin-top: 1rem;">
+                            <button id="save-sketch-btn" class="btn">
+                                <i class="fas fa-save"></i> Сохранить чертеж
+                            </button>
+                            <button id="load-template-btn" class="btn btn-secondary">
+                                <i class="fas fa-layer-group"></i> Шаблоны
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="dashboard-card">
+                    <h3><i class="fas fa-edit"></i> Текстовый редактор журнала</h3>
+                    <div class="form-group">
+                        <label for="journal-title">Заголовок записи *</label>
+                        <input type="text" id="journal-title" class="form-control" placeholder="Например: Стратиграфия квадрата 5А">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="journal-date">Дата записи *</label>
+                        <input type="date" id="journal-date" class="form-control" value="2023-06-15">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="journal-category">Категория</label>
+                        <select id="journal-category" class="form-control">
+                            <option value="stratigraphy">Стратиграфия</option>
+                            <option value="findings">Находки</option>
+                            <option value="weather">Погодные условия</option>
+                            <option value="observations">Наблюдения</option>
+                            <option value="planning">Планирование работ</option>
+                            <option value="problems">Проблемы и решения</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="journal-content">Содержание записи *</label>
+                        <div class="input-with-icon">
+                            <textarea id="journal-content" class="form-control" rows="10" placeholder="Опишите наблюдения, находки, стратиграфию..."></textarea>
+                            <button class="voice-input-btn" type="button" title="Голосовой ввод" id="journal-voice-btn">
+                                <i class="fas fa-microphone"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Прикрепленные материалы</label>
+                        <div style="display: flex; gap: 1rem; flex-wrap: wrap; margin-top: 0.5rem;">
+                            <div id="attached-sketches" style="display: flex; gap: 0.5rem; flex-wrap: wrap;"></div>
+                            <div id="attached-audio" style="display: flex; gap: 0.5rem; flex-wrap: wrap;"></div>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
+                        <button id="save-journal-btn" class="btn btn-success">
+                            <i class="fas fa-save"></i> Сохранить запись
+                        </button>
+                        <button id="save-draft-btn" class="btn btn-secondary">
+                            <i class="fas fa-file-alt"></i> Сохранить черновик
+                        </button>
+                        <button id="attach-sketch-btn" class="btn">
+                            <i class="fas fa-paperclip"></i> Прикрепить чертеж
+                        </button>
+                        <button id="attach-audio-btn" class="btn">
+                            <i class="fas fa-volume-up"></i> Прикрепить аудио
+                        </button>
+                    </div>
+                </div>
+
+                <div class="dashboard-card" style="margin-top: 2rem;">
+                    <h3><i class="fas fa-history"></i> Архив записей журнала</h3>
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Дата</th>
+                                    <th>Заголовок</th>
+                                    <th>Категория</th>
+                                    <th>Автор</th>
+                                    <th>Прикрепления</th>
+                                    <th>Действия</th>
+                                </tr>
+                            </thead>
+                            <tbody id="journal-entries-list">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
             <div id="dashboard-page" class="page">
                 <h2 style="margin-bottom: 1.5rem; color: var(--primary-color);">
                     <i class="fas fa-tachometer-alt"></i> Панель управления экспедицией
@@ -1935,7 +2193,6 @@
                             <div class="report-preview">
                                 <h4>Предварительный просмотр</h4>
                                 <div id="report-preview-content" style="margin-top: 1rem;">
-                                    <!-- Предпросмотр отчета -->
                                 </div>
                             </div>
                         </div>
@@ -1953,7 +2210,6 @@
                     <div class="dashboard-card">
                         <h3>Участники экспедиции</h3>
                         <ul class="user-list" id="expedition-users">
-                            <!-- Список пользователей загружается через JavaScript -->
                         </ul>
                         <div style="display: flex; gap: 0.5rem; margin-top: 1rem;">
                             <button id="add-user-btn" class="btn">
@@ -1977,7 +2233,6 @@
                                     </tr>
                                 </thead>
                                 <tbody id="change-log">
-                                    <!-- Журнал загружается через JavaScript -->
                                 </tbody>
                             </table>
                         </div>
@@ -1997,7 +2252,6 @@
                 </div>
             </div>
 
-            <!-- Личный кабинет -->
             <div id="profile-page" class="page">
                 <div class="profile-header">
                     <div class="profile-avatar" id="profile-avatar">ИИ</div>
@@ -2040,7 +2294,6 @@
                                 </tr>
                             </thead>
                             <tbody id="user-artifacts-list">
-                                <!-- Данные загружаются через JavaScript -->
                             </tbody>
                         </table>
                     </div>
@@ -2100,7 +2353,6 @@
             </div>
         </main>
 
-        <!-- Подвал сайта (виден только после авторизации) -->
         <footer id="site-footer" style="display: none;">
             <p>&copy; 2023 ArchaeoPoint. Все права защищены.</p>
             <p>Система защиты археологических данных с точной ГИС-привязкой</p>
@@ -2113,7 +2365,6 @@
         </footer>
     </div>
 
-    <!-- Модальное окно для добавления артефакта -->
     <div id="artifact-modal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
@@ -2127,7 +2378,7 @@
                         <label for="artifact-name">Название артефакта *</label>
                         <div class="input-with-icon">
                             <input type="text" id="artifact-name" class="form-control" placeholder="Например: Бронзовое зеркало">
-                            <button class="voice-input-btn" type="button" title="Голосовой ввод">
+                            <button class="voice-input-btn" type="button" title="Голосовой ввод" id="artifact-voice-name">
                                 <i class="fas fa-microphone"></i>
                             </button>
                         </div>
@@ -2206,7 +2457,7 @@
                     <label for="artifact-context">Контекст находки *</label>
                     <div class="input-with-icon">
                         <textarea id="artifact-context" class="form-control" rows="3" placeholder="Описание слоя, квадрата раскопа, связанные находки..."></textarea>
-                        <button class="voice-input-btn" type="button" title="Голосовой ввод">
+                        <button class="voice-input-btn" type="button" title="Голосовой ввод" id="artifact-voice-context">
                             <i class="fas fa-microphone"></i>
                         </button>
                     </div>
@@ -2216,7 +2467,7 @@
                     <label for="artifact-description">Описание артефакта</label>
                     <div class="input-with-icon">
                         <textarea id="artifact-description" class="form-control" rows="3" placeholder="Подробное описание находки..."></textarea>
-                        <button class="voice-input-btn" type="button" title="Голосовой ввод">
+                        <button class="voice-input-btn" type="button" title="Голосовой ввод" id="artifact-voice-description">
                             <i class="fas fa-microphone"></i>
                         </button>
                     </div>
@@ -2252,7 +2503,6 @@
         </div>
     </div>
 
-    <!-- Модальное окно для пакетной загрузки -->
     <div id="batch-upload-modal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
@@ -2306,7 +2556,53 @@
         </div>
     </div>
 
-    <!-- Модальное окно для двухфакторной аутентификации -->
+    <div id="templates-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-layer-group"></i> Шаблоны чертежей</h3>
+                <button class="close-modal">&times;</button>
+            </div>
+            
+            <div class="features" style="margin-top: 1rem;">
+                <div class="feature-card template-card" data-template="grid">
+                    <div class="feature-icon">
+                        <i class="fas fa-th"></i>
+                    </div>
+                    <h3>Координатная сетка</h3>
+                    <p>Стандартная сетка для чертежей раскопов</p>
+                    <button class="btn btn-sm use-template-btn" data-template="grid">Использовать</button>
+                </div>
+                
+                <div class="feature-card template-card" data-template="stratigraphy">
+                    <div class="feature-icon">
+                        <i class="fas fa-layer-group"></i>
+                    </div>
+                    <h3>Стратиграфическая колонка</h3>
+                    <p>Шаблон для стратиграфических описаний</p>
+                    <button class="btn btn-sm use-template-btn" data-template="stratigraphy">Использовать</button>
+                </div>
+                
+                <div class="feature-card template-card" data-template="plan">
+                    <div class="feature-icon">
+                        <i class="fas fa-map"></i>
+                    </div>
+                    <h3>План раскопа</h3>
+                    <p>Шаблон для планов археологических раскопов</p>
+                    <button class="btn btn-sm use-template-btn" data-template="plan">Использовать</button>
+                </div>
+                
+                <div class="feature-card template-card" data-template="profile">
+                    <div class="feature-icon">
+                        <i class="fas fa-mountain"></i>
+                    </div>
+                    <h3>Профиль разреза</h3>
+                    <p>Для черчения профилей стратиграфии</p>
+                    <button class="btn btn-sm use-template-btn" data-template="profile">Использовать</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div id="twofa-setup-modal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
@@ -2354,7 +2650,6 @@
                     
                     <div class="qr-code-container">
                         <div class="qr-code" id="twofa-qr-code">
-                            <!-- QR код для приложения -->
                         </div>
                         <p style="margin-top: 1rem;">Секретный ключ: <code id="twofa-secret">JBSWY3DPEHPK3PXP</code></p>
                     </div>
@@ -2384,7 +2679,6 @@
         </div>
     </div>
 
-    <!-- Модальное окно для QR-кода артефакта -->
     <div id="qr-modal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
@@ -2414,7 +2708,6 @@
         </div>
     </div>
 
-    <!-- Модальное окно для добавления пользователя -->
     <div id="user-modal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
@@ -2468,11 +2761,51 @@
         </div>
     </div>
 
+    <div id="view-journal-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="view-journal-title">Просмотр записи журнала</h3>
+                <button class="close-modal">&times;</button>
+            </div>
+            
+            <div class="artifact-form">
+                <div style="margin-bottom: 1.5rem;">
+                    <div style="display: flex; justify-content: space-between; color: #666;">
+                        <span id="view-journal-date">Дата: 2023-06-15</span>
+                        <span id="view-journal-author">Автор: Иван Археологов</span>
+                    </div>
+                    <div style="margin-top: 0.5rem;">
+                        <span class="user-role role-archaeologist" id="view-journal-category">Категория: Стратиграфия</span>
+                    </div>
+                </div>
+                
+                <div id="view-journal-content" style="background-color: #f8f9fa; padding: 1.5rem; border-radius: var(--border-radius); min-height: 200px; margin-bottom: 1.5rem;">
+                </div>
+                
+                <div id="view-journal-attachments">
+                    <h4>Прикрепленные материалы:</h4>
+                    <div id="view-attachments-list"></div>
+                </div>
+                
+                <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
+                    <button id="edit-journal-btn" class="btn">
+                        <i class="fas fa-edit"></i> Редактировать
+                    </button>
+                    <button id="delete-journal-btn" class="btn btn-danger">
+                        <i class="fas fa-trash"></i> Удалить
+                    </button>
+                    <button id="print-journal-btn" class="btn btn-secondary">
+                        <i class="fas fa-print"></i> Печать
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
     <script src="https://unpkg.com/leaflet.heat@0.2.0/dist/leaflet-heat.js"></script>
     <script>
-        // Глобальные переменные и константы
         let currentUser = null;
         let map = null;
         let markersCluster = null;
@@ -2488,102 +2821,31 @@
         let isListening = false;
         let recognition = null;
         
-        // Конфигурация
+        let journalEntries = [];
+        let isRecording = false;
+        let isPaused = false;
+        let recordingStartTime = null;
+        let recordingTimer = null;
+        let audioChunks = [];
+        let mediaRecorder = null;
+        let audioContext = null;
+        let analyser = null;
+        let currentSketch = null;
+        let currentTool = 'pencil';
+        let isDrawing = false;
+        let lastX = 0;
+        let lastY = 0;
+        let canvas = null;
+        let ctx = null;
+        
         const CONFIG = {
             OFFLINE_STORAGE_KEY: 'archaeopoint_offline_data',
-            SYNC_INTERVAL: 30000, // 30 секунд
-            MAX_OFFLINE_STORAGE: 50 * 1024 * 1024, // 50MB
-            GPS_ACCURACY_THRESHOLD: 10, // метров
-            AI_CONFIDENCE_THRESHOLD: 70 // %
+            SYNC_INTERVAL: 30000,
+            MAX_OFFLINE_STORAGE: 50 * 1024 * 1024,
+            GPS_ACCURACY_THRESHOLD: 10,
+            AI_CONFIDENCE_THRESHOLD: 70
         };
         
-        // Симуляция AI распознавания
-        const AI_RECOGNITION = {
-            recognizeImage: function(imageData) {
-                // В реальном приложении здесь был бы вызов к нейросети
-                // Для демо используем случайные результаты
-                const types = ['ceramic', 'metal', 'stone', 'bones', 'gold', 'other'];
-                const probabilities = {
-                    ceramic: 85,
-                    metal: 75,
-                    stone: 90,
-                    bones: 80,
-                    gold: 40,
-                    other: 60
-                };
-                
-                const randomType = types[Math.floor(Math.random() * types.length)];
-                return {
-                    type: randomType,
-                    confidence: probabilities[randomType],
-                    suggestions: [
-                        `Похоже на ${this.getTypeName(randomType)}`,
-                        'Рекомендуется провести дополнительный анализ',
-                        'Проверьте контекст находки'
-                    ]
-                };
-            },
-            
-            getTypeName: function(type) {
-                const typeNames = {
-                    gold: "золотые изделия",
-                    ceramic: "керамику",
-                    bones: "костные останки",
-                    metal: "металлические изделия",
-                    stone: "каменные изделия",
-                    other: "прочие находки"
-                };
-                return typeNames[type] || "неизвестный тип";
-            }
-        };
-        
-        // Симуляция голосового ввода
-        const VOICE_RECOGNITION = {
-            isSupported: 'webkitSpeechRecognition' in window || 'SpeechRecognition' in window,
-            
-            init: function() {
-                if (!this.isSupported) return null;
-                
-                const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-                recognition = new SpeechRecognition();
-                recognition.continuous = false;
-                recognition.interimResults = false;
-                recognition.lang = 'ru-RU';
-                
-                return recognition;
-            },
-            
-            start: function(onResult, onError) {
-                if (!recognition) {
-                    recognition = this.init();
-                    if (!recognition) {
-                        onError('Голосовой ввод не поддерживается вашим браузером');
-                        return;
-                    }
-                }
-                
-                recognition.onresult = function(event) {
-                    const transcript = event.results[0][0].transcript;
-                    onResult(transcript);
-                };
-                
-                recognition.onerror = function(event) {
-                    onError(event.error);
-                };
-                
-                recognition.start();
-                isListening = true;
-            },
-            
-            stop: function() {
-                if (recognition && isListening) {
-                    recognition.stop();
-                    isListening = false;
-                }
-            }
-        };
-        
-        // Офлайн-хранилище
         const OFFLINE_STORAGE = {
             save: function(key, data) {
                 try {
@@ -2596,7 +2858,7 @@
                     this.updatePendingSync();
                     return true;
                 } catch (e) {
-                    console.error('Ошибка сохранения в локальное хранилище:', e);
+                    console.error('Ошибка сохранения:', e);
                     return false;
                 }
             },
@@ -2606,7 +2868,7 @@
                     const item = JSON.parse(localStorage.getItem(key));
                     return item ? item.data : null;
                 } catch (e) {
-                    console.error('Ошибка загрузки из локального хранилища:', e);
+                    console.error('Ошибка загрузки:', e);
                     return null;
                 }
             },
@@ -2620,9 +2882,13 @@
                 const items = [];
                 for (let i = 0; i < localStorage.length; i++) {
                     const key = localStorage.key(i);
-                    if (key.startsWith('artifact_') || key.startsWith('pending_')) {
-                        const item = JSON.parse(localStorage.getItem(key));
-                        items.push({ key, ...item });
+                    if (key.startsWith('artifact_') || key.startsWith('journal_') || key.startsWith('pending_')) {
+                        try {
+                            const item = JSON.parse(localStorage.getItem(key));
+                            items.push({ key, ...item });
+                        } catch (e) {
+                            console.error('Ошибка парсинга:', key, e);
+                        }
                     }
                 }
                 return items;
@@ -2632,7 +2898,6 @@
                 const pending = this.getAll().filter(item => !item.synced);
                 pendingSync = pending;
                 
-                // Обновляем UI
                 const pendingCount = pending.length;
                 document.getElementById('pending-changes').textContent = `${pendingCount} изменений ожидают синхронизации`;
                 document.getElementById('pending-sync-count').textContent = pendingCount;
@@ -2653,45 +2918,20 @@
                     const value = localStorage.getItem(key);
                     total += key.length + value.length;
                 }
-                return (total / 1024 / 1024).toFixed(2); // MB
+                return (total / 1024 / 1024).toFixed(2);
             }
         };
         
-        // Инициализация карты
         function initMap() {
-            // Центр карты - Крым (пример раскопок)
             const mapCenter = [44.948237, 34.100318];
             
-            // Инициализация карты
             map = L.map('map').setView(mapCenter, 16);
             
-            // Базовый слой OSM
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+                attribution: '&copy; OpenStreetMap contributors',
                 maxZoom: 19
             }).addTo(map);
             
-            // Дополнительные слои
-            const topoLayer = L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', {
-                attribution: 'Map data: &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, <a href="http://viewfinderpanoramas.org">SRTM</a> | Map style: &copy; <a href="https://opentopomap.org">OpenTopoMap</a>',
-                maxZoom: 17
-            });
-            
-            const schemeLayer = L.tileLayer('https://stamen-tiles.a.ssl.fastly.net/toner/{z}/{x}/{y}.png', {
-                attribution: 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, under <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a>. Data by <a href="http://openstreetmap.org">OpenStreetMap</a>, under <a href="http://www.openstreetmap.org/copyright">ODbL</a>.',
-                maxZoom: 20
-            });
-            
-            // Добавление контроля слоев
-            const baseLayers = {
-                "Спутниковая карта": L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'),
-                "Топографическая карта": topoLayer,
-                "Схема раскопа": schemeLayer
-            };
-            
-            L.control.layers(baseLayers).addTo(map);
-            
-            // Кластеризация маркеров
             markersCluster = L.markerClusterGroup({
                 maxClusterRadius: 50,
                 iconCreateFunction: function(cluster) {
@@ -2710,22 +2950,13 @@
             
             map.addLayer(markersCluster);
             
-            // Добавление тестовых данных
             addSampleArtifacts();
             
-            // Инициализация инструментов карты
-            initMapTools();
-        }
-        
-        // Инициализация инструментов карты
-        function initMapTools() {
-            // Обработчик для измерения расстояний
             map.on('click', function(e) {
                 if (isMeasuring) {
                     measurementPoints.push(e.latlng);
                     
                     if (measurementPoints.length === 1) {
-                        // Первая точка
                         L.marker(e.latlng, {
                             icon: L.divIcon({
                                 html: '<div style="background-color: red; width: 10px; height: 10px; border-radius: 50%;"></div>',
@@ -2733,25 +2964,21 @@
                             })
                         }).addTo(map);
                     } else if (measurementPoints.length === 2) {
-                        // Вторая точка - рисуем линию и вычисляем расстояние
                         const p1 = measurementPoints[0];
                         const p2 = measurementPoints[1];
                         
-                        // Линия
                         const line = L.polyline([p1, p2], {
                             color: 'red',
                             dashArray: '10, 10',
                             weight: 3
                         }).addTo(map);
                         
-                        // Расстояние
                         const distance = map.distance(p1, p2);
                         const midpoint = L.latLng(
                             (p1.lat + p2.lat) / 2,
                             (p1.lng + p2.lng) / 2
                         );
                         
-                        // Метка с расстоянием
                         L.marker(midpoint, {
                             icon: L.divIcon({
                                 html: `<div class="measurement-label">${distance.toFixed(2)} м</div>`,
@@ -2760,16 +2987,13 @@
                             })
                         }).addTo(map);
                         
-                        // Показываем результат
                         document.getElementById('measurement-result').innerHTML = 
                             `Расстояние: <strong>${distance.toFixed(2)} метров</strong>`;
                         document.getElementById('measurement-result').style.display = 'block';
                         
-                        // Сбрасываем режим измерения
                         isMeasuring = false;
                         measurementPoints = [];
                         
-                        // Скрываем результат через 5 секунд
                         setTimeout(() => {
                             document.getElementById('measurement-result').style.display = 'none';
                             map.removeLayer(line);
@@ -2779,7 +3003,1348 @@
             });
         }
         
-        // Добавление тестовых артефактов
+        function initFieldJournal() {
+            canvas = document.getElementById('sketch-canvas');
+            if (!canvas) return;
+            
+            ctx = canvas.getContext('2d');
+            setupCanvas();
+            loadJournalEntries();
+            initVoiceRecognition();
+            initDrawingTools();
+        }
+        
+        function setupCanvas() {
+            if (!canvas) return;
+            
+            const container = document.getElementById('sketch-container');
+            if (!container) return;
+            
+            canvas.width = container.clientWidth;
+            canvas.height = container.clientHeight;
+            
+            ctx.lineCap = 'round';
+            ctx.lineJoin = 'round';
+            ctx.strokeStyle = '#000000';
+            ctx.lineWidth = 2;
+            ctx.fillStyle = 'transparent';
+        }
+        
+        function loadJournalEntries() {
+            const savedEntries = OFFLINE_STORAGE.getAll().filter(item => 
+                item.key.startsWith('journal_') && !item.key.includes('draft') && !item.key.includes('journal_sketch')
+            );
+            
+            if (savedEntries.length > 0) {
+                journalEntries = savedEntries.map(item => item.data);
+                journalEntries.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+            } else {
+                journalEntries = [
+                    {
+                        id: 1,
+                        title: "Стратиграфия квадрата 5А",
+                        date: "2023-06-10",
+                        category: "stratigraphy",
+                        content: "Квадрат 5А. Верхний слой (0-30 см) - современный грунт с включениями строительного мусора. Второй слой (30-80 см) - средневековый культурный слой с находками керамики. Третий слой (80-150 см) - античный слой с фрагментами амфор.",
+                        author: "Иван Археологов",
+                        attachments: [
+                            { type: 'sketch', name: 'Стратиграфия.png' },
+                            { type: 'audio', name: 'Запись.wav' }
+                        ],
+                        createdAt: "2023-06-10T09:30:00Z"
+                    },
+                    {
+                        id: 2,
+                        title: "Находка бронзового зеркала",
+                        date: "2023-06-12",
+                        category: "findings",
+                        content: "В квадрате 5Б на глубине 45 см обнаружено бронзовое зеркало с орнаментом по краю. Размеры: диаметр 12 см, толщина 0.3 см. Сохранность хорошая, небольшие следы коррозии.",
+                        author: "Мария Петрова",
+                        attachments: [
+                            { type: 'sketch', name: 'Чертеж зеркала.png' }
+                        ],
+                        createdAt: "2023-06-12T14:20:00Z"
+                    }
+                ];
+                
+                journalEntries.forEach(entry => {
+                    OFFLINE_STORAGE.save(`journal_${entry.id}`, entry);
+                });
+            }
+            
+            updateJournalEntriesList();
+        }
+        
+        function initVoiceRecognition() {
+            if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+                const voiceStatus = document.getElementById('voice-recording-status');
+                if (voiceStatus) {
+                    voiceStatus.innerHTML = `
+                        <div class="alert alert-warning">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            Ваш браузер не поддерживает голосовой ввод.
+                        </div>
+                    `;
+                }
+                return;
+            }
+        }
+        
+        function initDrawingTools() {
+            if (!canvas) return;
+            
+            setActiveTool('pencil');
+            
+            canvas.addEventListener('mousedown', startDrawing);
+            canvas.addEventListener('mousemove', draw);
+            canvas.addEventListener('mouseup', stopDrawing);
+            canvas.addEventListener('mouseout', stopDrawing);
+            
+            canvas.addEventListener('touchstart', handleTouchStart);
+            canvas.addEventListener('touchmove', handleTouchMove);
+            canvas.addEventListener('touchend', handleTouchEnd);
+            
+            const colorInput = document.getElementById('drawing-color');
+            const widthInput = document.getElementById('drawing-width');
+            
+            if (colorInput) {
+                colorInput.addEventListener('change', function() {
+                    ctx.strokeStyle = this.value;
+                });
+            }
+            
+            if (widthInput) {
+                widthInput.addEventListener('input', function() {
+                    ctx.lineWidth = this.value;
+                });
+            }
+        }
+        
+        function setActiveTool(tool) {
+            currentTool = tool;
+            
+            document.querySelectorAll('#sketch-tools .map-tool-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            const activeBtn = document.querySelector(`[data-tool="${tool}"]`);
+            if (activeBtn) {
+                activeBtn.classList.add('active');
+            }
+            
+            if (!canvas) return;
+            
+            switch(tool) {
+                case 'pencil':
+                case 'line':
+                case 'rectangle':
+                case 'circle':
+                    canvas.style.cursor = 'crosshair';
+                    break;
+                case 'eraser':
+                    canvas.style.cursor = 'cell';
+                    break;
+                case 'text':
+                    canvas.style.cursor = 'text';
+                    break;
+            }
+        }
+        
+        function startDrawing(e) {
+            if (!canvas || !ctx) return;
+            
+            isDrawing = true;
+            const rect = canvas.getBoundingClientRect();
+            lastX = e.clientX - rect.left;
+            lastY = e.clientY - rect.top;
+            
+            if (currentTool === 'text') {
+                showTextInput(e.clientX - rect.left, e.clientY - rect.top);
+                isDrawing = false;
+            }
+        }
+        
+        function draw(e) {
+            if (!isDrawing || !canvas || !ctx) return;
+            
+            const rect = canvas.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            
+            switch(currentTool) {
+                case 'pencil':
+                    drawPencil(x, y);
+                    break;
+                case 'line':
+                    drawLine(x, y);
+                    break;
+                case 'rectangle':
+                    drawRectangle(x, y);
+                    break;
+                case 'circle':
+                    drawCircle(x, y);
+                    break;
+                case 'eraser':
+                    erase(x, y);
+                    break;
+            }
+            
+            lastX = x;
+            lastY = y;
+        }
+        
+        function stopDrawing() {
+            if (!ctx) return;
+            
+            isDrawing = false;
+            ctx.beginPath();
+            
+            if (currentTool !== 'pencil' && currentTool !== 'eraser') {
+                saveCanvasState();
+            }
+        }
+        
+        function drawPencil(x, y) {
+            const widthInput = document.getElementById('drawing-width');
+            const colorInput = document.getElementById('drawing-color');
+            
+            ctx.lineWidth = widthInput ? widthInput.value : 2;
+            ctx.strokeStyle = colorInput ? colorInput.value : '#000000';
+            
+            ctx.beginPath();
+            ctx.moveTo(lastX, lastY);
+            ctx.lineTo(x, y);
+            ctx.stroke();
+        }
+        
+        function drawLine(x, y) {
+            const tempCanvas = document.createElement('canvas');
+            const tempCtx = tempCanvas.getContext('2d');
+            tempCanvas.width = canvas.width;
+            tempCanvas.height = canvas.height;
+            tempCtx.drawImage(canvas, 0, 0);
+            
+            tempCtx.beginPath();
+            tempCtx.moveTo(lastX, lastY);
+            tempCtx.lineTo(x, y);
+            tempCtx.strokeStyle = ctx.strokeStyle;
+            tempCtx.lineWidth = ctx.lineWidth;
+            tempCtx.stroke();
+            
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.drawImage(tempCanvas, 0, 0);
+        }
+        
+        function drawRectangle(x, y) {
+            const tempCanvas = document.createElement('canvas');
+            const tempCtx = tempCanvas.getContext('2d');
+            tempCanvas.width = canvas.width;
+            tempCanvas.height = canvas.height;
+            tempCtx.drawImage(canvas, 0, 0);
+            
+            const width = x - lastX;
+            const height = y - lastY;
+            
+            tempCtx.beginPath();
+            tempCtx.rect(lastX, lastY, width, height);
+            tempCtx.strokeStyle = ctx.strokeStyle;
+            tempCtx.lineWidth = ctx.lineWidth;
+            tempCtx.stroke();
+            
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.drawImage(tempCanvas, 0, 0);
+        }
+        
+        function drawCircle(x, y) {
+            const tempCanvas = document.createElement('canvas');
+            const tempCtx = tempCanvas.getContext('2d');
+            tempCanvas.width = canvas.width;
+            tempCanvas.height = canvas.height;
+            tempCtx.drawImage(canvas, 0, 0);
+            
+            const radius = Math.sqrt(Math.pow(x - lastX, 2) + Math.pow(y - lastY, 2));
+            
+            tempCtx.beginPath();
+            tempCtx.arc(lastX, lastY, radius, 0, Math.PI * 2);
+            tempCtx.strokeStyle = ctx.strokeStyle;
+            tempCtx.lineWidth = ctx.lineWidth;
+            tempCtx.stroke();
+            
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.drawImage(tempCanvas, 0, 0);
+        }
+        
+        function erase(x, y) {
+            ctx.save();
+            ctx.globalCompositeOperation = 'destination-out';
+            ctx.beginPath();
+            ctx.arc(x, y, ctx.lineWidth * 2, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.restore();
+        }
+        
+        function showTextInput(x, y) {
+            const input = document.createElement('input');
+            input.type = 'text';
+            input.style.position = 'absolute';
+            input.style.left = (canvas.offsetLeft + x) + 'px';
+            input.style.top = (canvas.offsetTop + y) + 'px';
+            input.style.border = '1px solid #000';
+            input.style.padding = '2px';
+            input.style.fontSize = '14px';
+            input.style.fontFamily = 'Arial';
+            
+            input.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter') {
+                    drawText(x, y, this.value);
+                    this.remove();
+                }
+            });
+            
+            input.addEventListener('blur', function() {
+                if (this.value) {
+                    drawText(x, y, this.value);
+                }
+                this.remove();
+            });
+            
+            const container = document.getElementById('sketch-container');
+            if (container) {
+                container.appendChild(input);
+                input.focus();
+            }
+        }
+        
+        function drawText(x, y, text) {
+            ctx.font = '16px Arial';
+            ctx.fillStyle = ctx.strokeStyle;
+            ctx.fillText(text, x, y);
+        }
+        
+        function saveCanvasState() {
+            if (canvas) {
+                currentSketch = canvas.toDataURL('image/png');
+            }
+        }
+        
+        function clearCanvas() {
+            if (ctx && canvas) {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                currentSketch = null;
+            }
+        }
+        
+        function handleTouchStart(e) {
+            e.preventDefault();
+            const touch = e.touches[0];
+            const mouseEvent = new MouseEvent('mousedown', {
+                clientX: touch.clientX,
+                clientY: touch.clientY
+            });
+            canvas.dispatchEvent(mouseEvent);
+        }
+        
+        function handleTouchMove(e) {
+            e.preventDefault();
+            const touch = e.touches[0];
+            const mouseEvent = new MouseEvent('mousemove', {
+                clientX: touch.clientX,
+                clientY: touch.clientY
+            });
+            canvas.dispatchEvent(mouseEvent);
+        }
+        
+        function handleTouchEnd(e) {
+            e.preventDefault();
+            const mouseEvent = new MouseEvent('mouseup', {});
+            canvas.dispatchEvent(mouseEvent);
+        }
+        
+        async function startRecording() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                mediaRecorder = new MediaRecorder(stream);
+                audioChunks = [];
+                
+                mediaRecorder.ondataavailable = function(event) {
+                    audioChunks.push(event.data);
+                };
+                
+                mediaRecorder.onstop = function() {
+                    const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
+                    const audioUrl = URL.createObjectURL(audioBlob);
+                    processAudioRecording(audioUrl, audioBlob);
+                    
+                    stream.getTracks().forEach(track => track.stop());
+                };
+                
+                mediaRecorder.start();
+                isRecording = true;
+                
+                document.getElementById('start-recording-btn').style.display = 'none';
+                document.getElementById('stop-recording-btn').style.display = 'inline-block';
+                document.getElementById('pause-recording-btn').style.display = 'inline-block';
+                
+                const voiceStatusIcon = document.getElementById('voice-status-icon');
+                const voiceStatusText = document.getElementById('voice-status-text');
+                
+                if (voiceStatusIcon) {
+                    voiceStatusIcon.innerHTML = '<i class="fas fa-microphone recording"></i>';
+                }
+                
+                if (voiceStatusText) {
+                    voiceStatusText.textContent = 'Идет запись...';
+                    voiceStatusText.style.color = '#e74c3c';
+                }
+                
+                startRecordingTimer();
+                startAudioVisualization(stream);
+                
+            } catch (error) {
+                console.error('Error accessing microphone:', error);
+                showAlert('Не удалось получить доступ к микрофону.', 'danger');
+            }
+        }
+        
+        function stopRecording() {
+            if (mediaRecorder && isRecording) {
+                mediaRecorder.stop();
+                isRecording = false;
+                
+                document.getElementById('start-recording-btn').style.display = 'inline-block';
+                document.getElementById('stop-recording-btn').style.display = 'none';
+                document.getElementById('pause-recording-btn').style.display = 'none';
+                
+                const voiceStatusIcon = document.getElementById('voice-status-icon');
+                const voiceStatusText = document.getElementById('voice-status-text');
+                
+                if (voiceStatusIcon) {
+                    voiceStatusIcon.innerHTML = '<i class="fas fa-microphone"></i>';
+                }
+                
+                if (voiceStatusText) {
+                    voiceStatusText.textContent = 'Запись завершена';
+                    voiceStatusText.style.color = '#27ae60';
+                }
+                
+                stopRecordingTimer();
+                stopAudioVisualization();
+            }
+        }
+        
+        function togglePauseRecording() {
+            if (!mediaRecorder) return;
+            
+            if (isPaused) {
+                mediaRecorder.resume();
+                isPaused = false;
+                document.getElementById('pause-recording-btn').innerHTML = '<i class="fas fa-pause"></i> Пауза';
+                resumeRecordingTimer();
+            } else {
+                mediaRecorder.pause();
+                isPaused = true;
+                document.getElementById('pause-recording-btn').innerHTML = '<i class="fas fa-play"></i> Продолжить';
+                pauseRecordingTimer();
+            }
+        }
+        
+        function startRecordingTimer() {
+            recordingStartTime = new Date();
+            const timerElement = document.getElementById('recording-timer');
+            if (timerElement) {
+                timerElement.style.display = 'block';
+            }
+            
+            recordingTimer = setInterval(() => {
+                const now = new Date();
+                const diff = Math.floor((now - recordingStartTime) / 1000);
+                const minutes = Math.floor(diff / 60).toString().padStart(2, '0');
+                const seconds = (diff % 60).toString().padStart(2, '0');
+                
+                const timerElement = document.getElementById('recording-timer');
+                if (timerElement) {
+                    timerElement.textContent = `${minutes}:${seconds}`;
+                }
+            }, 1000);
+        }
+        
+        function pauseRecordingTimer() {
+            if (recordingTimer) {
+                clearInterval(recordingTimer);
+                recordingTimer = null;
+            }
+        }
+        
+        function resumeRecordingTimer() {
+            if (!recordingTimer) {
+                startRecordingTimer();
+            }
+        }
+        
+        function stopRecordingTimer() {
+            if (recordingTimer) {
+                clearInterval(recordingTimer);
+                recordingTimer = null;
+            }
+            
+            const timerElement = document.getElementById('recording-timer');
+            if (timerElement) {
+                timerElement.style.display = 'none';
+                timerElement.textContent = '00:00';
+            }
+        }
+        
+        function startAudioVisualization(stream) {
+            if (!audioContext) {
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            
+            const source = audioContext.createMediaStreamSource(stream);
+            analyser = audioContext.createAnalyser();
+            analyser.fftSize = 256;
+            
+            source.connect(analyser);
+            
+            const bufferLength = analyser.frequencyBinCount;
+            const dataArray = new Uint8Array(bufferLength);
+            
+            const visualizer = document.createElement('div');
+            visualizer.className = 'visualizer';
+            visualizer.id = 'audio-visualizer';
+            
+            for (let i = 0; i < bufferLength; i++) {
+                const bar = document.createElement('div');
+                bar.className = 'visualizer-bar';
+                bar.style.left = `${(i / bufferLength) * 100}%`;
+                bar.style.height = '0px';
+                visualizer.appendChild(bar);
+            }
+            
+            const voiceStatus = document.getElementById('voice-recording-status');
+            if (voiceStatus) {
+                voiceStatus.appendChild(visualizer);
+            }
+            
+            function updateVisualization() {
+                if (!isRecording || !analyser) return;
+                
+                analyser.getByteFrequencyData(dataArray);
+                const bars = visualizer.querySelectorAll('.visualizer-bar');
+                
+                bars.forEach((bar, i) => {
+                    const value = dataArray[i];
+                    bar.style.height = `${value / 2}px`;
+                });
+                
+                requestAnimationFrame(updateVisualization);
+            }
+            
+            updateVisualization();
+        }
+        
+        function stopAudioVisualization() {
+            const visualizer = document.getElementById('audio-visualizer');
+            if (visualizer) {
+                visualizer.remove();
+            }
+            analyser = null;
+        }
+        
+        function processAudioRecording(audioUrl, audioBlob) {
+            const audioPlayer = `
+                <div class="attachment-item">
+                    <i class="fas fa-volume-up"></i>
+                    <span>Аудиозапись ${formatTime(new Date() - recordingStartTime)}</span>
+                    <audio controls class="audio-player">
+                        <source src="${audioUrl}" type="audio/wav">
+                        Ваш браузер не поддерживает аудио элементы.
+                    </audio>
+                </div>
+            `;
+            
+            const attachedAudio = document.getElementById('attached-audio');
+            if (attachedAudio) {
+                attachedAudio.innerHTML = audioPlayer;
+            }
+            
+            simulateSpeechRecognition();
+        }
+        
+        function simulateSpeechRecognition() {
+            setTimeout(() => {
+                const sampleTexts = [
+                    "Квадрат пять А. Глубина сорок пять сантиметров. Находка - фрагменты керамики. Диаметр примерно пятнадцать сантиметров. Орнамент линейный.",
+                    "Погодные условия: утро плюс восемнадцать градусов, ясно. Ветер слабый. Дневная температура плюс двадцать пять. Кратковременный дождь в четырнадцать тридцать.",
+                    "Стратиграфия: верхний слой темно-серый суглинок мощностью тридцать сантиметров. Второй слой коричневый суглинок с включениями угля. Третий слой светло-желтый песок."
+                ];
+                
+                const randomText = sampleTexts[Math.floor(Math.random() * sampleTexts.length)];
+                const confidence = Math.floor(Math.random() * 20) + 80;
+                
+                const transcriptionResults = document.getElementById('transcription-results');
+                const transcriptionText = document.getElementById('transcription-text');
+                const transcriptionConfidence = document.getElementById('transcription-confidence');
+                
+                if (transcriptionResults) {
+                    transcriptionResults.style.display = 'block';
+                }
+                
+                if (transcriptionText) {
+                    transcriptionText.textContent = randomText;
+                }
+                
+                if (transcriptionConfidence) {
+                    transcriptionConfidence.textContent = `${confidence}%`;
+                    
+                    if (confidence >= 90) {
+                        transcriptionConfidence.style.color = '#27ae60';
+                    } else if (confidence >= 80) {
+                        transcriptionConfidence.style.color = '#f39c12';
+                    } else {
+                        transcriptionConfidence.style.color = '#e74c3c';
+                    }
+                }
+                
+            }, 1500);
+        }
+        
+        function formatTime(milliseconds) {
+            const seconds = Math.floor(milliseconds / 1000);
+            const minutes = Math.floor(seconds / 60);
+            const remainingSeconds = seconds % 60;
+            return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
+        }
+        
+        function loadTemplate(templateType) {
+            clearCanvas();
+            
+            switch(templateType) {
+                case 'grid':
+                    drawGridTemplate();
+                    break;
+                case 'stratigraphy':
+                    drawStratigraphyTemplate();
+                    break;
+                case 'plan':
+                    drawPlanTemplate();
+                    break;
+                case 'profile':
+                    drawProfileTemplate();
+                    break;
+            }
+            
+            showAlert(`Шаблон "${getTemplateName(templateType)}" загружен`, 'success');
+        }
+        
+        function getTemplateName(templateType) {
+            const names = {
+                grid: 'Координатная сетка',
+                stratigraphy: 'Стратиграфическая колонка',
+                plan: 'План раскопа',
+                profile: 'Профиль разреза'
+            };
+            return names[templateType] || 'Шаблон';
+        }
+        
+        function drawGridTemplate() {
+            if (!ctx) return;
+            
+            ctx.strokeStyle = '#cccccc';
+            ctx.lineWidth = 1;
+            
+            for (let x = 50; x < canvas.width; x += 50) {
+                ctx.beginPath();
+                ctx.moveTo(x, 0);
+                ctx.lineTo(x, canvas.height);
+                ctx.stroke();
+                
+                ctx.fillStyle = '#666666';
+                ctx.font = '12px Arial';
+                ctx.fillText(`${x/10}m`, x-10, 20);
+            }
+            
+            for (let y = 50; y < canvas.height; y += 50) {
+                ctx.beginPath();
+                ctx.moveTo(0, y);
+                ctx.lineTo(canvas.width, y);
+                ctx.stroke();
+                
+                ctx.fillStyle = '#666666';
+                ctx.font = '12px Arial';
+                ctx.fillText(`${y/10}m`, 10, y+5);
+            }
+            
+            ctx.strokeStyle = '#000000';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(canvas.width/2, 0);
+            ctx.lineTo(canvas.width/2, canvas.height);
+            ctx.moveTo(0, canvas.height/2);
+            ctx.lineTo(canvas.width, canvas.height/2);
+            ctx.stroke();
+            
+            ctx.fillStyle = '#000000';
+            ctx.font = 'bold 16px Arial';
+            ctx.fillText('Координатная сетка раскопа', canvas.width/2 - 100, 40);
+            
+            saveCanvasState();
+        }
+        
+        function drawStratigraphyTemplate() {
+            if (!ctx) return;
+            
+            const colWidth = 100;
+            const colX = canvas.width/2 - colWidth/2;
+            const colHeight = canvas.height - 100;
+            const colY = 50;
+            
+            ctx.strokeStyle = '#000000';
+            ctx.lineWidth = 3;
+            ctx.strokeRect(colX, colY, colWidth, colHeight);
+            
+            ctx.fillStyle = '#000000';
+            ctx.font = 'bold 16px Arial';
+            ctx.fillText('Стратиграфическая колонка', canvas.width/2 - 80, 30);
+            
+            ctx.strokeStyle = '#666666';
+            ctx.lineWidth = 1;
+            ctx.font = '12px Arial';
+            
+            for (let depth = 0; depth <= 5; depth++) {
+                const y = colY + (depth/5) * colHeight;
+                ctx.beginPath();
+                ctx.moveTo(colX - 10, y);
+                ctx.lineTo(colX, y);
+                ctx.stroke();
+                ctx.fillText(`${depth * 100} см`, colX - 50, y + 4);
+            }
+            
+            const layers = [
+                { name: 'Современный слой', depth: 0.3, color: '#8B4513' },
+                { name: 'Средневековый слой', depth: 0.8, color: '#D2691E' },
+                { name: 'Античный слой', depth: 1.5, color: '#A0522D' }
+            ];
+            
+            let currentY = colY;
+            layers.forEach((layer, index) => {
+                const layerHeight = (layer.depth / 5) * colHeight;
+                ctx.fillStyle = layer.color;
+                ctx.fillRect(colX, currentY, colWidth, layerHeight);
+                
+                ctx.fillStyle = '#FFFFFF';
+                ctx.font = '12px Arial';
+                ctx.save();
+                ctx.translate(colX + 10, currentY + layerHeight/2);
+                ctx.rotate(-Math.PI/2);
+                ctx.fillText(layer.name, 0, 0);
+                ctx.restore();
+                
+                currentY += layerHeight;
+            });
+            
+            saveCanvasState();
+        }
+        
+        function drawPlanTemplate() {
+            if (!ctx) return;
+            
+            const squareSize = 300;
+            const squareX = canvas.width/2 - squareSize/2;
+            const squareY = canvas.height/2 - squareSize/2;
+            
+            ctx.strokeStyle = '#000000';
+            ctx.lineWidth = 3;
+            ctx.strokeRect(squareX, squareY, squareSize, squareSize);
+            
+            ctx.fillStyle = '#000000';
+            ctx.font = 'bold 16px Arial';
+            ctx.fillText('План археологического раскопа', canvas.width/2 - 120, 40);
+            
+            ctx.strokeStyle = '#666666';
+            ctx.lineWidth = 1;
+            
+            const gridSize = squareSize / 5;
+            for (let i = 1; i < 5; i++) {
+                ctx.beginPath();
+                ctx.moveTo(squareX + i * gridSize, squareY);
+                ctx.lineTo(squareX + i * gridSize, squareY + squareSize);
+                ctx.stroke();
+                
+                ctx.beginPath();
+                ctx.moveTo(squareX, squareY + i * gridSize);
+                ctx.lineTo(squareX + squareSize, squareY + i * gridSize);
+                ctx.stroke();
+            }
+            
+            ctx.fillStyle = '#000000';
+            ctx.font = '14px Arial';
+            
+            for (let i = 0; i <= 5; i++) {
+                const x = squareX + i * gridSize;
+                ctx.fillText(`${i}`, x - 5, squareY + squareSize + 20);
+            }
+            ctx.fillText('Ось X (м)', canvas.width/2 - 30, squareY + squareSize + 40);
+            
+            for (let i = 0; i <= 5; i++) {
+                const y = squareY + i * gridSize;
+                ctx.fillText(`${5-i}`, squareX - 20, y + 5);
+            }
+            ctx.save();
+            ctx.translate(squareX - 40, canvas.height/2);
+            ctx.rotate(-Math.PI/2);
+            ctx.fillText('Ось Y (м)', 0, 0);
+            ctx.restore();
+            
+            drawNorthArrow(squareX + squareSize - 50, squareY + 30);
+            
+            saveCanvasState();
+        }
+        
+        function drawProfileTemplate() {
+            if (!ctx) return;
+            
+            const profileY = canvas.height - 100;
+            const profileHeight = 200;
+            
+            ctx.strokeStyle = '#000000';
+            ctx.lineWidth = 2;
+            
+            ctx.beginPath();
+            ctx.moveTo(50, profileY);
+            ctx.lineTo(canvas.width - 50, profileY);
+            ctx.stroke();
+            
+            ctx.beginPath();
+            ctx.moveTo(50, profileY);
+            ctx.lineTo(50, profileY - profileHeight);
+            ctx.stroke();
+            
+            ctx.fillStyle = '#000000';
+            ctx.font = 'bold 16px Arial';
+            ctx.fillText('Профиль археологического разреза', canvas.width/2 - 120, 40);
+            
+            ctx.fillStyle = '#666666';
+            ctx.font = '12px Arial';
+            for (let i = 0; i <= 10; i++) {
+                const x = 50 + (i/10) * (canvas.width - 100);
+                ctx.beginPath();
+                ctx.moveTo(x, profileY);
+                ctx.lineTo(x, profileY + 10);
+                ctx.stroke();
+                ctx.fillText(`${i}m`, x - 5, profileY + 25);
+            }
+            
+            for (let i = 0; i <= 4; i++) {
+                const y = profileY - (i/4) * profileHeight;
+                ctx.beginPath();
+                ctx.moveTo(45, y);
+                ctx.lineTo(50, y);
+                ctx.stroke();
+                ctx.fillText(`${i * 50}см`, 20, y + 4);
+            }
+            
+            ctx.strokeStyle = '#8B4513';
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.moveTo(50, profileY - 50);
+            
+            const points = [];
+            for (let i = 0; i <= 10; i++) {
+                const x = 50 + (i/10) * (canvas.width - 100);
+                const y = profileY - 50 - Math.random() * 100;
+                points.push({x, y});
+                if (i === 0) {
+                    ctx.moveTo(x, y);
+                } else {
+                    ctx.lineTo(x, y);
+                }
+            }
+            ctx.stroke();
+            
+            const layers = [
+                { name: 'Гумус', yOffset: 30 },
+                { name: 'Суглинок', yOffset: 80 },
+                { name: 'Песок', yOffset: 140 }
+            ];
+            
+            layers.forEach(layer => {
+                ctx.fillStyle = '#000000';
+                ctx.font = '12px Arial';
+                ctx.fillText(layer.name, 60, profileY - layer.yOffset);
+            });
+            
+            ctx.fillStyle = '#000000';
+            ctx.fillText('Расстояние (м)', canvas.width/2 - 40, profileY + 50);
+            
+            ctx.save();
+            ctx.translate(20, canvas.height/2);
+            ctx.rotate(-Math.PI/2);
+            ctx.fillText('Глубина (см)', 0, 0);
+            ctx.restore();
+            
+            saveCanvasState();
+        }
+        
+        function drawNorthArrow(x, y) {
+            ctx.fillStyle = '#000000';
+            
+            ctx.beginPath();
+            ctx.moveTo(x, y);
+            ctx.lineTo(x - 10, y + 20);
+            ctx.lineTo(x + 10, y + 20);
+            ctx.closePath();
+            ctx.fill();
+            
+            ctx.font = 'bold 14px Arial';
+            ctx.fillText('N', x - 4, y + 40);
+        }
+        
+        function saveSketch() {
+            if (!canvas) {
+                showAlert('Нет чертежа для сохранения', 'danger');
+                return;
+            }
+            
+            const dataURL = canvas.toDataURL('image/png');
+            const sketchId = 'journal_sketch_' + Date.now();
+            
+            OFFLINE_STORAGE.save(sketchId, {
+                dataURL: dataURL,
+                name: `Чертеж ${new Date().toLocaleDateString()}`,
+                timestamp: new Date().toISOString(),
+                tool: currentTool
+            });
+            
+            const attachedSketches = document.getElementById('attached-sketches');
+            if (attachedSketches) {
+                const sketchItem = document.createElement('div');
+                sketchItem.className = 'attachment-item';
+                sketchItem.innerHTML = `
+                    <i class="fas fa-drafting-compass"></i>
+                    <span>Чертеж ${new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
+                    <button class="btn btn-sm btn-danger remove-attachment" data-id="${sketchId}">
+                        <i class="fas fa-times"></i>
+                    </button>
+                `;
+                attachedSketches.appendChild(sketchItem);
+                
+                sketchItem.querySelector('.remove-attachment').addEventListener('click', function() {
+                    OFFLINE_STORAGE.remove(this.dataset.id);
+                    this.closest('.attachment-item').remove();
+                });
+            }
+            
+            showAlert('Чертеж сохранен и прикреплен к записи', 'success');
+        }
+        
+        function attachSketch() {
+            const attachedSketches = document.getElementById('attached-sketches');
+            if (!attachedSketches) return;
+            
+            if (!currentSketch) {
+                showAlert('Сначала создайте чертеж', 'warning');
+                return;
+            }
+            
+            const sketchId = 'journal_sketch_' + Date.now();
+            const sketchItem = document.createElement('div');
+            sketchItem.className = 'attachment-item';
+            sketchItem.innerHTML = `
+                <i class="fas fa-drafting-compass"></i>
+                <span>Чертеж ${new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
+                <button class="btn btn-sm btn-danger remove-attachment" data-id="${sketchId}">
+                    <i class="fas fa-times"></i>
+                </button>
+            `;
+            attachedSketches.appendChild(sketchItem);
+            
+            OFFLINE_STORAGE.save(sketchId, {
+                dataURL: currentSketch,
+                name: `Чертеж ${new Date().toLocaleDateString()}`,
+                timestamp: new Date().toISOString()
+            });
+            
+            sketchItem.querySelector('.remove-attachment').addEventListener('click', function() {
+                OFFLINE_STORAGE.remove(this.dataset.id);
+                this.closest('.attachment-item').remove();
+            });
+            
+            showAlert('Чертеж прикреплен к записи', 'success');
+        }
+        
+        function attachAudio() {
+            const attachedAudio = document.getElementById('attached-audio');
+            if (!attachedAudio) return;
+            
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = 'audio/*';
+            input.style.display = 'none';
+            
+            input.addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        const audioId = 'audio_' + Date.now();
+                        const audioUrl = e.target.result;
+                        
+                        const audioItem = document.createElement('div');
+                        audioItem.className = 'attachment-item';
+                        audioItem.innerHTML = `
+                            <i class="fas fa-volume-up"></i>
+                            <span>${file.name}</span>
+                            <audio controls class="audio-player">
+                                <source src="${audioUrl}" type="${file.type}">
+                            </audio>
+                            <button class="btn btn-sm btn-danger remove-attachment" data-id="${audioId}">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        `;
+                        attachedAudio.appendChild(audioItem);
+                        
+                        OFFLINE_STORAGE.save(audioId, {
+                            dataURL: audioUrl,
+                            name: file.name,
+                            timestamp: new Date().toISOString(),
+                            type: file.type
+                        });
+                        
+                        audioItem.querySelector('.remove-attachment').addEventListener('click', function() {
+                            OFFLINE_STORAGE.remove(this.dataset.id);
+                            this.closest('.attachment-item').remove();
+                        });
+                        
+                        showAlert('Аудиофайл прикреплен к записи', 'success');
+                    };
+                    reader.readAsDataURL(file);
+                }
+                document.body.removeChild(input);
+            });
+            
+            document.body.appendChild(input);
+            input.click();
+        }
+        
+        function saveJournalEntry() {
+            const title = document.getElementById('journal-title').value;
+            const date = document.getElementById('journal-date').value;
+            const category = document.getElementById('journal-category').value;
+            const content = document.getElementById('journal-content').value;
+            
+            if (!title || !content) {
+                showAlert('Заполните обязательные поля: заголовок и содержание', 'danger');
+                return;
+            }
+            
+            const attachments = [];
+            
+            const sketchAttachments = document.querySelectorAll('#attached-sketches .attachment-item');
+            sketchAttachments.forEach(item => {
+                const name = item.querySelector('span').textContent;
+                attachments.push({ type: 'sketch', name: name });
+            });
+            
+            const audioAttachments = document.querySelectorAll('#attached-audio .attachment-item');
+            audioAttachments.forEach(item => {
+                const name = item.querySelector('span').textContent;
+                attachments.push({ type: 'audio', name: name });
+            });
+            
+            const newId = journalEntries.length > 0 
+                ? Math.max(...journalEntries.map(e => e.id)) + 1 
+                : 1;
+            
+            const entry = {
+                id: newId,
+                title: title,
+                date: date,
+                category: category,
+                content: content,
+                author: currentUser ? currentUser.name : 'Неизвестный пользователь',
+                attachments: attachments,
+                createdAt: new Date().toISOString()
+            };
+            
+            journalEntries.unshift(entry);
+            
+            OFFLINE_STORAGE.save(`journal_${entry.id}`, entry);
+            
+            updateJournalEntriesList();
+            
+            clearJournalForm();
+            
+            showAlert('Запись журнала сохранена', 'success');
+        }
+        
+        function saveJournalDraft() {
+            const title = document.getElementById('journal-title').value || 'Черновик';
+            const content = document.getElementById('journal-content').value;
+            
+            if (!content) {
+                showAlert('Нет содержания для сохранения', 'warning');
+                return;
+            }
+            
+            const draft = {
+                title: title,
+                content: content,
+                savedAt: new Date().toLocaleString()
+            };
+            
+            OFFLINE_STORAGE.save('journal_draft', draft);
+            showAlert('Черновик сохранен локально', 'success');
+        }
+        
+        function newJournalEntry() {
+            clearJournalForm();
+            
+            const draft = OFFLINE_STORAGE.load('journal_draft');
+            if (draft) {
+                document.getElementById('journal-title').value = draft.title;
+                document.getElementById('journal-content').value = draft.content;
+                showAlert('Загружен последний черновик', 'info');
+            }
+        }
+        
+        function clearJournalForm() {
+            document.getElementById('journal-title').value = '';
+            document.getElementById('journal-date').value = new Date().toISOString().split('T')[0];
+            document.getElementById('journal-content').value = '';
+            
+            document.getElementById('attached-sketches').innerHTML = '';
+            document.getElementById('attached-audio').innerHTML = '';
+            
+            const transcriptionResults = document.getElementById('transcription-results');
+            if (transcriptionResults) {
+                transcriptionResults.style.display = 'none';
+            }
+        }
+        
+        function updateJournalEntriesList() {
+            const entriesList = document.getElementById('journal-entries-list');
+            if (!entriesList) return;
+            
+            entriesList.innerHTML = '';
+            
+            if (journalEntries.length === 0) {
+                const emptyRow = document.createElement('tr');
+                emptyRow.innerHTML = `
+                    <td colspan="6" style="text-align: center; padding: 2rem; color: #666;">
+                        <i class="fas fa-book-open" style="font-size: 2rem; margin-bottom: 1rem; display: block;"></i>
+                        <p>Записей журнала пока нет</p>
+                        <button id="create-first-entry" class="btn btn-sm" style="margin-top: 1rem;">
+                            <i class="fas fa-plus"></i> Создать первую запись
+                        </button>
+                    </td>
+                `;
+                entriesList.appendChild(emptyRow);
+                
+                document.getElementById('create-first-entry').addEventListener('click', function() {
+                    newJournalEntry();
+                    document.getElementById('journal-title').focus();
+                });
+                
+                return;
+            }
+            
+            journalEntries.forEach(entry => {
+                const row = document.createElement('tr');
+                
+                const entryDate = new Date(entry.date);
+                const formattedDate = entryDate.toLocaleDateString('ru-RU', {
+                    day: '2-digit',
+                    month: '2-digit',
+                    year: 'numeric'
+                });
+                
+                let attachmentsHTML = '';
+                if (entry.attachments && entry.attachments.length > 0) {
+                    entry.attachments.forEach(attach => {
+                        if (attach.type === 'sketch') {
+                            attachmentsHTML += '<i class="fas fa-drafting-compass" title="Чертеж"></i> ';
+                        } else if (attach.type === 'audio') {
+                            attachmentsHTML += '<i class="fas fa-volume-up" title="Аудиозапись"></i> ';
+                        }
+                    });
+                }
+                
+                row.innerHTML = `
+                    <td>${formattedDate}</td>
+                    <td><strong>${entry.title}</strong></td>
+                    <td><span class="user-role role-${entry.category}">${getCategoryName(entry.category)}</span></td>
+                    <td>${entry.author}</td>
+                    <td>${attachmentsHTML || '-'}</td>
+                    <td>
+                        <button class="btn btn-sm" onclick="viewJournalEntry(${entry.id})" title="Просмотр">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                        <button class="btn btn-sm btn-secondary" onclick="editJournalEntry(${entry.id})" title="Редактировать">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="btn btn-sm btn-danger" onclick="deleteJournalEntry(${entry.id})" title="Удалить">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                `;
+                
+                entriesList.appendChild(row);
+            });
+        }
+        
+        function getCategoryName(category) {
+            const categories = {
+                stratigraphy: 'Стратиграфия',
+                findings: 'Находки',
+                weather: 'Погодные условия',
+                observations: 'Наблюдения',
+                planning: 'Планирование работ',
+                problems: 'Проблемы и решения'
+            };
+            return categories[category] || category;
+        }
+        
+        window.viewJournalEntry = function(id) {
+            const entry = journalEntries.find(e => e.id === id);
+            if (!entry) return;
+            
+            document.getElementById('view-journal-title').textContent = entry.title;
+            document.getElementById('view-journal-date').textContent = `Дата: ${entry.date}`;
+            document.getElementById('view-journal-author').textContent = `Автор: ${entry.author}`;
+            document.getElementById('view-journal-category').textContent = `Категория: ${getCategoryName(entry.category)}`;
+            document.getElementById('view-journal-content').innerHTML = `<p style="white-space: pre-wrap;">${entry.content}</p>`;
+            
+            const attachmentsList = document.getElementById('view-attachments-list');
+            if (attachmentsList) {
+                attachmentsList.innerHTML = '';
+                
+                if (entry.attachments.length === 0) {
+                    attachmentsList.innerHTML = '<p>Нет прикрепленных материалов</p>';
+                } else {
+                    entry.attachments.forEach(attach => {
+                        const attachItem = document.createElement('div');
+                        attachItem.className = 'attachment-item';
+                        
+                        if (attach.type === 'sketch') {
+                            attachItem.innerHTML = `<i class="fas fa-drafting-compass"></i> ${attach.name}`;
+                        } else if (attach.type === 'audio') {
+                            attachItem.innerHTML = `<i class="fas fa-volume-up"></i> ${attach.name}`;
+                        }
+                        
+                        attachmentsList.appendChild(attachItem);
+                    });
+                }
+            }
+            
+            document.getElementById('edit-journal-btn').onclick = function() {
+                hideAllModals();
+                editJournalEntry(id);
+            };
+            
+            document.getElementById('delete-journal-btn').onclick = function() {
+                if (confirm('Вы уверены, что хотите удалить эту запись?')) {
+                    deleteJournalEntry(id);
+                    hideAllModals();
+                }
+            };
+            
+            document.getElementById('print-journal-btn').onclick = function() {
+                printJournalEntry(entry);
+            };
+            
+            showModal('view-journal-modal');
+        };
+        
+        window.editJournalEntry = function(id) {
+            const entry = journalEntries.find(e => e.id === id);
+            if (!entry) return;
+            
+            showPage('field-journal-page');
+            
+            setTimeout(() => {
+                document.getElementById('journal-title').value = entry.title;
+                document.getElementById('journal-date').value = entry.date;
+                document.getElementById('journal-category').value = entry.category;
+                document.getElementById('journal-content').value = entry.content;
+                
+                document.getElementById('journal-title').scrollIntoView({ behavior: 'smooth' });
+                
+                showAlert('Запись загружена для редактирования', 'info');
+            }, 100);
+        };
+        
+        window.deleteJournalEntry = function(id) {
+            if (confirm('Вы уверены, что хотите удалить эту запись?')) {
+                const index = journalEntries.findIndex(e => e.id === id);
+                if (index !== -1) {
+                    journalEntries.splice(index, 1);
+                    OFFLINE_STORAGE.remove(`journal_${id}`);
+                    updateJournalEntriesList();
+                    showAlert('Запись удалена', 'success');
+                }
+            }
+        };
+        
+        function printJournalEntry(entry) {
+            const printWindow = window.open('', '_blank');
+            printWindow.document.write(`
+                <html>
+                <head>
+                    <title>${entry.title} - ArchaeoPoint</title>
+                    <style>
+                        body { font-family: Arial, sans-serif; padding: 20px; }
+                        h1 { color: #8B4513; }
+                        .meta { color: #666; margin-bottom: 20px; }
+                        .content { margin-top: 20px; white-space: pre-wrap; }
+                        .footer { margin-top: 40px; font-size: 12px; color: #999; }
+                    </style>
+                </head>
+                <body>
+                    <h1>${entry.title}</h1>
+                    <div class="meta">
+                        <p><strong>Дата:</strong> ${entry.date}</p>
+                        <p><strong>Автор:</strong> ${entry.author}</p>
+                        <p><strong>Категория:</strong> ${getCategoryName(entry.category)}</p>
+                    </div>
+                    <div class="content">${entry.content}</div>
+                    <div class="footer">
+                        <p>Распечатано из ArchaeoPoint: ${new Date().toLocaleString()}</p>
+                    </div>
+                </body>
+                </html>
+            `);
+            printWindow.document.close();
+            printWindow.print();
+        }
+        
+        function exportJournal() {
+            if (journalEntries.length === 0) {
+                showAlert('Нет записей для экспорта', 'warning');
+                return;
+            }
+            
+            const exportData = {
+                exportedAt: new Date().toISOString(),
+                expedition: "Экспедиция Крым-2023",
+                totalEntries: journalEntries.length,
+                entries: journalEntries
+            };
+            
+            const dataStr = JSON.stringify(exportData, null, 2);
+            const dataBlob = new Blob([dataStr], { type: 'application/json' });
+            const url = URL.createObjectURL(dataBlob);
+            
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `archaeopoint-journal-${new Date().toISOString().split('T')[0]}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            showAlert('Журнал экспортирован в JSON файл', 'success');
+        }
+        
         function addSampleArtifacts() {
             const sampleArtifacts = [
                 {
@@ -2829,38 +4394,6 @@
                     layer: "layer3",
                     photos: [],
                     synced: true
-                },
-                {
-                    id: 4,
-                    name: "Каменный топор",
-                    type: "stone",
-                    lat: 44.948037,
-                    lng: 34.100918,
-                    alt: 125.0,
-                    date: "2023-06-14",
-                    depth: 40,
-                    context: "Квадрат 6А, хозяйственная яма",
-                    description: "Каменный топор с отверстием для рукояти",
-                    discoveredBy: "Иван Археологов",
-                    layer: "layer1",
-                    photos: [],
-                    synced: true
-                },
-                {
-                    id: 5,
-                    name: "Костные останки",
-                    type: "bones",
-                    lat: 44.948737,
-                    lng: 34.099918,
-                    alt: 124.5,
-                    date: "2023-06-11",
-                    depth: 62,
-                    context: "Квадрат 5Г, погребение №5",
-                    description: "Фрагменты костей животных",
-                    discoveredBy: "Мария Петрова",
-                    layer: "layer3",
-                    photos: [],
-                    synced: true
                 }
             ];
             
@@ -2869,28 +4402,24 @@
             updateArtifactsTable();
             updateStatistics();
             
-            // Сохраняем в локальное хранилище для демонстрации офлайн-работы
             artifacts.forEach(artifact => {
                 OFFLINE_STORAGE.save(`artifact_${artifact.id}`, artifact);
             });
             
-            // Обновляем статус синхронизации
             OFFLINE_STORAGE.updatePendingSync();
         }
         
-        // Обновление артефактов на карте
         function updateArtifactsOnMap() {
-            // Очистка существующих маркеров
+            if (!markersCluster) return;
+            
             markersCluster.clearLayers();
             artifactMarkers = [];
             
-            // Получение выбранных типов артефактов
             const selectedTypes = [];
             document.querySelectorAll('input[name="artifact-type"]:checked').forEach(checkbox => {
                 selectedTypes.push(checkbox.value);
             });
             
-            // Цвета для типов артефактов
             const artifactColors = {
                 gold: '#FFD700',
                 ceramic: '#8B4513',
@@ -2900,7 +4429,6 @@
                 other: '#9370DB'
             };
             
-            // Добавление маркеров для каждого артефакта
             artifacts.forEach(artifact => {
                 if (selectedTypes.includes(artifact.type)) {
                     const icon = L.divIcon({
@@ -2911,7 +4439,6 @@
                     
                     const marker = L.marker([artifact.lat, artifact.lng], { icon });
                     
-                    // Добавление попапа с информацией
                     const popupContent = `
                         <div class="artifact-popup">
                             <h3>${artifact.name}</h3>
@@ -2935,26 +4462,22 @@
                 }
             });
             
-            // Обновление кластера на карте
             map.addLayer(markersCluster);
             
-            // Обновление тепловой карты, если включена
-            if (document.getElementById('toggle-heatmap').classList.contains('active')) {
+            if (document.getElementById('toggle-heatmap') && document.getElementById('toggle-heatmap').classList.contains('active')) {
                 updateHeatmap();
             }
         }
         
-        // Обновление тепловой карты
         function updateHeatmap() {
-            // Удаляем существующий слой тепловой карты
+            if (!map) return;
+            
             if (heatmapLayer) {
                 map.removeLayer(heatmapLayer);
             }
             
-            // Создаем точки для тепловой карты
             const heatPoints = artifacts.map(artifact => [artifact.lat, artifact.lng, 1]);
             
-            // Создаем тепловую карту
             heatmapLayer = L.heatLayer(heatPoints, {
                 radius: 25,
                 blur: 15,
@@ -2964,11 +4487,12 @@
             
             map.addLayer(heatmapLayer);
             
-            // Показываем легенду
-            document.getElementById('heatmap-legend').style.display = 'block';
+            const legend = document.getElementById('heatmap-legend');
+            if (legend) {
+                legend.style.display = 'block';
+            }
         }
         
-        // Получение названия типа артефакта
         function getArtifactTypeName(type) {
             const typeNames = {
                 gold: "Золотые изделия",
@@ -2981,38 +4505,22 @@
             return typeNames[type] || "Неизвестный тип";
         }
         
-        // Инициализация приложения
         document.addEventListener('DOMContentLoaded', function() {
-            // Проверка авторизации
             checkAuth();
-            
-            // Инициализация отслеживания сетевого соединения
             initNetworkMonitoring();
-            
-            // Инициализация PWA
             initPWA();
-            
-            // Инициализация обработчиков событий
             initEventHandlers();
-            
-            // Инициализация тестовых данных
             initTestData();
-            
-            // Запуск синхронизации
             startSyncService();
         });
         
-        // Инициализация отслеживания сетевого соединения
         function initNetworkMonitoring() {
-            // Проверка начального состояния
             updateOnlineStatus();
             
-            // Слушатели событий сети
             window.addEventListener('online', updateOnlineStatus);
             window.addEventListener('offline', updateOnlineStatus);
         }
         
-        // Обновление статуса сети
         function updateOnlineStatus() {
             isOnline = navigator.onLine;
             
@@ -3020,7 +4528,6 @@
                 document.getElementById('offline-notification').classList.remove('show');
                 document.getElementById('sync-status').classList.remove('offline');
                 
-                // Пытаемся синхронизировать накопленные данные
                 syncPendingData();
             } else {
                 document.getElementById('offline-notification').classList.add('show');
@@ -3029,58 +4536,51 @@
             }
         }
         
-        // Инициализация PWA
         function initPWA() {
-            // Проверка поддержки Service Worker
             if ('serviceWorker' in navigator) {
-                // Регистрация Service Worker
                 navigator.serviceWorker.register('/sw.js').catch(error => {
                     console.log('Ошибка регистрации Service Worker:', error);
                 });
                 
-                // Обработчик события beforeinstallprompt
                 let deferredPrompt;
                 
                 window.addEventListener('beforeinstallprompt', (e) => {
-                    // Предотвращаем автоматическое отображение prompt
                     e.preventDefault();
                     deferredPrompt = e;
                     
-                    // Показываем кнопку установки
-                    document.getElementById('install-app-btn').style.display = 'inline-block';
-                    
-                    // Обработчик для кнопки установки
-                    document.getElementById('install-app-btn').addEventListener('click', () => {
-                        // Показываем prompt установки
-                        deferredPrompt.prompt();
+                    const installBtn = document.getElementById('install-app-btn');
+                    if (installBtn) {
+                        installBtn.style.display = 'inline-block';
                         
-                        // Ожидаем ответа пользователя
-                        deferredPrompt.userChoice.then((choiceResult) => {
-                            if (choiceResult.outcome === 'accepted') {
-                                console.log('Пользователь установил приложение');
-                            }
-                            deferredPrompt = null;
+                        installBtn.addEventListener('click', () => {
+                            deferredPrompt.prompt();
+                            
+                            deferredPrompt.userChoice.then((choiceResult) => {
+                                if (choiceResult.outcome === 'accepted') {
+                                    console.log('Пользователь установил приложение');
+                                }
+                                deferredPrompt = null;
+                            });
                         });
-                    });
+                    }
                 });
                 
-                // Обработчик события appinstalled
                 window.addEventListener('appinstalled', () => {
                     console.log('Приложение установлено');
-                    document.getElementById('install-app-btn').style.display = 'none';
+                    const installBtn = document.getElementById('install-app-btn');
+                    if (installBtn) {
+                        installBtn.style.display = 'none';
+                    }
                 });
             }
             
-            // Проверка, запущено ли приложение в standalone режиме
             if (window.matchMedia('(display-mode: standalone)').matches || 
                 window.navigator.standalone === true) {
                 console.log('Приложение запущено в standalone режиме');
             }
         }
         
-        // Инициализация обработчиков событий
         function initEventHandlers() {
-            // Обработчики для страницы входа
             document.getElementById('show-register').addEventListener('click', function() {
                 document.getElementById('login-form').style.display = 'none';
                 document.getElementById('register-form').style.display = 'block';
@@ -3113,7 +4613,6 @@
             });
             
             document.getElementById('verify-2fa-btn').addEventListener('click', function() {
-                // Проверка кода двухфакторной аутентификации
                 const code = Array.from(document.querySelectorAll('.two-factor-code input'))
                     .map(input => input.value)
                     .join('');
@@ -3135,7 +4634,6 @@
                     document.getElementById('register-form').style.display = 'none';
                     document.getElementById('login-form').style.display = 'block';
                     
-                    // Очистка полей
                     document.getElementById('register-name').value = '';
                     document.getElementById('register-email').value = '';
                     document.getElementById('register-expedition').value = '';
@@ -3145,7 +4643,6 @@
                 }
             });
             
-            // Переключение темы
             document.getElementById('theme-toggle').addEventListener('click', function() {
                 const isDarkMode = document.body.classList.toggle('dark-mode');
                 const icon = this.querySelector('i');
@@ -3159,29 +4656,36 @@
                 }
             });
             
-            // Переключение темной темы в настройках
             document.getElementById('enable-dark-mode').addEventListener('change', function() {
                 if (this.checked) {
                     document.body.classList.add('dark-mode');
-                    document.getElementById('theme-toggle').querySelector('i').className = 'fas fa-sun';
+                    const themeIcon = document.querySelector('#theme-toggle i');
+                    if (themeIcon) {
+                        themeIcon.className = 'fas fa-sun';
+                    }
                     localStorage.setItem('archaeopoint_theme', 'dark');
                 } else {
                     document.body.classList.remove('dark-mode');
-                    document.getElementById('theme-toggle').querySelector('i').className = 'fas fa-moon';
+                    const themeIcon = document.querySelector('#theme-toggle i');
+                    if (themeIcon) {
+                        themeIcon.className = 'fas fa-moon';
+                    }
                     localStorage.setItem('archaeopoint_theme', 'light');
                 }
             });
             
-            // Обработчики для навигации
             document.querySelectorAll('nav a').forEach(link => {
                 link.addEventListener('click', function(e) {
                     e.preventDefault();
                     const pageId = this.id.replace('nav-', '') + '-page';
                     showPage(pageId);
+                    
+                    if (pageId === 'field-journal-page') {
+                        setTimeout(initFieldJournal, 100);
+                    }
                 });
             });
             
-            // Обработчики для главной страницы
             document.getElementById('goto-map-btn').addEventListener('click', function() {
                 showPage('map-page');
             });
@@ -3190,10 +4694,8 @@
                 showModal('artifact-modal');
             });
             
-            // Обработчики для карты
             document.querySelectorAll('input[name="map-layer"]').forEach(radio => {
                 radio.addEventListener('change', function() {
-                    // В реальном приложении здесь была бы смена слоев карты
                     console.log('Выбран слой:', this.value);
                 });
             });
@@ -3209,10 +4711,10 @@
             });
             
             document.getElementById('center-map-btn').addEventListener('click', function() {
-                if (artifacts.length > 0) {
+                if (artifacts.length > 0 && map) {
                     const bounds = L.latLngBounds(artifacts.map(a => [a.lat, a.lng]));
                     map.fitBounds(bounds, { padding: [50, 50] });
-                } else {
+                } else if (map) {
                     map.setView([44.948237, 34.100318], 16);
                 }
             });
@@ -3224,36 +4726,39 @@
                 }
             });
             
-            // Тепловая карта
             document.getElementById('toggle-heatmap').addEventListener('click', function() {
                 this.classList.toggle('active');
                 
                 if (this.classList.contains('active')) {
                     updateHeatmap();
-                    document.getElementById('heatmap-legend').style.display = 'block';
+                    const legend = document.getElementById('heatmap-legend');
+                    if (legend) {
+                        legend.style.display = 'block';
+                    }
                 } else {
-                    if (heatmapLayer) {
+                    if (heatmapLayer && map) {
                         map.removeLayer(heatmapLayer);
                         heatmapLayer = null;
                     }
-                    document.getElementById('heatmap-legend').style.display = 'none';
+                    const legend = document.getElementById('heatmap-legend');
+                    if (legend) {
+                        legend.style.display = 'none';
+                    }
                 }
             });
             
-            // 3D вид
             document.getElementById('toggle-3d').addEventListener('click', function() {
                 this.classList.toggle('active');
                 const visualization = document.getElementById('visualization-3d');
                 
                 if (this.classList.contains('active')) {
                     visualization.style.display = 'block';
-                    showAlert('3D визуализация включена. В реальном приложении здесь был бы трехмерный вид культурных слоев.', 'info');
+                    showAlert('3D визуализация включена.', 'info');
                 } else {
                     visualization.style.display = 'none';
                 }
             });
             
-            // Измерение расстояний
             document.getElementById('measure-distance').addEventListener('click', function() {
                 isMeasuring = !isMeasuring;
                 this.classList.toggle('active');
@@ -3266,7 +4771,6 @@
                 }
             });
             
-            // Обработчики для модальных окон
             document.querySelectorAll('.close-modal').forEach(btn => {
                 btn.addEventListener('click', function() {
                     hideAllModals();
@@ -3285,7 +4789,6 @@
                 hideAllModals();
             });
             
-            // Определение координат по GPS
             document.getElementById('get-gps-location').addEventListener('click', function() {
                 if (navigator.geolocation) {
                     showProgress('Определение координат...', 30);
@@ -3294,32 +4797,30 @@
                         function(position) {
                             const lat = position.coords.latitude;
                             const lng = position.coords.longitude;
-                            const accuracy = position.coords.accuracy; // в метрах
+                            const accuracy = position.coords.accuracy;
                             
-                            // Преобразуем точность в градусы (приблизительно)
-                            const accuracyDeg = accuracy / 111320; // 1 градус ≈ 111.32 км
+                            const accuracyDeg = accuracy / 111320;
                             
                             document.getElementById('artifact-coords-lat').value = lat.toFixed(6);
                             document.getElementById('artifact-coords-lng').value = lng.toFixed(6);
                             document.getElementById('artifact-coords-alt').value = position.coords.altitude ? 
                                 position.coords.altitude.toFixed(1) : '0.0';
                             
-                            // Показываем точность
                             document.getElementById('gps-accuracy-lat').textContent = `Точность: ±${accuracyDeg.toFixed(6)}° (${accuracy.toFixed(1)} м)`;
                             document.getElementById('gps-accuracy-lng').textContent = `Точность: ±${accuracyDeg.toFixed(6)}° (${accuracy.toFixed(1)} м)`;
                             document.getElementById('gps-accuracy-alt').textContent = position.coords.altitudeAccuracy ? 
                                 `Точность: ±${position.coords.altitudeAccuracy.toFixed(1)} м` : 'Точность: неизвестна';
                             
-                            // Центрируем карту на местоположении
-                            map.setView([lat, lng], 18);
-                            
-                            // Добавляем маркер местоположения
-                            L.marker([lat, lng], {
-                                icon: L.divIcon({
-                                    html: '<div style="background-color: #3498db; width: 15px; height: 15px; border-radius: 50%; border: 2px solid white;"></div>',
-                                    iconSize: [15, 15]
-                                })
-                            }).addTo(map).bindPopup('Ваше текущее местоположение').openPopup();
+                            if (map) {
+                                map.setView([lat, lng], 18);
+                                
+                                L.marker([lat, lng], {
+                                    icon: L.divIcon({
+                                        html: '<div style="background-color: #3498db; width: 15px; height: 15px; border-radius: 50%; border: 2px solid white;"></div>',
+                                        iconSize: [15, 15]
+                                    })
+                                }).addTo(map).bindPopup('Ваше текущее местоположение').openPopup();
+                            }
                             
                             hideProgress();
                             showAlert('Координаты успешно определены!', 'success');
@@ -3340,17 +4841,14 @@
                 }
             });
             
-            // Сохранение артефакта
             document.getElementById('save-artifact-btn').addEventListener('click', function() {
                 saveArtifact();
             });
             
-            // Сохранение артефакта в офлайн-режиме
             document.getElementById('save-offline-btn').addEventListener('click', function() {
                 saveArtifact(true);
             });
             
-            // Пакетная загрузка
             document.getElementById('batch-upload-btn').addEventListener('click', function() {
                 showModal('batch-upload-modal');
             });
@@ -3360,30 +4858,18 @@
                 showModal('batch-upload-modal');
             });
             
-            // Голосовой ввод
-            document.querySelectorAll('.voice-input-btn').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    const textarea = this.parentElement.querySelector('textarea, input[type="text"]');
-                    
-                    if (isListening) {
-                        VOICE_RECOGNITION.stop();
-                        this.classList.remove('listening');
-                    } else {
-                        VOICE_RECOGNITION.start(
-                            function(transcript) {
-                                textarea.value = transcript;
-                                showAlert('Текст распознан успешно!', 'success');
-                            },
-                            function(error) {
-                                showAlert('Ошибка распознавания голоса: ' + error, 'danger');
-                            }
-                        );
-                        this.classList.add('listening');
-                    }
-                });
+            document.getElementById('artifact-voice-name').addEventListener('click', function() {
+                startVoiceInput('artifact-name');
             });
             
-            // AI распознавание изображений
+            document.getElementById('artifact-voice-context').addEventListener('click', function() {
+                startVoiceInput('artifact-context');
+            });
+            
+            document.getElementById('artifact-voice-description').addEventListener('click', function() {
+                startVoiceInput('artifact-description');
+            });
+            
             document.getElementById('photo-input').addEventListener('change', function(e) {
                 const files = e.target.files;
                 const preview = document.getElementById('photo-preview');
@@ -3409,32 +4895,14 @@
                         container.appendChild(removeBtn);
                         
                         preview.appendChild(container);
-                        
-                        // AI анализ изображения
-                        if (document.getElementById('enable-ai-recognition').checked) {
-                            setTimeout(() => {
-                                const result = AI_RECOGNITION.recognizeImage(e.target.result);
-                                if (result.confidence > CONFIG.AI_CONFIDENCE_THRESHOLD) {
-                                    document.getElementById('ai-suggestion').style.display = 'block';
-                                    document.getElementById('ai-suggested-type').textContent = 
-                                        getArtifactTypeName(result.type);
-                                    document.getElementById('ai-confidence').textContent = 
-                                        `${result.confidence}%`;
-                                    
-                                    document.getElementById('apply-ai-suggestion').addEventListener('click', function() {
-                                        document.getElementById('artifact-type').value = result.type;
-                                        showAlert(`Тип установлен: ${getArtifactTypeName(result.type)}`, 'success');
-                                    });
-                                }
-                            }, 1000);
-                        }
                     };
                     
                     reader.readAsDataURL(file);
                 }
             });
             
-            // Обработчики для панели управления
+            setupJournalEventHandlers();
+            
             document.getElementById('add-user-btn').addEventListener('click', function() {
                 showModal('user-modal');
             });
@@ -3447,7 +4915,6 @@
                 showModal('twofa-setup-modal');
             });
             
-            // Переключение методов 2FA
             document.querySelectorAll('input[name="twofa-method"]').forEach(radio => {
                 radio.addEventListener('change', function() {
                     if (this.value === 'sms') {
@@ -3469,7 +4936,6 @@
                 }
             });
             
-            // Синхронизация данных
             document.getElementById('force-sync-btn').addEventListener('click', function() {
                 syncPendingData(true);
             });
@@ -3483,7 +4949,6 @@
                 }
             });
             
-            // Экспорт данных
             document.getElementById('export-artifacts-btn').addEventListener('click', function() {
                 showAlert('Функция экспорта будет доступна в полной версии системы', 'info');
             });
@@ -3495,51 +4960,101 @@
                 }, 2000);
             });
             
-            // Обработчик выхода из системы
             document.getElementById('logout-btn').addEventListener('click', function() {
                 logoutUser();
             });
             
-            // Перетаскивание файлов для пакетной загрузки
             const batchDropArea = document.getElementById('batch-drop-area');
             const batchPhotoInput = document.getElementById('batch-photo-input');
             
-            batchDropArea.addEventListener('click', function() {
-                batchPhotoInput.click();
-            });
-            
-            batchDropArea.addEventListener('dragover', function(e) {
-                e.preventDefault();
-                this.style.borderColor = 'var(--primary-color)';
-                this.style.backgroundColor = 'rgba(139, 69, 19, 0.1)';
-            });
-            
-            batchDropArea.addEventListener('dragleave', function() {
-                this.style.borderColor = '#ddd';
-                this.style.backgroundColor = '';
-            });
-            
-            batchDropArea.addEventListener('drop', function(e) {
-                e.preventDefault();
-                this.style.borderColor = '#ddd';
-                this.style.backgroundColor = '';
+            if (batchDropArea) {
+                batchDropArea.addEventListener('click', function() {
+                    if (batchPhotoInput) batchPhotoInput.click();
+                });
                 
-                const files = e.dataTransfer.files;
-                handleBatchFiles(files);
-            });
+                batchDropArea.addEventListener('dragover', function(e) {
+                    e.preventDefault();
+                    this.style.borderColor = 'var(--primary-color)';
+                    this.style.backgroundColor = 'rgba(139, 69, 19, 0.1)';
+                });
+                
+                batchDropArea.addEventListener('dragleave', function() {
+                    this.style.borderColor = '#ddd';
+                    this.style.backgroundColor = '';
+                });
+                
+                batchDropArea.addEventListener('drop', function(e) {
+                    e.preventDefault();
+                    this.style.borderColor = '#ddd';
+                    this.style.backgroundColor = '';
+                    
+                    const files = e.dataTransfer.files;
+                    handleBatchFiles(files);
+                });
+            }
             
-            batchPhotoInput.addEventListener('change', function(e) {
-                handleBatchFiles(e.target.files);
-            });
+            if (batchPhotoInput) {
+                batchPhotoInput.addEventListener('change', function(e) {
+                    handleBatchFiles(e.target.files);
+                });
+            }
             
             document.getElementById('process-batch-btn').addEventListener('click', function() {
                 processBatchUpload();
             });
         }
         
-        // Обработка файлов для пакетной загрузки
+        function setupJournalEventHandlers() {
+            document.getElementById('start-recording-btn').addEventListener('click', startRecording);
+            document.getElementById('stop-recording-btn').addEventListener('click', stopRecording);
+            document.getElementById('pause-recording-btn').addEventListener('click', togglePauseRecording);
+            
+            document.querySelectorAll('#sketch-tools .map-tool-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    setActiveTool(this.dataset.tool);
+                });
+            });
+            
+            document.getElementById('clear-sketch-btn').addEventListener('click', clearCanvas);
+            document.getElementById('save-sketch-btn').addEventListener('click', saveSketch);
+            document.getElementById('load-template-btn').addEventListener('click', function() {
+                showModal('templates-modal');
+            });
+            
+            document.querySelectorAll('.use-template-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    loadTemplate(this.dataset.template);
+                    hideAllModals();
+                });
+            });
+            
+            document.getElementById('save-journal-btn').addEventListener('click', saveJournalEntry);
+            document.getElementById('save-draft-btn').addEventListener('click', saveJournalDraft);
+            document.getElementById('new-journal-entry').addEventListener('click', newJournalEntry);
+            
+            document.getElementById('attach-sketch-btn').addEventListener('click', attachSketch);
+            document.getElementById('attach-audio-btn').addEventListener('click', attachAudio);
+            
+            document.getElementById('journal-voice-btn').addEventListener('click', function() {
+                startVoiceInput('journal-content');
+            });
+            
+            document.getElementById('export-journal-btn').addEventListener('click', exportJournal);
+            
+            document.getElementById('apply-transcription-btn').addEventListener('click', function() {
+                const transcription = document.getElementById('transcription-text').textContent;
+                const journalContent = document.getElementById('journal-content');
+                if (journalContent && transcription) {
+                    journalContent.value += (journalContent.value ? '\n\n' : '') + transcription;
+                    showAlert('Текст добавлен в запись журнала', 'success');
+                }
+            });
+        }
+        
         function handleBatchFiles(files) {
             const filesList = document.getElementById('batch-files-list');
+            if (!filesList) return;
+            
             filesList.innerHTML = '';
             
             for (let i = 0; i < Math.min(files.length, 100); i++) {
@@ -3561,19 +5076,23 @@
                 filesList.appendChild(fileItem);
             }
             
-            document.querySelector('#batch-preview h4').textContent = `Выбранные файлы (${Math.min(files.length, 100)})`;
+            const previewTitle = document.querySelector('#batch-preview h4');
+            if (previewTitle) {
+                previewTitle.textContent = `Выбранные файлы (${Math.min(files.length, 100)})`;
+            }
             
-            // Добавляем обработчики для кнопок удаления
             document.querySelectorAll('.remove-file').forEach(btn => {
                 btn.addEventListener('click', function() {
                     this.closest('.batch-file-item').remove();
                     const currentCount = document.querySelectorAll('.batch-file-item').length;
-                    document.querySelector('#batch-preview h4').textContent = `Выбранные файлы (${currentCount})`;
+                    const previewTitle = document.querySelector('#batch-preview h4');
+                    if (previewTitle) {
+                        previewTitle.textContent = `Выбранные файлы (${currentCount})`;
+                    }
                 });
             });
         }
         
-        // Обработка пакетной загрузки
         function processBatchUpload() {
             const fileCount = document.querySelectorAll('.batch-file-item').length;
             if (fileCount === 0) {
@@ -3581,12 +5100,8 @@
                 return;
             }
             
-            const defaultType = document.getElementById('batch-artifact-type').value;
-            const defaultLayer = document.getElementById('batch-layer').value;
-            
             showProgress('Обработка файлов...', 0);
             
-            // Имитация обработки
             let processed = 0;
             const interval = setInterval(() => {
                 processed++;
@@ -3602,696 +5117,695 @@
             }, 300);
         }
         
-        // Проверка авторизации
         function checkAuth() {
             const savedUser = localStorage.getItem('archaeopoint_user');
             const savedTheme = localStorage.getItem('archaeopoint_theme');
             
-            // Применяем тему
             if (savedTheme === 'dark') {
                 document.body.classList.add('dark-mode');
-                document.getElementById('theme-toggle').querySelector('i').className = 'fas fa-sun';
-                document.getElementById('enable-dark-mode').checked = true;
+                const themeIcon = document.querySelector('#theme-toggle i');
+                if (themeIcon) {
+                    themeIcon.className = 'fas fa-sun';
+                }
             }
             
             if (savedUser) {
-                currentUser = JSON.parse(savedUser);
-                showAuthenticatedUI();
-                initMap(); // Инициализируем карту только после авторизации
-                updateStorageUsage();
+                try {
+                    currentUser = JSON.parse(savedUser);
+                    showMainApp();
+                } catch (e) {
+                    console.error('Ошибка загрузки пользователя:', e);
+                    showGatekeeper();
+                }
+            } else {
+                showGatekeeper();
             }
         }
         
-        // Показать интерфейс для авторизованного пользователя
-        function showAuthenticatedUI() {
-            document.getElementById('gatekeeper-page').style.display = 'none';
+        function showGatekeeper() {
+            document.getElementById('gatekeeper-page').classList.add('active');
+            document.getElementById('site-header').style.display = 'none';
+            document.getElementById('main-content').style.display = 'none';
+            document.getElementById('site-footer').style.display = 'none';
+        }
+        
+        function showMainApp() {
+            document.getElementById('gatekeeper-page').classList.remove('active');
             document.getElementById('site-header').style.display = 'flex';
             document.getElementById('main-content').style.display = 'block';
             document.getElementById('site-footer').style.display = 'block';
             
-            // Обновление информации о пользователе
-            document.getElementById('user-name').textContent = currentUser.name;
-            document.getElementById('user-role').textContent = currentUser.role === 'admin' ? 'Начальник экспедиции' : 'Археолог';
-            document.getElementById('user-avatar').textContent = currentUser.name.split(' ').map(n => n[0]).join('').toUpperCase();
+            updateUserInfo();
             
-            document.getElementById('profile-name').textContent = currentUser.name;
-            document.getElementById('profile-role').textContent = currentUser.role === 'admin' ? 'Начальник экспедиции' : 'Археолог';
-            document.getElementById('profile-avatar').textContent = currentUser.name.split(' ').map(n => n[0]).join('').toUpperCase();
-            document.getElementById('profile-email').value = currentUser.email || '';
-            document.getElementById('profile-phone').value = currentUser.phone || '';
+            if (!map) {
+                initMap();
+            }
             
-            // Обновление статистики
             updateStatistics();
-            updateUserList();
-            updateUserArtifacts();
-            updateChangeLog();
+            updateExpeditionUsers();
+            updateStorageUsage();
         }
         
-        // Вход пользователя
-        function loginUser(token, password, is2FA = false) {
-            // В реальном приложении здесь был бы запрос к серверу
-            // Для демо используем тестовых пользователей
+        function loginUser(token, password, use2fa = false) {
+            showProgress('Вход в систему...', 50);
             
-            const testUsers = [
-                { 
-                    email: "admin@archaeopoint.ru", 
-                    password: "admin123", 
-                    name: "Александр Иванов", 
-                    role: "admin", 
-                    expedition: "Крым-2023",
-                    phone: "+7 (900) 123-45-67",
-                    twoFA: true
-                },
-                { 
-                    email: "archaeologist@archaeopoint.ru", 
-                    password: "arch123", 
-                    name: "Иван Археологов", 
-                    role: "archaeologist", 
-                    expedition: "Крым-2023",
-                    phone: "+7 (900) 987-65-43",
-                    twoFA: false
-                },
-                { 
-                    email: "assistant@archaeopoint.ru", 
-                    password: "assist123", 
-                    name: "Мария Петрова", 
-                    role: "assistant", 
-                    expedition: "Крым-2023",
-                    phone: "+7 (900) 555-44-33",
-                    twoFA: false
-                }
-            ];
-            
-            const user = testUsers.find(u => u.email === token || u.password === password);
-            
-            if (user) {
-                // Если включена 2FA, проверяем, что пользователь использовал 2FA форму
-                if (user.twoFA && !is2FA) {
-                    document.getElementById('login-form').style.display = 'none';
-                    document.getElementById('two-factor-form').style.display = 'block';
-                    showAlert('Для этого аккаунта требуется двухфакторная аутентификация', 'info');
-                    return;
-                }
+            setTimeout(() => {
+                hideProgress();
                 
-                currentUser = user;
-                localStorage.setItem('archaeopoint_user', JSON.stringify(user));
-                showAuthenticatedUI();
-                showAlert('Успешный вход в систему!', 'success');
-            } else {
-                showAlert('Неверный токен или пароль. Для демо используйте admin@archaeopoint.ru / admin123', 'danger');
+                if ((token === 'admin@archaeopoint.ru' && password === 'admin123') || 
+                    (token === 'expedition_token_2023' && password === 'archaeo2023')) {
+                    
+                    currentUser = {
+                        id: 1,
+                        name: 'Иван Археологов',
+                        email: 'admin@archaeopoint.ru',
+                        role: 'archaeologist',
+                        expedition: 'Крым-2023',
+                        avatar: 'ИИ',
+                        uses2fa: use2fa
+                    };
+                    
+                    localStorage.setItem('archaeopoint_user', JSON.stringify(currentUser));
+                    
+                    showMainApp();
+                    
+                    showAlert('Вход выполнен успешно! Добро пожаловать в ArchaeoPoint!', 'success');
+                } else {
+                    showAlert('Неверный токен или пароль. Используйте: admin@archaeopoint.ru / admin123', 'danger');
+                }
+            }, 1500);
+        }
+        
+        function logoutUser() {
+            if (confirm('Вы уверены, что хотите выйти из системы?')) {
+                currentUser = null;
+                localStorage.removeItem('archaeopoint_user');
+                showGatekeeper();
+                showAlert('Вы вышли из системы', 'info');
             }
         }
         
-        // Выход пользователя
-        function logoutUser() {
-            currentUser = null;
-            localStorage.removeItem('archaeopoint_user');
+        function updateUserInfo() {
+            if (!currentUser) return;
             
-            document.getElementById('site-header').style.display = 'none';
-            document.getElementById('main-content').style.display = 'none';
-            document.getElementById('site-footer').style.display = 'none';
-            document.getElementById('gatekeeper-page').style.display = 'block';
-            document.getElementById('login-form').style.display = 'block';
-            document.getElementById('register-form').style.display = 'none';
-            document.getElementById('two-factor-form').style.display = 'none';
+            const userName = document.getElementById('user-name');
+            const userRole = document.getElementById('user-role');
+            const userAvatar = document.getElementById('user-avatar');
+            const profileName = document.getElementById('profile-name');
+            const profileRole = document.getElementById('profile-role');
+            const profileAvatar = document.getElementById('profile-avatar');
             
-            // Очистка полей входа
-            document.getElementById('login-token').value = '';
-            document.getElementById('login-password').value = '';
-            
-            showAlert('Вы вышли из системы', 'info');
+            if (userName) userName.textContent = currentUser.name;
+            if (userRole) userRole.textContent = getRoleName(currentUser.role);
+            if (userAvatar) userAvatar.textContent = currentUser.avatar;
+            if (profileName) profileName.textContent = currentUser.name;
+            if (profileRole) profileRole.textContent = getRoleName(currentUser.role);
+            if (profileAvatar) profileAvatar.textContent = currentUser.avatar;
         }
         
-        // Показать страницу
+        function getRoleName(role) {
+            const roles = {
+                admin: 'Администратор',
+                archaeologist: 'Археолог',
+                assistant: 'Помощник',
+                student: 'Студент',
+                researcher: 'Исследователь'
+            };
+            return roles[role] || role;
+        }
+        
         function showPage(pageId) {
             document.querySelectorAll('.page').forEach(page => {
                 page.classList.remove('active');
             });
             
-            document.getElementById(pageId).classList.add('active');
-            
-            // Обновление данных при переходе на страницу
-            if (pageId === 'artifacts-page') {
-                updateArtifactsTable();
-                updateStratigraphy();
-            } else if (pageId === 'dashboard-page' && currentUser.role === 'admin') {
-                updateStatistics();
-                updateUserList();
-                updateChangeLog();
-                updateStorageUsage();
-            } else if (pageId === 'profile-page') {
-                updateUserArtifacts();
-            }
-        }
-        
-        // Показать модальное окно
-        function showModal(modalId) {
-            document.querySelectorAll('.modal').forEach(modal => {
-                modal.classList.remove('active');
-            });
-            
-            document.getElementById(modalId).classList.add('active');
-            
-            // Если открываем окно добавления артефакта, заполняем текущей датой
-            if (modalId === 'artifact-modal') {
-                const today = new Date().toISOString().split('T')[0];
-                document.getElementById('artifact-date').value = today;
-                document.getElementById('artifact-name').value = '';
-                document.getElementById('artifact-context').value = '';
-                document.getElementById('artifact-description').value = '';
-                document.getElementById('artifact-depth').value = '';
-                document.getElementById('photo-preview').innerHTML = '';
-                document.getElementById('ai-suggestion').style.display = 'none';
+            const page = document.getElementById(pageId);
+            if (page) {
+                page.classList.add('active');
                 
-                // Устанавливаем координаты центра карты
-                const center = map.getCenter();
-                document.getElementById('artifact-coords-lat').value = center.lat.toFixed(6);
-                document.getElementById('artifact-coords-lng').value = center.lng.toFixed(6);
-                document.getElementById('artifact-coords-alt').value = '125.5';
+                updateNavigation(pageId);
                 
-                // Если пользователь не админ, скрываем некоторые поля
-                if (currentUser.role !== 'admin') {
-                    // Ничего не скрываем в демо-версии
+                window.scrollTo(0, 0);
+                
+                if (pageId === 'map-page' && map) {
+                    setTimeout(() => {
+                        map.invalidateSize();
+                    }, 100);
+                }
+                
+                if (pageId === 'field-journal-page') {
+                    setTimeout(() => {
+                        initFieldJournal();
+                        updateJournalEntriesList();
+                    }, 100);
                 }
             }
         }
         
-        // Скрыть все модальные окна
+        function updateNavigation(activePageId) {
+            const navLinks = document.querySelectorAll('nav a');
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.id === 'nav-' + activePageId.replace('-page', '')) {
+                    link.classList.add('active');
+                }
+            });
+        }
+        
+        function showModal(modalId) {
+            const modal = document.getElementById(modalId);
+            if (modal) {
+                modal.classList.add('active');
+                document.body.style.overflow = 'hidden';
+            }
+        }
+        
         function hideAllModals() {
             document.querySelectorAll('.modal').forEach(modal => {
                 modal.classList.remove('active');
             });
+            document.body.style.overflow = '';
         }
         
-        // Сохранение артефакта
+        function showAlert(message, type = 'info') {
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${type}`;
+            alertDiv.innerHTML = `
+                <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'danger' ? 'exclamation-circle' : 'info-circle'}"></i>
+                ${message}
+                <button class="close-alert" style="float: right; background: none; border: none; font-size: 1rem;">&times;</button>
+            `;
+            
+            const main = document.getElementById('main-content');
+            if (main) {
+                main.insertBefore(alertDiv, main.firstChild);
+                
+                setTimeout(() => {
+                    if (alertDiv.parentNode) {
+                        alertDiv.style.opacity = '0';
+                        alertDiv.style.transition = 'opacity 0.5s';
+                        setTimeout(() => {
+                            if (alertDiv.parentNode) {
+                                alertDiv.parentNode.removeChild(alertDiv);
+                            }
+                        }, 500);
+                    }
+                }, 5000);
+                
+                alertDiv.querySelector('.close-alert').addEventListener('click', function() {
+                    alertDiv.style.opacity = '0';
+                    setTimeout(() => {
+                        if (alertDiv.parentNode) {
+                            alertDiv.parentNode.removeChild(alertDiv);
+                        }
+                    }, 500);
+                });
+            }
+        }
+        
+        function showProgress(message, initialValue = 0) {
+            const progressBar = document.getElementById('progress-bar');
+            if (progressBar) {
+                progressBar.style.width = initialValue + '%';
+                progressBar.style.display = 'block';
+            }
+        }
+        
+        function updateProgress(value) {
+            const progressBar = document.getElementById('progress-bar');
+            if (progressBar) {
+                progressBar.style.width = value + '%';
+            }
+        }
+        
+        function hideProgress() {
+            const progressBar = document.getElementById('progress-bar');
+            if (progressBar) {
+                progressBar.style.display = 'none';
+                progressBar.style.width = '0%';
+            }
+        }
+        
         function saveArtifact(offlineOnly = false) {
             const name = document.getElementById('artifact-name').value;
             const type = document.getElementById('artifact-type').value;
             const date = document.getElementById('artifact-date').value;
+            const layer = document.getElementById('artifact-layer').value;
+            const lat = parseFloat(document.getElementById('artifact-coords-lat').value);
+            const lng = parseFloat(document.getElementById('artifact-coords-lng').value);
+            const alt = parseFloat(document.getElementById('artifact-coords-alt').value);
             const depth = document.getElementById('artifact-depth').value;
-            const lat = document.getElementById('artifact-coords-lat').value;
-            const lng = document.getElementById('artifact-coords-lng').value;
-            const alt = document.getElementById('artifact-coords-alt').value;
             const context = document.getElementById('artifact-context').value;
             const description = document.getElementById('artifact-description').value;
-            const layer = document.getElementById('artifact-layer').value;
             
-            if (!name || !type || !date || !lat || !lng || !context) {
-                showAlert('Заполните все обязательные поля (отмечены *)', 'danger');
+            if (!name || !type || !date) {
+                showAlert('Заполните обязательные поля: название, тип и дата', 'danger');
                 return;
             }
             
-            const newArtifact = {
+            if (isNaN(lat) || isNaN(lng)) {
+                showAlert('Введите корректные координаты', 'danger');
+                return;
+            }
+            
+            const artifact = {
                 id: artifacts.length + 1,
                 name: name,
                 type: type,
-                lat: parseFloat(lat),
-                lng: parseFloat(lng),
-                alt: parseFloat(alt) || 0,
+                lat: lat,
+                lng: lng,
+                alt: alt || 0,
                 date: date,
-                depth: depth ? parseInt(depth) : null,
+                depth: depth || 0,
                 context: context,
                 description: description,
-                discoveredBy: currentUser.name,
-                layer: layer,
-                photos: [], // В реальном приложении здесь были бы загруженные фото
-                synced: !offlineOnly && isOnline
+                discoveredBy: currentUser ? currentUser.name : 'Неизвестный пользователь',
+                layer: layer || '',
+                photos: [],
+                synced: !offlineOnly && isOnline,
+                createdAt: new Date().toISOString()
             };
             
-            if (offlineOnly || !isOnline) {
-                // Сохраняем в локальное хранилище
-                OFFLINE_STORAGE.save(`artifact_${Date.now()}`, newArtifact);
-                showAlert('Артефакт сохранен локально. Будет синхронизирован при появлении соединения.', 'warning');
+            artifacts.push(artifact);
+            
+            updateArtifactsOnMap();
+            updateArtifactsTable();
+            updateStatistics();
+            
+            OFFLINE_STORAGE.save(`artifact_${artifact.id}`, artifact);
+            
+            if (offlineOnly) {
+                showAlert('Артефакт сохранен локально. Будет синхронизирован при появлении сети.', 'warning');
             } else {
-                // Добавляем в основной массив
-                artifacts.push(newArtifact);
-                updateArtifactsOnMap();
-                updateArtifactsTable();
-                updateStatistics();
-                showAlert('Артефакт успешно добавлен!', 'success');
+                showAlert('Артефакт успешно сохранен и синхронизирован', 'success');
             }
             
-            // Добавление в историю изменений
-            addToChangeLog('Добавлен артефакт: ' + name);
-            
-            // Закрытие модального окна
             hideAllModals();
-            
-            // Показ QR-кода, если не в офлайн-режиме
-            if (!offlineOnly) {
-                setTimeout(() => {
-                    showArtifactQR(newArtifact);
-                }, 500);
-            }
+            clearArtifactForm();
         }
         
-        // Показать QR-код артефакта
-        function showArtifactQR(artifact) {
-            document.getElementById('qr-artifact-name').textContent = artifact.name;
-            document.getElementById('qr-artifact-id').textContent = `ID: AP-2023-${artifact.id.toString().padStart(3, '0')}`;
-            showModal('qr-modal');
+        function clearArtifactForm() {
+            document.getElementById('artifact-name').value = '';
+            document.getElementById('artifact-type').value = '';
+            document.getElementById('artifact-date').value = new Date().toISOString().split('T')[0];
+            document.getElementById('artifact-layer').value = '';
+            document.getElementById('artifact-coords-lat').value = '44.948237';
+            document.getElementById('artifact-coords-lng').value = '34.100318';
+            document.getElementById('artifact-coords-alt').value = '125.5';
+            document.getElementById('artifact-depth').value = '';
+            document.getElementById('artifact-context').value = '';
+            document.getElementById('artifact-description').value = '';
+            document.getElementById('photo-preview').innerHTML = '';
+            document.getElementById('ai-suggestion').style.display = 'none';
         }
         
-        // Показать детали артефакта
-        function showArtifactDetails(artifactId) {
-            const artifact = artifacts.find(a => a.id === artifactId);
-            if (artifact) {
-                alert(`Детали артефакта:\n\nНазвание: ${artifact.name}\nТип: ${getArtifactTypeName(artifact.type)}\nДата находки: ${artifact.date}\nКоординаты: ${artifact.lat}, ${artifact.lng}, ${artifact.alt} м\nГлубина: ${artifact.depth} см\nСлой: ${getLayerName(artifact.layer)}\nКонтекст: ${artifact.context}\nОписание: ${artifact.description}\nНашел: ${artifact.discoveredBy}`);
-            }
-        }
-        
-        // Получить название слоя
-        function getLayerName(layerId) {
-            const layers = {
-                layer1: 'Слой I (современный)',
-                layer2: 'Слой II (средневековый)',
-                layer3: 'Слой III (античный)'
-            };
-            return layers[layerId] || 'Не указан';
-        }
-        
-        // Обновление таблицы артефактов
         function updateArtifactsTable() {
-            const tbody = document.getElementById('artifacts-table-body');
-            tbody.innerHTML = '';
+            const tableBody = document.getElementById('artifacts-table-body');
+            if (!tableBody) return;
+            
+            tableBody.innerHTML = '';
             
             artifacts.forEach(artifact => {
                 const row = document.createElement('tr');
                 row.innerHTML = `
-                    <td>AP-2023-${artifact.id.toString().padStart(3, '0')}</td>
+                    <td>AP-${artifact.id.toString().padStart(3, '0')}</td>
                     <td>${artifact.name}</td>
-                    <td><span style="background-color: ${getArtifactColor(artifact.type)}; color: ${artifact.type === 'bones' || artifact.type === 'metal' ? '#333' : 'white'}; padding: 0.2rem 0.5rem; border-radius: 12px; font-size: 0.8rem;">${getArtifactTypeName(artifact.type)}</span></td>
-                    <td>${artifact.date}</td>
-                    <td>${artifact.lat.toFixed(6)}, ${artifact.lng.toFixed(6)}, ${artifact.alt} м</td>
-                    <td>${artifact.discoveredBy}</td>
-                    <td>${getLayerName(artifact.layer)}</td>
                     <td>
-                        <button onclick="showArtifactDetails(${artifact.id})" class="btn btn-sm" title="Просмотр">
+                        <span class="color-indicator artifact-${artifact.type}"></span>
+                        ${getArtifactTypeName(artifact.type)}
+                    </td>
+                    <td>${artifact.date}</td>
+                    <td>${artifact.lat.toFixed(6)}, ${artifact.lng.toFixed(6)}, ${artifact.alt ? artifact.alt.toFixed(1) : '0.0'}м</td>
+                    <td>${artifact.discoveredBy}</td>
+                    <td>${artifact.layer ? artifact.layer.replace('layer', 'Слой ') : 'Не указан'}</td>
+                    <td>
+                        <button class="btn btn-sm" onclick="showArtifactDetails(${artifact.id})">
                             <i class="fas fa-eye"></i>
                         </button>
-                        <button onclick="showArtifactQR(${artifact})" class="btn btn-sm btn-secondary" title="QR-код">
+                        <button class="btn btn-sm btn-secondary" onclick="editArtifact(${artifact.id})">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="btn btn-sm btn-info" onclick="generateArtifactQR(${artifact.id})">
                             <i class="fas fa-qrcode"></i>
                         </button>
                     </td>
                 `;
-                tbody.appendChild(row);
+                tableBody.appendChild(row);
             });
         }
         
-        // Получить цвет для типа артефакта
-        function getArtifactColor(type) {
-            const colors = {
-                gold: '#FFD700',
-                ceramic: '#8B4513',
-                bones: '#F5F5DC',
-                metal: '#C0C0C0',
-                stone: '#808080',
-                other: '#9370DB'
-            };
-            return colors[type] || '#9370DB';
+        window.showArtifactDetails = function(id) {
+            const artifact = artifacts.find(a => a.id === id);
+            if (!artifact) return;
+            
+            const details = `
+                <h3>${artifact.name}</h3>
+                <p><strong>Тип:</strong> ${getArtifactTypeName(artifact.type)}</p>
+                <p><strong>Дата находки:</strong> ${artifact.date}</p>
+                <p><strong>Координаты:</strong> ${artifact.lat.toFixed(6)}°, ${artifact.lng.toFixed(6)}°</p>
+                <p><strong>Высота (Z):</strong> ${artifact.alt ? artifact.alt.toFixed(1) + ' м' : 'Не указана'}</p>
+                <p><strong>Глубина:</strong> ${artifact.depth ? artifact.depth + ' см' : 'Не указана'}</p>
+                <p><strong>Слой:</strong> ${artifact.layer ? artifact.layer.replace('layer', 'Слой ') : 'Не указан'}</p>
+                <p><strong>Контекст:</strong> ${artifact.context || 'Не указан'}</p>
+                <p><strong>Описание:</strong> ${artifact.description || 'Не указано'}</p>
+                <p><strong>Нашел:</strong> ${artifact.discoveredBy}</p>
+                <p><strong>Статус:</strong> ${artifact.synced ? 'Синхронизирован' : 'Только локально'}</p>
+            `;
+            
+            showAlert(details, 'info');
+        };
+        
+        window.editArtifact = function(id) {
+            const artifact = artifacts.find(a => a.id === id);
+            if (!artifact) return;
+            
+            document.getElementById('artifact-name').value = artifact.name;
+            document.getElementById('artifact-type').value = artifact.type;
+            document.getElementById('artifact-date').value = artifact.date;
+            document.getElementById('artifact-layer').value = artifact.layer;
+            document.getElementById('artifact-coords-lat').value = artifact.lat;
+            document.getElementById('artifact-coords-lng').value = artifact.lng;
+            document.getElementById('artifact-coords-alt').value = artifact.alt;
+            document.getElementById('artifact-depth').value = artifact.depth;
+            document.getElementById('artifact-context').value = artifact.context;
+            document.getElementById('artifact-description').value = artifact.description;
+            
+            showModal('artifact-modal');
+            
+            const saveBtn = document.getElementById('save-artifact-btn');
+            if (saveBtn) {
+                saveBtn.innerHTML = '<i class="fas fa-save"></i> Обновить артефакт';
+                saveBtn.onclick = function() {
+                    updateArtifact(id);
+                };
+            }
+        };
+        
+        function updateArtifact(id) {
+            const artifact = artifacts.find(a => a.id === id);
+            if (!artifact) return;
+            
+            artifact.name = document.getElementById('artifact-name').value;
+            artifact.type = document.getElementById('artifact-type').value;
+            artifact.date = document.getElementById('artifact-date').value;
+            artifact.layer = document.getElementById('artifact-layer').value;
+            artifact.lat = parseFloat(document.getElementById('artifact-coords-lat').value);
+            artifact.lng = parseFloat(document.getElementById('artifact-coords-lng').value);
+            artifact.alt = parseFloat(document.getElementById('artifact-coords-alt').value);
+            artifact.depth = document.getElementById('artifact-depth').value;
+            artifact.context = document.getElementById('artifact-context').value;
+            artifact.description = document.getElementById('artifact-description').value;
+            
+            OFFLINE_STORAGE.save(`artifact_${id}`, artifact);
+            
+            updateArtifactsOnMap();
+            updateArtifactsTable();
+            
+            clearArtifactForm();
+            const saveBtn = document.getElementById('save-artifact-btn');
+            if (saveBtn) {
+                saveBtn.innerHTML = '<i class="fas fa-save"></i> Сохранить артефакт';
+                saveBtn.onclick = function() {
+                    saveArtifact();
+                };
+            }
+            
+            hideAllModals();
+            showAlert('Артефакт обновлен', 'success');
         }
         
-        // Обновление статистики
+        window.generateArtifactQR = function(id) {
+            const artifact = artifacts.find(a => a.id === id);
+            if (!artifact) return;
+            
+            document.getElementById('qr-artifact-name').textContent = artifact.name;
+            document.getElementById('qr-artifact-id').textContent = `ID: AP-${artifact.id.toString().padStart(3, '0')}`;
+            
+            const qrDisplay = document.getElementById('qr-code-display');
+            if (qrDisplay) {
+                qrDisplay.innerHTML = `
+                    <div style="text-align: center;">
+                        <div style="font-size: 3rem; color: #333;">QR</div>
+                        <div style="font-size: 0.8rem;">ArchaeoPoint</div>
+                        <div style="font-size: 0.7rem; margin-top: 0.5rem;">AP-${artifact.id.toString().padStart(3, '0')}</div>
+                    </div>
+                `;
+            }
+            
+            showModal('qr-modal');
+        };
+        
         function updateStatistics() {
             document.getElementById('total-artifacts').textContent = artifacts.length;
-            document.getElementById('total-users').textContent = users.length;
+            document.getElementById('today-artifacts').textContent = getTodayArtifactsCount();
+            document.getElementById('last-week').textContent = getLastWeekArtifactsCount();
             
-            // Находки за сегодня
-            const today = new Date().toISOString().split('T')[0];
-            const todayArtifacts = artifacts.filter(a => a.date === today).length;
-            document.getElementById('today-artifacts').textContent = todayArtifacts;
-            
-            // Находки за 7 дней
-            const weekAgo = new Date();
-            weekAgo.setDate(weekAgo.getDate() - 7);
-            const lastWeekArtifacts = artifacts.filter(a => new Date(a.date) >= weekAgo).length;
-            document.getElementById('last-week').textContent = lastWeekArtifacts;
-            
-            // Статистика для личного кабинета
             if (currentUser) {
-                const userArtifacts = artifacts.filter(a => a.discoveredBy === currentUser.name).length;
-                document.getElementById('user-artifacts').textContent = userArtifacts;
+                const userArtifacts = artifacts.filter(a => a.discoveredBy === currentUser.name);
+                document.getElementById('user-artifacts').textContent = userArtifacts.length;
                 
-                // Дни в экспедиции (примерные)
-                const joinDate = new Date('2023-06-01');
-                const todayDate = new Date();
-                const daysInExpedition = Math.ceil((todayDate - joinDate) / (1000 * 60 * 60 * 24));
-                document.getElementById('user-days').textContent = daysInExpedition;
-                
-                // Последняя находка
-                const userLatest = artifacts.filter(a => a.discoveredBy === currentUser.name)
-                    .sort((a, b) => new Date(b.date) - new Date(a.date))[0];
-                document.getElementById('user-last').textContent = userLatest ? userLatest.date : '-';
+                updateUserArtifactsList(userArtifacts);
             }
         }
         
-        // Обновление использования хранилища
-        function updateStorageUsage() {
-            const usage = OFFLINE_STORAGE.getStorageUsage();
-            document.getElementById('storage-usage').textContent = `${usage} MB`;
+        function getTodayArtifactsCount() {
+            const today = new Date().toISOString().split('T')[0];
+            return artifacts.filter(a => a.date === today).length;
         }
         
-        // Инициализация тестовых данных
-        function initTestData() {
-            // Тестовые пользователи
-            users = [
-                { id: 1, name: "Александр Иванов", email: "admin@archaeopoint.ru", role: "admin", expedition: "Крым-2023", joined: "2023-05-15", phone: "+7 (900) 123-45-67" },
-                { id: 2, name: "Иван Археологов", email: "ivan@example.com", role: "archaeologist", expedition: "Крым-2023", joined: "2023-06-01", phone: "+7 (900) 987-65-43" },
-                { id: 3, name: "Мария Петрова", email: "maria@example.com", role: "assistant", expedition: "Крым-2023", joined: "2023-06-05", phone: "+7 (900) 555-44-33" },
-                { id: 4, name: "Алексей Смирнов", email: "alexey@example.com", role: "archaeologist", expedition: "Крым-2023", joined: "2023-06-03", phone: "+7 (900) 111-22-33" },
-                { id: 5, name: "Екатерина Волкова", email: "ekaterina@example.com", role: "student", expedition: "Крым-2023", joined: "2023-06-10", phone: "+7 (900) 444-55-66" }
-            ];
+        function getLastWeekArtifactsCount() {
+            const oneWeekAgo = new Date();
+            oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+            const oneWeekAgoStr = oneWeekAgo.toISOString().split('T')[0];
             
-            // Тестовые экспедиции
-            expeditions = [
-                { id: 1, name: "Крым-2023", location: "Крым, Бахчисарайский район", startDate: "2023-06-01", endDate: "2023-08-31", director: "Александр Иванов" },
-                { id: 2, name: "Великий Новгород-2023", location: "Новгородская область", startDate: "2023-07-15", endDate: "2023-09-30", director: "Петр Сидоров" }
-            ];
-            
-            // Тестовые стратиграфические слои
-            updateStratigraphy();
+            return artifacts.filter(a => a.date >= oneWeekAgoStr).length;
         }
         
-        // Обновление стратиграфии
-        function updateStratigraphy() {
-            const layersList = document.getElementById('layers-list');
-            if (!layersList) return;
+        function updateUserArtifactsList(userArtifacts) {
+            const list = document.getElementById('user-artifacts-list');
+            if (!list) return;
             
-            const layers = [
-                { id: 'layer1', name: 'Слой I (современный)', depthFrom: 0, depthTo: 30, color: '#8B4513', artifacts: 5 },
-                { id: 'layer2', name: 'Слой II (средневековый)', depthFrom: 30, depthTo: 80, color: '#D2691E', artifacts: 12 },
-                { id: 'layer3', name: 'Слой III (античный)', depthFrom: 80, depthTo: 150, color: '#A0522D', artifacts: 8 }
-            ];
+            list.innerHTML = '';
             
-            layersList.innerHTML = '';
+            const recentArtifacts = userArtifacts.slice(-5).reverse();
             
-            layers.forEach(layer => {
-                const layerItem = document.createElement('div');
-                layerItem.className = 'layer-item';
-                layerItem.draggable = true;
-                layerItem.dataset.layerId = layer.id;
-                layerItem.style.borderLeftColor = layer.color;
-                
-                layerItem.innerHTML = `
-                    <div style="display: flex; justify-content: space-between; align-items: center;">
-                        <div>
-                            <div style="font-weight: 500;">${layer.name}</div>
-                            <div style="font-size: 0.8rem; color: #666;">Глубина: ${layer.depthFrom}-${layer.depthTo} см</div>
-                        </div>
-                        <div style="font-size: 0.8rem; background-color: ${layer.color}20; padding: 0.2rem 0.5rem; border-radius: 12px;">
-                            ${layer.artifacts} артефактов
-                        </div>
-                    </div>
-                `;
-                
-                layersList.appendChild(layerItem);
-            });
-        }
-        
-        // Обновление списка пользователей
-        function updateUserList() {
-            const userList = document.getElementById('expedition-users');
-            if (!userList) return;
-            
-            userList.innerHTML = '';
-            
-            users.forEach(user => {
-                const li = document.createElement('li');
-                li.className = 'user-item';
-                
-                let roleClass = '';
-                let roleText = '';
-                
-                switch(user.role) {
-                    case 'admin':
-                        roleClass = 'role-admin';
-                        roleText = 'Начальник';
-                        break;
-                    case 'archaeologist':
-                        roleClass = 'role-archaeologist';
-                        roleText = 'Археолог';
-                        break;
-                    case 'assistant':
-                        roleClass = 'role-assistant';
-                        roleText = 'Помощник';
-                        break;
-                    default:
-                        roleClass = '';
-                        roleText = user.role;
-                }
-                
-                li.innerHTML = `
-                    <div>
-                        <div style="font-weight: 500;">${user.name}</div>
-                        <div style="font-size: 0.8rem; color: #666;">${user.email}</div>
-                    </div>
-                    <div>
-                        <span class="user-role ${roleClass}">${roleText}</span>
-                        ${currentUser && currentUser.role === 'admin' && user.id !== currentUser.id ? 
-                          `<button onclick="removeUser(${user.id})" class="btn btn-danger btn-sm" style="margin-left: 0.5rem;">
-                            <i class="fas fa-times"></i>
-                          </button>` : ''}
-                    </div>
-                `;
-                
-                userList.appendChild(li);
-            });
-        }
-        
-        // Удаление пользователя
-        function removeUser(userId) {
-            if (confirm('Вы уверены, что хотите удалить этого участника экспедиции?')) {
-                users = users.filter(u => u.id !== userId);
-                updateUserList();
-                addToChangeLog('Удален участник экспедиции (ID: ' + userId + ')');
-                showAlert('Пользователь удален из экспедиции', 'success');
-            }
-        }
-        
-        // Обновление истории изменений
-        function updateChangeLog() {
-            const log = [
-                { date: '2023-06-15 10:30', action: 'Добавлен артефакт "Бронзовое зеркало"', user: 'Иван Археологов' },
-                { date: '2023-06-15 09:15', action: 'Экспорт данных в PDF', user: 'Александр Иванов' },
-                { date: '2023-06-14 16:45', action: 'Добавлен участник экспедиции', user: 'Александр Иванов' },
-                { date: '2023-06-14 14:20', action: 'Добавлен артефакт "Золотая подвеска"', user: 'Мария Петрова' },
-                { date: '2023-06-13 11:10', action: 'Изменены настройки доступа', user: 'Александр Иванов' }
-            ];
-            
-            const tbody = document.getElementById('change-log');
-            if (!tbody) return;
-            
-            tbody.innerHTML = '';
-            
-            log.forEach(entry => {
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td>${entry.date}</td>
-                    <td>${entry.action}</td>
-                    <td>${entry.user}</td>
-                `;
-                tbody.appendChild(row);
-            });
-        }
-        
-        // Добавление записи в историю изменений
-        function addToChangeLog(action) {
-            // В реальном приложении здесь была бы запись в базу данных
-            console.log('Запись в историю изменений:', action);
-        }
-        
-        // Обновление списка артефактов пользователя
-        function updateUserArtifacts() {
-            if (!currentUser) return;
-            
-            const userArtifacts = artifacts.filter(a => a.discoveredBy === currentUser.name)
-                .sort((a, b) => new Date(b.date) - new Date(a.date))
-                .slice(0, 5); // Показываем только последние 5 находок
-            
-            const tbody = document.getElementById('user-artifacts-list');
-            if (!tbody) return;
-            
-            tbody.innerHTML = '';
-            
-            if (userArtifacts.length === 0) {
-                const row = document.createElement('tr');
-                row.innerHTML = `<td colspan="4" style="text-align: center; color: #666;">Вы еще не добавили ни одного артефакта</td>`;
-                tbody.appendChild(row);
-                return;
-            }
-            
-            userArtifacts.forEach(artifact => {
+            recentArtifacts.forEach(artifact => {
                 const row = document.createElement('tr');
                 row.innerHTML = `
                     <td>${artifact.name}</td>
                     <td>${getArtifactTypeName(artifact.type)}</td>
                     <td>${artifact.date}</td>
-                    <td>${artifact.lat.toFixed(4)}, ${artifact.lng.toFixed(4)}</td>
+                    <td>${artifact.lat.toFixed(4)}°, ${artifact.lng.toFixed(4)}°</td>
                 `;
-                tbody.appendChild(row);
+                list.appendChild(row);
             });
         }
         
-        // Сохранение профиля
-        function saveProfile() {
-            const email = document.getElementById('profile-email').value;
-            const phone = document.getElementById('profile-phone').value;
-            const notifications = document.getElementById('profile-notifications').value;
+        function initTestData() {
+            users = [
+                { id: 1, name: 'Иван Археологов', role: 'archaeologist', expedition: 'Крым-2023', email: 'ivan@example.com' },
+                { id: 2, name: 'Мария Петрова', role: 'archaeologist', expedition: 'Крым-2023', email: 'maria@example.com' },
+                { id: 3, name: 'Алексей Смирнов', role: 'assistant', expedition: 'Крым-2023', email: 'alex@example.com' },
+                { id: 4, name: 'Екатерина Волкова', role: 'student', expedition: 'Крым-2023', email: 'ekaterina@example.com' },
+                { id: 5, name: 'Дмитрий Козлов', role: 'researcher', expedition: 'Крым-2023', email: 'dmitry@example.com' }
+            ];
             
-            // Обновляем данные пользователя
-            currentUser.email = email;
-            currentUser.phone = phone;
-            localStorage.setItem('archaeopoint_user', JSON.stringify(currentUser));
+            expeditions = [
+                { id: 1, name: 'Крым-2023', location: 'Крым, Бахчисарайский район', startDate: '2023-06-01', endDate: '2023-08-31' },
+                { id: 2, name: 'Великий Новгород-2023', location: 'Новгородская область', startDate: '2023-07-15', endDate: '2023-09-15' }
+            ];
             
-            showAlert('Настройки профиля сохранены', 'success');
+            const changeLog = [
+                { date: '2023-06-15 10:30', action: 'Добавлен артефакт "Бронзовое зеркало"', user: 'Иван Археологов' },
+                { date: '2023-06-15 11:45', action: 'Обновлена карта раскопок', user: 'Мария Петрова' },
+                { date: '2023-06-14 09:20', action: 'Добавлена запись в полевой журнал', user: 'Алексей Смирнов' },
+                { date: '2023-06-14 16:10', action: 'Экспортированы данные артефактов', user: 'Иван Археологов' }
+            ];
+            
+            const changeLogBody = document.getElementById('change-log');
+            if (changeLogBody) {
+                changeLogBody.innerHTML = '';
+                changeLog.forEach(log => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${log.date}</td>
+                        <td>${log.action}</td>
+                        <td>${log.user}</td>
+                    `;
+                    changeLogBody.appendChild(row);
+                });
+            }
         }
         
-        // Синхронизация накопленных данных
-        function syncPendingData(force = false) {
-            if (!isOnline && !force) {
-                console.log('Нет соединения с интернетом. Синхронизация отложена.');
+        function updateExpeditionUsers() {
+            const usersList = document.getElementById('expedition-users');
+            if (!usersList) return;
+            
+            usersList.innerHTML = '';
+            
+            users.forEach(user => {
+                const li = document.createElement('li');
+                li.className = 'user-item';
+                li.innerHTML = `
+                    <div>
+                        <strong>${user.name}</strong>
+                        <div style="font-size: 0.8rem; color: #666;">${user.email}</div>
+                    </div>
+                    <span class="user-role role-${user.role}">${getRoleName(user.role)}</span>
+                `;
+                usersList.appendChild(li);
+            });
+            
+            document.getElementById('total-users').textContent = users.length;
+        }
+        
+        function updateStorageUsage() {
+            const storageUsage = OFFLINE_STORAGE.getStorageUsage();
+            document.getElementById('storage-usage').textContent = `${storageUsage} MB`;
+        }
+        
+        function startVoiceInput(targetId) {
+            if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+                showAlert('Голосовой ввод не поддерживается вашим браузером', 'warning');
                 return;
             }
             
-            const pending = OFFLINE_STORAGE.getAll().filter(item => !item.synced);
+            const targetElement = document.getElementById(targetId);
+            const voiceButton = document.querySelector(`#${targetId.replace('-', '-voice-')}`);
             
-            if (pending.length === 0) {
-                console.log('Нет данных для синхронизации');
-                return;
+            if (!targetElement) return;
+            
+            if (voiceButton) {
+                voiceButton.classList.add('listening');
+                voiceButton.innerHTML = '<i class="fas fa-microphone-slash"></i>';
             }
             
-            console.log(`Начинаю синхронизацию ${pending.length} записей...`);
+            targetElement.classList.add('voice-input-active');
             
-            // Имитация синхронизации
-            showProgress('Синхронизация данных...', 0);
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            const recognition = new SpeechRecognition();
+            recognition.continuous = false;
+            recognition.interimResults = false;
+            recognition.lang = 'ru-RU';
             
-            let synced = 0;
-            const interval = setInterval(() => {
-                synced++;
-                const progress = Math.floor((synced / pending.length) * 100);
-                updateProgress(progress);
+            recognition.onresult = function(event) {
+                const transcript = event.results[0][0].transcript;
                 
-                if (synced >= pending.length) {
-                    clearInterval(interval);
-                    
-                    // Помечаем все как синхронизированные
-                    pending.forEach(item => {
-                        const stored = JSON.parse(localStorage.getItem(item.key));
-                        stored.synced = true;
-                        localStorage.setItem(item.key, JSON.stringify(stored));
-                        
-                        // Добавляем в основной массив артефактов
-                        if (item.key.startsWith('artifact_')) {
-                            artifacts.push(item.data);
-                        }
-                    });
-                    
-                    // Обновляем UI
-                    OFFLINE_STORAGE.updatePendingSync();
-                    updateArtifactsOnMap();
-                    updateArtifactsTable();
-                    updateStatistics();
-                    
-                    hideProgress();
-                    showAlert(`Успешно синхронизировано ${pending.length} записей`, 'success');
+                if (targetElement.tagName === 'TEXTAREA') {
+                    targetElement.value += (targetElement.value ? ' ' : '') + transcript;
+                } else {
+                    targetElement.value = transcript;
                 }
-            }, 500);
+                
+                resetVoiceInputUI(targetId, voiceButton, targetElement);
+                
+                showAlert('Текст распознан и добавлен', 'success');
+            };
+            
+            recognition.onerror = function(event) {
+                resetVoiceInputUI(targetId, voiceButton, targetElement);
+                
+                if (event.error === 'not-allowed') {
+                    showAlert('Доступ к микрофону запрещен. Разрешите доступ в настройках браузера.', 'danger');
+                } else {
+                    showAlert('Ошибка распознавания речи. Попробуйте еще раз.', 'danger');
+                }
+            };
+            
+            recognition.start();
+            isListening = true;
+            
+            setTimeout(() => {
+                if (isListening) {
+                    recognition.stop();
+                    resetVoiceInputUI(targetId, voiceButton, targetElement);
+                }
+            }, 10000);
         }
         
-        // Запуск службы синхронизации
+        function resetVoiceInputUI(targetId, voiceButton, targetElement) {
+            isListening = false;
+            
+            if (voiceButton) {
+                voiceButton.classList.remove('listening');
+                voiceButton.innerHTML = '<i class="fas fa-microphone"></i>';
+            }
+            
+            if (targetElement) {
+                targetElement.classList.remove('voice-input-active');
+            }
+        }
+        
         function startSyncService() {
-            // Периодическая проверка и синхронизация
             setInterval(() => {
                 if (isOnline && pendingSync.length > 0) {
                     syncPendingData();
                 }
             }, CONFIG.SYNC_INTERVAL);
+        }
+        
+        function syncPendingData(force = false) {
+            if (!isOnline || pendingSync.length === 0) return;
             
-            // Проверка при загрузке страницы
-            if (isOnline && pendingSync.length > 0) {
-                setTimeout(() => {
-                    syncPendingData();
-                }, 5000);
-            }
-        }
-        
-        // Показать прогресс бар
-        function showProgress(message, initialProgress) {
-            document.getElementById('progress-bar').style.width = initialProgress + '%';
-            document.getElementById('progress-bar').style.display = 'block';
-        }
-        
-        function updateProgress(progress) {
-            document.getElementById('progress-bar').style.width = progress + '%';
-        }
-        
-        function hideProgress() {
-            setTimeout(() => {
-                document.getElementById('progress-bar').style.display = 'none';
-                document.getElementById('progress-bar').style.width = '0%';
-            }, 500);
-        }
-        
-        // Показать уведомление
-        function showAlert(message, type) {
-            // Создаем элемент уведомления
-            const alertDiv = document.createElement('div');
-            alertDiv.className = `alert alert-${type}`;
-            alertDiv.innerHTML = `
-                <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'danger' ? 'exclamation-circle' : type === 'warning' ? 'exclamation-triangle' : 'info-circle'}"></i>
-                ${message}
-            `;
-            
-            // Добавляем уведомление
-            const main = document.querySelector('main');
-            if (main) {
-                main.insertBefore(alertDiv, main.firstChild);
-            } else {
-                document.body.appendChild(alertDiv);
+            if (force) {
+                showProgress('Синхронизация данных...', 0);
             }
             
-            // Удаляем уведомление через 5 секунд
-            setTimeout(() => {
-                alertDiv.remove();
-            }, 5000);
-        }
-        
-        // Инициализация Service Worker для PWA
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', function() {
-                navigator.serviceWorker.register('/sw.js').then(function(registration) {
-                    console.log('ServiceWorker registration successful with scope: ', registration.scope);
-                }, function(err) {
-                    console.log('ServiceWorker registration failed: ', err);
-                });
-            });
-        }
-        
-        // Создаем манифест для PWA
-        const manifest = {
-            "name": "ArchaeoPoint",
-            "short_name": "ArchaeoPoint",
-            "description": "Профессиональная платформа для цифровой фиксации археологических данных",
-            "start_url": "/",
-            "display": "standalone",
-            "background_color": "#3E2723",
-            "theme_color": "#8B4513",
-            "icons": [
-                {
-                    "src": "icon-192x192.png",
-                    "sizes": "192x192",
-                    "type": "image/png"
-                },
-                {
-                    "src": "icon-512x512.png",
-                    "sizes": "512x512",
-                    "type": "image/png"
+            let syncedCount = 0;
+            const totalCount = pendingSync.length;
+            
+            const syncInterval = setInterval(() => {
+                syncedCount++;
+                const progress = Math.floor((syncedCount / totalCount) * 100);
+                
+                if (force) {
+                    updateProgress(progress);
                 }
-            ]
-        };
+                
+                if (syncedCount >= totalCount) {
+                    clearInterval(syncInterval);
+                    
+                    pendingSync.forEach(item => {
+                        const data = OFFLINE_STORAGE.load(item.key);
+                        if (data) {
+                            data.synced = true;
+                            OFFLINE_STORAGE.save(item.key, data);
+                        }
+                    });
+                    
+                    OFFLINE_STORAGE.updatePendingSync();
+                    
+                    if (force) {
+                        hideProgress();
+                        showAlert(`Синхронизировано ${totalCount} записей`, 'success');
+                    }
+                    
+                    updateArtifactsOnMap();
+                }
+            }, 200);
+        }
         
-        // В реальном приложении манифест был бы в отдельном файле
-        console.log('PWA манифест готов:', manifest);
+        window.addEventListener('resize', function() {
+            if (map) {
+                setTimeout(() => {
+                    map.invalidateSize();
+                }, 100);
+            }
+            
+            if (canvas) {
+                setupCanvas();
+            }
+        });
+        
+        window.addEventListener('load', function() {
+            const firstVisit = !localStorage.getItem('archaeopoint_first_visit');
+            if (firstVisit && currentUser) {
+                setTimeout(() => {
+                    showAlert('Добро пожаловать в ArchaeoPoint! Для начала работы перейдите на карту раскопок или добавьте первый артефакт.', 'info');
+                    localStorage.setItem('archaeopoint_first_visit', 'true');
+                }, 1000);
+            }
+        });
     </script>
 </body>
 </html>
